@@ -12,7 +12,7 @@
     "cf:dev": "wrangler dev",
     "predeploy": "npm run build",
     "deploy": "wrangler deploy",
-    "deploy:live": "convex deploy --cmd \"npm run build\" && wrangler deploy",
+    "deploy:live": "convex deploy --yes --cmd \"npm run build\" && wrangler deploy",
     "convex:dev": "convex dev",
     "convex:deploy": "convex deploy"
   },
