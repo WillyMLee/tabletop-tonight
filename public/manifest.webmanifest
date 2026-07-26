@@ -1,0 +1,10 @@
+{
+  "name": "Tabletop Tonight",
+  "short_name": "Tabletop",
+  "description": "Plan teams, run the itinerary, and keep score at game night.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#03030f",
+  "theme_color": "#03030f",
+  "icons": []
+}
