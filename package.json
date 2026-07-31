@@ -24,7 +24,8 @@
     "convex": "^1.42.3",
     "lucide-react": "^1.26.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "wordle-words": "^0.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.4",

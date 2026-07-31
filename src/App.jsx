@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useConvexConnectionState, useMutation, useQuery } from 'convex/react'
+import { all as validWordleWords } from '../node_modules/wordle-words/index.mjs'
 import { api } from '../convex/_generated/api.js'
 import {
   ArrowRight,
@@ -31,8 +32,8 @@ import {
   X,
   Zap,
 } from 'lucide-react'
-import { games, getGame, partySlugs, tonightSlugs } from './data/games.js'
-import { activeConnections, activeWordle, connectionWords } from './data/puzzles.js'
+import { games, getGame, tonightSlugs } from './data/games.js'
+import { activeConnections, connectionWords, connectionsRounds, wordleRounds } from './data/puzzles.js'
 
 const defaultPlayers = []
 
@@ -466,33 +467,40 @@ function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurr
 }
 
 function GameLibrary({ navigate }) {
-  const [filter, setFilter] = useState('Tonight')
-  const filters = ['Tonight', 'Party games', 'All games', 'Tabletop', 'GameCube', 'In-app']
-  const visibleGames = games.filter(game => {
-    if (filter === 'All games') return true
-    if (filter === 'Tonight') return tonightSlugs.includes(game.slug)
-    if (filter === 'Party games') return partySlugs.includes(game.slug)
-    return game.category === filter
-  })
+  const groupGames = ['geoguessr', 'wordle', 'connections', 'hot-streak', 'flip-7'].map(getGame).filter(Boolean)
+  const teamLocations = [
+    { location: 'Couch', note: 'GameCube doubles', games: ['mario-tennis-gc'] },
+    { location: 'Dinner Table #1', note: 'Four-player strategy', games: ['blokus'] },
+    { location: 'Dinner Table #2', note: 'Choose one tabletop game', games: ['magical-athlete', 'yahtzee', 'scout'] },
+    { location: 'Island', note: 'Dexterity station', games: ['jenga'] },
+  ]
+  const GameCard = ({ game, compact = false }) => <article className={`library-game-card card ${game.color} ${compact ? 'compact' : ''}`}>
+    <div className="library-card-top"><span>{game.icon}</span><em>{game.status}</em></div>
+    <div className="library-card-copy"><small>{game.format}</small><h2>{game.name}</h2><p>{game.summary}</p></div>
+    <div className="game-specs"><span><Users size={14} /> {game.players}</span><span><Clock3 size={14} /> {game.duration}</span></div>
+    <div className="library-card-actions"><button onClick={() => navigate(`/games/${game.slug}`)}>How to play <ArrowRight size={15} /></button>{game.playable && <button className="play-now" onClick={() => navigate(`/play/${game.playable}`)}>Play now <Play size={14} /></button>}</div>
+  </article>
   return (
     <main>
       <section className="page-intro games-intro">
-        <span className="eyebrow">THE GAME SHELF</span>
-        <h1>Pick it. Learn it. <em>Play it.</em></h1>
-        <p>Every game has a quick guide, timing notes, player fit, and a scoring format designed for your two-team night.</p>
+        <span className="eyebrow">TONIGHT'S GAME MAP</span>
+        <h1>Play together. Then <em>hit the circuit.</em></h1>
+        <p>Group games keep all fourteen players together. Team games are organized by the four places you will rotate through later.</p>
       </section>
-      <div className="game-filter-bar">
-        {filters.map(item => <button className={filter === item ? 'active' : ''} onClick={() => setFilter(item)} key={item}>{item}</button>)}
-      </div>
-      <section className="game-library-grid">
-        {visibleGames.map(game => (
-          <article className={`library-game-card card ${game.color}`} key={game.slug}>
-            <div className="library-card-top"><span>{game.icon}</span><em>{game.status}</em></div>
-            <div><small>{game.format}</small><h2>{game.name}</h2><p>{game.summary}</p></div>
-            <div className="game-specs"><span><Users size={14} /> {game.players}</span><span><Clock3 size={14} /> {game.duration}</span><span><Star size={14} /> {game.difficulty}</span></div>
-            <button onClick={() => navigate(`/games/${game.slug}`)}>How to play <ArrowRight size={15} /></button>
-          </article>
-        ))}
+      <section className="puzzle-launch-panel">
+        <div><span className="kicker">READY ON YOUR PHONE</span><h2>Jump into the puzzle arcade</h2><p>Choose a round, submit your run, and see the live individual leaderboard.</p></div>
+        <div><button onClick={() => navigate('/play/wordle')}><span>▣</span><strong>Play Wordle</strong><small>5 rounds</small><ChevronRight size={16} /></button><button onClick={() => navigate('/play/connections')}><span>▦</span><strong>Play Connections</strong><small>3 NYC rounds</small><ChevronRight size={16} /></button></div>
+      </section>
+      <section className="organized-game-section">
+        <div className="game-section-heading"><span>01</span><div><small>EVERYONE TOGETHER</small><h2>Group Games</h2><p>Play these in order before dinner and the team circuit.</p></div></div>
+        <div className="game-library-grid group-library-grid">{groupGames.map(game => <GameCard game={game} key={game.slug} />)}</div>
+      </section>
+      <section className="organized-game-section team-game-section">
+        <div className="game-section-heading"><span>02</span><div><small>FOUR ROTATION STATIONS</small><h2>Team Games</h2><p>Your pod goes to the named location and stays there for the circuit round.</p></div></div>
+        <div className="location-game-grid">{teamLocations.map(location => <section className="location-game-group" key={location.location}>
+          <header><span className="location-pin">●</span><div><small>CIRCUIT LOCATION</small><h3>{location.location}</h3><p>{location.note}</p></div></header>
+          <div>{location.games.map(slug => <GameCard game={getGame(slug)} compact key={slug} />)}</div>
+        </section>)}</div>
       </section>
     </main>
   )
@@ -879,51 +887,74 @@ function PuzzleLeaderboard({ game, puzzleId, results }) {
   </aside>
 }
 
-function ConnectionsGame({ onComplete, results }) {
+function PuzzleRoundPicker({ rounds, roundIndex, setRoundIndex }) {
+  return <nav className="puzzle-round-picker" aria-label="Puzzle rounds">
+    <div><span className="kicker">CHOOSE A CHALLENGE</span><strong>{rounds.length} rounds available</strong></div>
+    <div>{rounds.map((round, index) => <button aria-current={roundIndex === index ? 'true' : undefined} className={roundIndex === index ? 'active' : ''} onClick={() => setRoundIndex(index)} key={round.id}><span>{index + 1}</span>{round.label}{round.title && <small>{round.title}</small>}</button>)}</div>
+  </nav>
+}
+
+function ConnectionsRound({ puzzle, onComplete, results }) {
   const [selected, setSelected] = useState([])
   const [solved, setSolved] = useState([])
   const [mistakes, setMistakes] = useState(0)
+  const [lost, setLost] = useState(false)
   const [startedAt, setStartedAt] = useState(() => Date.now())
   const [elapsed, setElapsed] = useState(0)
   const [resultMetric, setResultMetric] = useState(null)
   useEffect(() => {
-    if (resultMetric) return undefined
+    if (resultMetric || lost) return undefined
     const timer = setInterval(() => setElapsed(Math.max(0, Math.floor((Date.now() - startedAt) / 1000))), 1000)
     return () => clearInterval(timer)
-  }, [startedAt, resultMetric])
+  }, [startedAt, resultMetric, lost])
   const toggle = word => {
-    if (resultMetric) return
+    if (resultMetric || lost) return
     setSelected(selected.includes(word) ? selected.filter(item => item !== word) : selected.length < 4 ? [...selected, word] : selected)
   }
   const submit = async () => {
-    const match = gridGroups.find(group => !solved.includes(group.label) && group.words.every(word => selected.includes(word)))
+    const match = puzzle.groups.find(group => !solved.includes(group.label) && group.words.every(word => selected.includes(word)))
     if (match) {
       const next = [...solved, match.label]
       setSolved(next)
-      if (next.length === gridGroups.length) {
+      if (next.length === puzzle.groups.length) {
         const metric = Math.max(1, Math.ceil((Date.now() - startedAt) / 1000))
         setResultMetric(metric)
         await onComplete(metric)
       }
-    } else setMistakes(value => value + 1)
+    } else {
+      const nextMistakes = mistakes + 1
+      setMistakes(nextMistakes)
+      if (nextMistakes >= 4) setLost(true)
+    }
     setSelected([])
   }
-  const reset = () => { setSelected([]); setSolved([]); setMistakes(0); setStartedAt(Date.now()); setElapsed(0); setResultMetric(null) }
-  const remaining = gridWords.filter(word => !gridGroups.some(group => solved.includes(group.label) && group.words.includes(word)))
+  const reset = () => { setSelected([]); setSolved([]); setMistakes(0); setLost(false); setStartedAt(Date.now()); setElapsed(0); setResultMetric(null) }
+  const remaining = puzzle.words.filter(word => !puzzle.groups.some(group => solved.includes(group.label) && group.words.includes(word)))
   return <div className="puzzle-with-board"><div className="party-grid-game">
-      <div className="game-head"><div><span className="kicker">INDIVIDUAL PUZZLE · {formatPuzzleTime(resultMetric || elapsed)}</span><h2>Connections</h2><p>Find four groups of four. Your time is recorded automatically when the last group locks.</p></div><button className="icon-button light" aria-label="Restart Connections puzzle" onClick={reset}><RotateCcw size={18} /></button></div>
-      <div className="solved-groups">{solved.map(label => { const group = gridGroups.find(item => item.label === label); return <div className={group.color} key={label}><strong>{label}</strong><span>{group.words.join(' · ')}</span></div> })}</div>
-      <div className="word-grid">{remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={selected.includes(word) ? 'selected' : ''} onClick={() => toggle(word)}>{word}</button>)}</div>
+      <div className="game-head"><div><span className="kicker">{puzzle.label.toUpperCase()} · {formatPuzzleTime(resultMetric || elapsed)}</span><h2>Connections: {puzzle.title}</h2><p>Find four groups of four. You have four mistakes; your time records when the last group locks.</p></div><button className="icon-button light" aria-label="Restart Connections puzzle" onClick={reset}><RotateCcw size={18} /></button></div>
+      <div className="solved-groups">{solved.map(label => { const group = puzzle.groups.find(item => item.label === label); return <div className={group.color} key={label}><strong>{label}</strong><span>{group.words.join(' · ')}</span></div> })}</div>
+      {!lost && <div className="word-grid">{remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={selected.includes(word) ? 'selected' : ''} onClick={() => toggle(word)}>{word}</button>)}</div>}
       {resultMetric && <p className="wordle-result" aria-live="polite">Maze cleared in {formatPuzzleTime(resultMetric)}. Your best time is live.</p>}
-      <div className="game-footer"><span>Mistakes {[0, 1, 2, 3].map(index => <i className={index < mistakes ? 'lost' : ''} key={index} />)}</span><button className="primary" disabled={selected.length !== 4 || Boolean(resultMetric)} onClick={submit}>Submit four</button></div>
-    </div><PuzzleLeaderboard game="connections" puzzleId={activeConnections.id} results={results} /></div>
+      {lost && <section className="connections-reveal" aria-live="polite"><div><strong>Game over</strong><p>Four misses used. Here are the answers:</p></div>{puzzle.groups.map(group => <div className={group.color} key={group.label}><strong>{group.label}</strong><span>{group.words.join(' · ')}</span></div>)}</section>}
+      <div className="game-footer"><span>Mistakes {[0, 1, 2, 3].map(index => <i className={index < mistakes ? 'lost' : ''} key={index} />)}</span><button className="primary" disabled={selected.length !== 4 || Boolean(resultMetric) || lost} onClick={submit}>{lost ? 'Round over' : 'Submit four'}</button></div>
+    </div><PuzzleLeaderboard game="connections" puzzleId={puzzle.id} results={results} /></div>
 }
 
-function WordleGame({ onComplete, results }) {
+function ConnectionsGame({ onComplete, results }) {
+  const [roundIndex, setRoundIndex] = useState(0)
+  const puzzle = connectionsRounds[roundIndex]
+  return <><PuzzleRoundPicker rounds={connectionsRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><ConnectionsRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={metric => onComplete(puzzle.id, metric)} /></>
+}
+
+const validWordleGuesses = new Set([...validWordleWords.map(word => word.toUpperCase()), ...wordleRounds.map(round => round.answer)])
+
+function WordleRound({ puzzle, onComplete, results }) {
   const [entry, setEntry] = useState('')
   const [guesses, setGuesses] = useState([])
   const [winner, setWinner] = useState(false)
-  const target = activeWordle.answer
+  const [validating, setValidating] = useState(false)
+  const [wordError, setWordError] = useState('')
+  const target = puzzle.answer
   const grade = word => {
     const result = Array(5).fill('miss')
     const counts = {}
@@ -932,10 +963,14 @@ function WordleGame({ onComplete, results }) {
     word.split('').forEach((letter, index) => { if (result[index] === 'miss' && counts[letter]) { result[index] = 'near'; counts[letter] -= 1 } })
     return result
   }
-  const submit = async event => {
-    event.preventDefault()
+  const submitGuess = async () => {
     const word = entry.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5)
-    if (word.length !== 5 || winner || guesses.length >= 6) return
+    if (word.length !== 5 || winner || guesses.length >= 6 || validating) return
+    if (guesses.some(guess => guess.word === word)) { setWordError('You already tried that word.'); return }
+    setWordError('')
+    setValidating(true)
+    if (!validWordleGuesses.has(word)) { setWordError(`${word} is not in the Wordle word list.`); setValidating(false); return }
+    setValidating(false)
     const solved = word === target
     setGuesses([...guesses, { word, result: grade(word) }])
     setEntry('')
@@ -945,15 +980,34 @@ function WordleGame({ onComplete, results }) {
       await onComplete(attempts)
     }
   }
-  const reset = () => { setEntry(''); setGuesses([]); setWinner(false) }
+  const submit = event => { event.preventDefault(); submitGuess() }
+  const reset = () => { setEntry(''); setGuesses([]); setWinner(false); setWordError(''); setValidating(false) }
+  const finished = winner || guesses.length >= 6
+  const letterStates = useMemo(() => {
+    const priority = { miss: 1, near: 2, hit: 3 }
+    return guesses.reduce((states, guess) => {
+      guess.word.split('').forEach((letter, index) => { if (!states[letter] || priority[guess.result[index]] > priority[states[letter]]) states[letter] = guess.result[index] })
+      return states
+    }, {})
+  }, [guesses])
+  const typeLetter = letter => { if (!finished && !validating && entry.length < 5) { setEntry(`${entry}${letter}`); setWordError('') } }
+  const eraseLetter = () => { if (!finished && !validating) { setEntry(entry.slice(0, -1)); setWordError('') } }
   const rows = [...guesses, ...Array(Math.max(0, 6 - guesses.length)).fill(null)]
   return <div className="puzzle-with-board"><div className="wordle-game">
-      <div className="game-head"><div><span className="kicker">INDIVIDUAL PUZZLE</span><h2>Wordle</h2><p>Solve the same five-letter word as everyone else. Your attempt count records automatically.</p></div><button className="icon-button light" aria-label="Restart Wordle puzzle" onClick={reset}><RotateCcw size={18} /></button></div>
+      <div className="game-head"><div><span className="kicker">{puzzle.label.toUpperCase()} · INDIVIDUAL PUZZLE</span><h2>Wordle</h2><p>Green is correct, yellow is in the word, and gray is absent. Every guess is checked against a real Wordle word list.</p></div><button className="icon-button light" aria-label="Restart Wordle puzzle" onClick={reset}><RotateCcw size={18} /></button></div>
       <div className="wordle-board">{rows.map((guess, row) => <div className="wordle-row" key={row}>{Array.from({length: 5}, (_, column) => <span className={guess ? guess.result[column] : ''} key={column}>{guess?.word[column] || ''}</span>)}</div>)}</div>
-      <form className="wordle-entry" onSubmit={submit}><input aria-label="Five letter guess" value={entry} maxLength={5} onChange={event => setEntry(event.target.value.toUpperCase().replace(/[^A-Z]/g, ''))} placeholder="ENTER 5 LETTERS" /><button className="primary" disabled={entry.length !== 5 || Boolean(winner)}>Guess</button></form>
+      <form className="wordle-entry" onSubmit={submit}><input aria-label="Five letter guess" value={entry} maxLength={5} disabled={finished || validating} onChange={event => { setEntry(event.target.value.toUpperCase().replace(/[^A-Z]/g, '')); setWordError('') }} placeholder="ENTER 5 LETTERS" /><button className="primary" disabled={entry.length !== 5 || finished || validating}>{validating ? 'Checking…' : 'Guess'}</button></form>
+      {wordError && <p className="wordle-error" role="alert">{wordError}</p>}
+      <div className="wordle-keyboard" aria-label="Wordle keyboard">{['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].map((row, index) => <div key={row}>{index === 2 && <button className="wide" disabled={entry.length !== 5 || finished || validating} onClick={submitGuess}>Enter</button>}{row.split('').map(letter => <button className={letterStates[letter] || ''} disabled={finished || validating} onClick={() => typeLetter(letter)} key={letter}>{letter}</button>)}{index === 2 && <button className="wide" disabled={!entry.length || finished || validating} aria-label="Backspace" onClick={eraseLetter}>⌫</button>}</div>)}</div>
       {winner && <p className="wordle-result" aria-live="polite">Solved in {guesses.length} {guesses.length === 1 ? 'attempt' : 'attempts'}. Your best run is live.</p>}
-      {!winner && guesses.length === 6 && <p className="wordle-result" aria-live="polite">Not solved this run. Tap restart and try again.</p>}
-    </div><PuzzleLeaderboard game="wordle" puzzleId={activeWordle.id} results={results} /></div>
+      {!winner && guesses.length === 6 && <p className="wordle-result" aria-live="polite">Round over. The word was <strong>{target}</strong>. Tap restart to try again.</p>}
+    </div><PuzzleLeaderboard game="wordle" puzzleId={puzzle.id} results={results} /></div>
+}
+
+function WordleGame({ onComplete, results }) {
+  const [roundIndex, setRoundIndex] = useState(0)
+  const puzzle = wordleRounds[roundIndex]
+  return <><PuzzleRoundPicker rounds={wordleRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><WordleRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={metric => onComplete(puzzle.id, metric)} /></>
 }
 
 function SignalSprint({ onPoint }) {
@@ -1011,7 +1065,7 @@ function Playroom({ mode = 'connections', navigate, players, guestPlayerIdentity
       <button aria-pressed={gameMode === 'connections'} className={gameMode === 'connections' ? 'active' : ''} onClick={() => setGameMode('connections')}><span>▦</span><div><strong>Connections</strong><small>Four groups · 10 min</small></div></button>
       <button aria-pressed={gameMode === 'wordle'} className={gameMode === 'wordle' ? 'active' : ''} onClick={() => setGameMode('wordle')}><span>▣</span><div><strong>Wordle</strong><small>Five letters · 10 min</small></div></button>
     </div>
-    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={metric => complete('connections', activeConnections.id, metric)} /> : <WordleGame results={puzzleResults} onComplete={metric => complete('wordle', activeWordle.id, metric)} />}</section>}
+    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('connections', puzzleId, metric)} /> : <WordleGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('wordle', puzzleId, metric)} />}</section>}
     <section className="fair-play-note"><CircleHelp size={20} /><div><strong>One honest run at a time</strong><p>Play quietly on your own device. Replays are allowed, and the board keeps only your best completed result.</p></div></section>
   </main>
 }

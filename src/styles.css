@@ -742,6 +742,40 @@ h1, h2, h3, .section-heading h2, .page-intro h1, .live-event h2, .station-top h3
 .library-card-top > span, .detail-game-icon, .station-top > span { background: #121b5a; color: var(--yellow); border: 1px solid #2448ff; }
 .library-card-top em { background: #12194d; color: var(--yellow); }
 .library-game-card > button { background: #17266f; color: var(--yellow); }
+.puzzle-launch-panel { background: linear-gradient(135deg,#11194e,#080a27); border: 2px solid var(--yellow); border-radius: 16px; display: grid; grid-template-columns: minmax(0,1fr) minmax(360px,.9fr); align-items: center; gap: 24px; padding: 22px; margin-bottom: 28px; }
+.puzzle-launch-panel h2 { color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; margin: 4px 0 6px; }
+.puzzle-launch-panel p { color: #a6afd4; font-size: 11px; line-height: 1.5; margin: 0; }
+.puzzle-launch-panel > div:last-child { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.puzzle-launch-panel button { background: #17266f; border: 1px solid #3550ff; border-radius: 8px; color: white; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 9px; padding: 13px; text-align: left; }
+.puzzle-launch-panel button:hover { border-color: var(--yellow); background: #20338e; }
+.puzzle-launch-panel button > span { color: var(--yellow); font-size: 22px; grid-row: span 2; }
+.puzzle-launch-panel button strong { font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 13px; }
+.puzzle-launch-panel button small { color: #99a6d7; font-size: 9px; }
+.puzzle-launch-panel button svg { color: var(--yellow); grid-column: 3; grid-row: 1 / span 2; }
+.organized-game-section { margin-top: 34px; }
+.game-section-heading { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #2448ff; padding-bottom: 14px; margin-bottom: 18px; }
+.game-section-heading > span { width: 44px; height: 44px; background: var(--yellow); border-radius: 50%; color: #08091a; display: grid; place-items: center; flex: 0 0 auto; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 16px; font-weight: 800; }
+.game-section-heading small { color: #21ddeb; font-size: 8px; font-weight: 800; letter-spacing: .1em; }
+.game-section-heading h2 { color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 28px; margin: 1px 0 2px; }
+.game-section-heading p { color: #9aa6d3; font-size: 10px; margin: 0; }
+.group-library-grid { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.group-library-grid .library-game-card { min-height: 355px; }
+.library-card-copy { flex: 1; padding: 20px 0 13px; }
+.library-card-actions { display: grid; gap: 7px; }
+.library-card-actions button { background: #17266f; border: 0; border-radius: 8px; color: var(--yellow); display: flex; align-items: center; justify-content: space-between; font-size: 10px; font-weight: 700; padding: 10px 12px; }
+.library-card-actions button.play-now { background: var(--yellow); color: #08091a; }
+.location-game-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 17px; }
+.location-game-group { background: #07091f; border: 2px solid #2448ff; border-radius: 14px; overflow: hidden; }
+.location-game-group > header { position: static; height: auto; background: #12194d; border: 0; color: white; display: flex; align-items: center; gap: 12px; padding: 15px 17px; }
+.location-pin { color: var(--yellow); font-size: 24px; text-shadow: 0 0 10px rgba(255,230,0,.65); }
+.location-game-group header small { color: var(--yellow); font-size: 8px; font-weight: 800; letter-spacing: .1em; }
+.location-game-group header h3 { font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 20px; margin: 2px 0; }
+.location-game-group header p { color: #9aa6d3; font-size: 9px; margin: 0; }
+.location-game-group > div { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 10px; padding: 12px; }
+.library-game-card.compact { min-height: 290px; padding: 17px; }
+.library-game-card.compact h2 { font-size: 18px; }
+.library-game-card.compact p { font-size: 10px; }
+.library-game-card.compact .library-card-top em { max-width: 120px; }
 .game-specs { border-color: #1d2f97; }
 .game-specs span { color: #a6afd4; }
 .game-detail-hero, .game-detail-hero.coral, .game-detail-hero.lime, .game-detail-hero.blue, .game-detail-hero.yellow, .game-detail-hero.purple, .game-detail-hero.cyan, .game-detail-hero.pink { background: #0a0d31; color: white; border: 2px solid #2448ff; }
@@ -790,6 +824,33 @@ h1, h2, h3, .section-heading h2, .page-intro h1, .live-event h2, .station-top h3
 .wordle-entry { display: flex; gap: 8px; justify-content: center; }
 .wordle-entry input { width: min(250px, 70%); background: #0d1034; color: white; border: 2px solid #2448ff; border-radius: 5px; padding: 12px; text-align: center; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .wordle-result { color: var(--yellow); font-family: 'Chakra Petch', 'Manrope', sans-serif; text-align: center; font-size: 13px; font-weight: 600; margin: 18px 0 0; line-height: 1.5; }
+.puzzle-round-picker { background: #0b0e32; border-bottom: 1px solid #2448ff; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 18px; padding: 14px 20px; }
+.puzzle-round-picker > div:first-child strong { color: white; display: block; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 13px; margin-top: 2px; }
+.puzzle-round-picker > div:last-child { display: flex; justify-content: flex-end; gap: 7px; overflow-x: auto; }
+.puzzle-round-picker button { min-width: 82px; background: #151a4f; border: 1px solid #3550ff; border-radius: 7px; color: #aab4dc; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 1px 6px; padding: 8px 9px; text-align: left; white-space: nowrap; }
+.puzzle-round-picker button > span { width: 20px; height: 20px; border: 1px solid currentColor; border-radius: 50%; display: grid; place-items: center; grid-row: span 2; font-size: 9px; font-weight: 800; }
+.puzzle-round-picker button small { color: #7f8dc8; font-size: 7px; }
+.puzzle-round-picker button.active { background: var(--yellow); border-color: var(--yellow); color: #08091a; }
+.puzzle-round-picker button.active small { color: #4e4a1c; }
+.connections-reveal { display: grid; gap: 7px; margin-top: 15px; }
+.connections-reveal > div { border-radius: 7px; padding: 10px 12px; }
+.connections-reveal > div:first-child { background: #ff3b6b; color: #08091a; }
+.connections-reveal > div:first-child p { font-size: 10px; margin: 2px 0 0; }
+.connections-reveal > div:not(:first-child) { color: #08091a; display: grid; gap: 2px; text-align: center; }
+.connections-reveal > div:not(:first-child) span { font-size: 9px; }
+.connections-reveal .yellow { background: var(--yellow); }
+.connections-reveal .green { background: #21ddeb; }
+.connections-reveal .blue { background: #2448ff; color: white; }
+.connections-reveal .purple { background: #a65cff; color: white; }
+.wordle-error { color: #ff7898; font-size: 10px; font-weight: 700; margin: 9px 0 0; text-align: center; }
+.wordle-keyboard { display: grid; gap: 6px; margin: 18px auto 0; max-width: 520px; }
+.wordle-keyboard > div { display: flex; justify-content: center; gap: 4px; }
+.wordle-keyboard button { min-width: 30px; height: 42px; background: #293060; border: 1px solid #4c5896; border-radius: 5px; color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 12px; font-weight: 800; padding: 0 5px; }
+.wordle-keyboard button.wide { min-width: 55px; font-size: 9px; }
+.wordle-keyboard button.hit { background: #20c778; border-color: #20c778; }
+.wordle-keyboard button.near { background: #d2ad00; border-color: var(--yellow); }
+.wordle-keyboard button.miss { background: #20243f; border-color: #353a5d; color: #7f86a9; }
+.wordle-keyboard button:disabled { cursor: not-allowed; }
 
 /* Dedicated run-of-show control room */
 .run-show-page { max-width: 1480px; }
@@ -1042,6 +1103,8 @@ h1, h2, h3, .section-heading h2, .page-intro h1, .live-event h2, .station-top h3
 footer { background: #03030f; border-top: 1px solid #2448ff; }
 
 @media (max-width: 1080px) {
+  .group-library-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .puzzle-launch-panel { grid-template-columns: 1fr; }
   .guest-join { grid-template-columns: 1fr; }
   .live-hub-layout { grid-template-columns: 1fr; grid-template-areas: 'content' 'organizer'; }
   .night-organizer { position: relative; top: auto; max-height: none; overflow: visible; }
@@ -1056,6 +1119,17 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 }
 
 @media (max-width: 700px) {
+  .group-library-grid, .location-game-grid { grid-template-columns: 1fr; }
+  .puzzle-launch-panel { padding: 17px; }
+  .puzzle-launch-panel > div:last-child { grid-template-columns: 1fr; }
+  .game-section-heading { align-items: flex-start; }
+  .game-section-heading h2 { font-size: 23px; }
+  .puzzle-round-picker { grid-template-columns: 1fr; padding: 12px 14px; }
+  .puzzle-round-picker > div:last-child { justify-content: flex-start; }
+  .puzzle-round-picker button { min-width: 78px; }
+  .game-selector.two-games button:last-child { display: flex; }
+  .wordle-keyboard button { min-width: 25px; height: 39px; padding: 0 3px; }
+  .wordle-keyboard button.wide { min-width: 44px; }
   .guest-join { gap: 19px; padding: 19px 15px; }
   .guest-join-copy { align-items: flex-start; }
   .join-ghost { width: 50px; height: 52px; padding-top: 18px; }
