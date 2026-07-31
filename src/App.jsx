@@ -234,16 +234,19 @@ function Logo() {
 
 function Nav({ path, navigate }) {
   const items = [
-    ['/', House, 'Live'],
-    ['/games', Library, 'Games'],
-    ['/run-of-show', ListChecks, 'Run Show'],
+    ['/', House, 'Start'],
+    ['/group-games', Gamepad2, 'Group Games'],
+    ['/circuit', Shuffle, 'Circuit'],
     ['/scores', Trophy, 'Scores'],
-    ['/teams', Users, 'Teams'],
   ]
   return (
     <nav className="nav-shell" aria-label="Main navigation">
       {items.map(([href, Icon, label]) => {
-        const active = href === '/' ? path === '/' : path.startsWith(href)
+        const active = href === '/'
+          ? path === '/'
+          : href === '/group-games'
+            ? path.startsWith(href) || path === '/play/wordle' || path === '/play/connections'
+            : path.startsWith(href)
         return (
         <button key={href} className={active ? 'active' : ''} onClick={() => navigate(href)}>
           <Icon size={19} /> <span>{label}</span>
@@ -435,36 +438,107 @@ function GuestJoin({ players, playerIdentity, joinPlayer, changePlayerTeam }) {
   </section>
 }
 
-function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurrentEvent, guestPlayerIdentity, joinPlayer, changePlayerTeam }) {
+function Tonight({ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }) {
   const activePlayers = players.filter(player => player.checkedIn)
-  const current = itinerary[currentEvent] || itinerary[0]
   return (
     <main className="live-hub">
       <GuestJoin players={players} playerIdentity={guestPlayerIdentity} joinPlayer={joinPlayer} changePlayerTeam={changePlayerTeam} />
-      <section className="pac-section score-zone">
-        <div className="pac-section-head">
-          <div><span className="kicker"><span className="live-dot" /> LIVE SCORE</span><h1>Team championship</h1><p>{current.title} is live · {current.time} {current.period}</p></div>
-          <button className="pixel-button" onClick={() => navigate('/scores')}>FULL SCOREBOARD <ChevronRight size={15} /></button>
-        </div>
-        <TeamScores scores={scores} onChange={changeScore} />
-        <div className="score-meter"><span style={{ width: `${(scores.meeple / Math.max(scores.meeple + scores.mayhem, 1)) * 100}%` }} /></div>
-        <p className="score-status"><span>••••••••</span> {Math.abs(scores.meeple - scores.mayhem)} POINTS BETWEEN THE TEAMS <span>••••••••</span></p>
-      </section>
-
       <section className="pac-section teams-zone">
-        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h2>Teams</h2><p>{activePlayers.length} {activePlayers.length === 1 ? 'player is' : 'players are'} ready to chase the high score.</p></div><button className="pixel-button" onClick={() => navigate('/teams')}>MANAGE TEAMS <ChevronRight size={15} /></button></div>
+        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h1>Choose your team</h1><p>{activePlayers.length} {activePlayers.length === 1 ? 'player is' : 'players are'} checked in. Pick pink or cyan above; you can switch anytime.</p></div></div>
         <div className="ghost-team-grid">
           {Object.keys(teamInfo).map(team => {
             const info = teamInfo[team]
             const members = activePlayers.filter(player => player.team === team)
             return <article className={`ghost-team-card ${info.color}`} key={team}>
-              <header><span className="team-ghost"><i /><i /></span><div><small>PLAYER {team === 'meeple' ? 'ONE' : 'TWO'}</small><h3>{info.name}</h3></div><strong>{scores[team]}</strong></header>
-              <div className="ghost-player-list">{members.map(member => <button key={member.id} onClick={() => navigate('/teams')}><Avatar name={member.name} /><span><strong>{member.name}</strong><small>{member.points} PTS</small></span></button>)}</div>
+              <header><span className="team-ghost"><i /><i /></span><div><small>{team === 'meeple' ? 'PINK TEAM' : 'CYAN TEAM'}</small><h3>{info.name}</h3></div><strong>{members.length}</strong></header>
+              <div className="ghost-player-list">{members.length ? members.map(member => <div className="ghost-player" key={member.id}><Avatar name={member.name} /><span><strong>{member.name}</strong><small>READY</small></span></div>) : <p className="empty-team">No players yet—be the first ghost in.</p>}</div>
             </article>
           })}
         </div>
       </section>
 
+    </main>
+  )
+}
+
+function GroupGames({ navigate }) {
+  return (
+    <main className="phase-page group-games-page">
+      <section className="phase-page-hero">
+        <span className="eyebrow">6:30–7:20 PM · EVERYONE PLAYS</span>
+        <h1>Group Games</h1>
+        <p>Three individual challenges, played together in one room. Start at the top and move on when the host calls time.</p>
+        <div className="phase-summary"><span><strong>3</strong> games</span><span><strong>50</strong> minutes</span><span><strong>1</strong> phone per player</span></div>
+      </section>
+
+      <section className="simple-game-flow" aria-label="Group game order">
+        {groupGameLineup.map(item => {
+          const game = getGame(item.slug)
+          const isGeoGuessr = item.slug === 'geoguessr'
+          return <article className={`simple-game-step ${game.color}`} key={item.slug}>
+            <span className="flow-number">{String(item.order).padStart(2, '0')}</span>
+            <span className="flow-icon">{game.icon}</span>
+            <div className="flow-copy">
+              <small>{item.duration} · {item.location}</small>
+              <h2>{game.name}</h2>
+              <p>{item.note}</p>
+              <div className="flow-score"><Trophy size={15} /><span>{isGeoGuessr ? 'Three separate individual podiums: 5–3–1 points.' : item.slug === 'wordle' ? 'Fewest attempts leads the round.' : 'Fastest successful solve leads the round.'}</span></div>
+              <details><summary>Quick rules</summary><ol>{game.rules.slice(0, 3).map(rule => <li key={rule}>{rule}</li>)}</ol></details>
+            </div>
+            {game.externalUrl ? <a className="flow-action" href={game.externalUrl} target="_blank" rel="noreferrer">Open GeoGuessr <ArrowRight size={15} /></a> : <button className="flow-action" onClick={() => navigate(`/play/${game.playable}`)}>Play now <ArrowRight size={15} /></button>}
+          </article>
+        })}
+      </section>
+      <section className="host-voice-note"><Lightbulb size={20} /><div><strong>Host handoff</strong><p>Explain one game at a time. Guests only need to tap the next card when you are ready to move on.</p></div></section>
+    </main>
+  )
+}
+
+function Circuit({ currentEvent, setCurrentEvent, players, podAssignments, circuitResults, movePlayerToPod, randomizePods, recordCircuitResult }) {
+  const selectedRound = currentEvent >= 4 && currentEvent <= 7 ? currentEvent - 4 : 0
+  const rotation = rotations[selectedRound]
+  const pods = useMemo(() => {
+    const groups = { A: [], B: [], C: [], D: [] }
+    players.filter(player => player.checkedIn).forEach((player, index) => {
+      const pod = podAssignments[player.id] || ['A', 'B', 'C', 'D'][index % 4]
+      groups[pod]?.push(player)
+    })
+    return groups
+  }, [players, podAssignments])
+
+  return (
+    <main className="phase-page circuit-page">
+      <section className="phase-page-hero circuit-hero">
+        <span className="eyebrow">7:30–8:50 PM · FOUR ROTATIONS</span>
+        <h1>Game Circuit</h1>
+        <p>Stay with your pod. Play for 20 minutes, record the result, then move clockwise when the host calls time.</p>
+        <div className="phase-summary"><span><strong>4</strong> pods</span><span><strong>4</strong> stations</span><span><strong>20</strong> min each</span></div>
+      </section>
+
+      <nav className="circuit-round-picker" aria-label="Circuit rounds">
+        {rotations.map((item, index) => <button className={selectedRound === index ? 'active' : ''} aria-current={selectedRound === index ? 'step' : undefined} onClick={() => setCurrentEvent(index + 4)} key={item.round}><span>{index + 1}</span><strong>Circuit {index + 1}</strong><small>{item.time}</small></button>)}
+      </nav>
+
+      <section className="circuit-now-bar">
+        <div><span className="live-dot" /><small>SELECTED ROTATION</small><strong>{rotation.round}</strong><em>{rotation.time}</em></div>
+        {selectedRound === 0 && <button onClick={randomizePods}><Shuffle size={15} /> Shuffle pods</button>}
+      </section>
+
+      <section className="simple-station-grid">
+        {rotation.stations.map(station => {
+          const resultKey = `${selectedRound + 4}:${station.slug}`
+          const result = circuitResults[resultKey] || ''
+          const gamesAtStation = station.options || [station.slug]
+          return <article className="simple-station-card" key={`${selectedRound}-${station.location}`}>
+            <header><span className="station-icon">{station.icon}</span><div><small>{station.location}</small><h2>{station.name}</h2></div><span className="pod-badge">POD {station.pod}</span></header>
+            <div className="pod-roster">
+              {(pods[station.pod] || []).length ? pods[station.pod].map(player => <div key={player.id}><Avatar name={player.name} size="sm" /><span><strong>{player.name}</strong><small>{teamInfo[player.team].short}</small></span><select value={station.pod} onChange={event => movePlayerToPod(player.id, event.target.value)} aria-label={`Move ${player.name} to another pod`}>{['A', 'B', 'C', 'D'].map(pod => <option value={pod} key={pod}>Pod {pod}</option>)}</select></div>) : <p>No players assigned yet.</p>}
+            </div>
+            <details className="station-rules"><summary>Setup + quick rules</summary>{gamesAtStation.map(slug => { const game = getGame(slug); return <div key={slug}><strong>{game.name}</strong><ol>{game.rules.slice(0, 3).map(rule => <li key={rule}>{rule}</li>)}</ol></div> })}</details>
+            <div className="station-score"><small>RECORD RESULT · 10 POINTS</small><div><button className={result === 'meeple' ? 'active blinky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'meeple' ? '' : 'meeple')}>Blinky</button><button className={result === 'split' ? 'active split' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'split' ? '' : 'split')}>Split</button><button className={result === 'mayhem' ? 'active inky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'mayhem' ? '' : 'mayhem')}>Inky</button></div></div>
+          </article>
+        })}
+      </section>
     </main>
   )
 }
@@ -1334,12 +1408,12 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
         <div className={`header-status ${syncMode === 'realtime' ? 'is-synced' : syncMode === 'connecting' ? 'is-connecting' : ''}`} title={syncMode === 'realtime' ? 'Updates sync live across devices' : syncMode === 'connecting' ? 'Reconnecting to live sync' : 'Stored on this device'}><span className="live-dot" /><strong>{checkedIn}</strong> checked in {syncMode !== 'local' && <small>{syncMode === 'realtime' ? 'LIVE SYNC' : 'CONNECTING'}</small>}</div>
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
-      {path === '/' && <Tonight {...{ scores, changeScore, players, navigate, currentEvent, setCurrentEvent, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
-      {path === '/games' && <GameLibrary navigate={navigate} />}
+      {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
+      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames navigate={navigate} />}
+      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, podAssignments, circuitResults, movePlayerToPod, randomizePods, recordCircuitResult }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
-      {(path === '/run-of-show' || path === '/lineup') && <RunOfShow {...{ currentEvent, setCurrentEvent, players, scores, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, navigate }} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore }} />}
-      {path === '/teams' && <Roster {...{ players, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer }} onReset={resetDemo} />}
+      {path === '/teams' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
       {playMode && <Playroom {...{ navigate, players, guestPlayerIdentity, puzzleResults, submitPuzzleResult }} mode={playMode} />}
       <footer><Logo /><p>Made for snacks, friendly rivalries, and questionable strategy.</p><span>Game night, organized.</span></footer>
       <div className="mobile-nav"><Nav path={path} navigate={navigate} /></div>
