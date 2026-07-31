@@ -14,7 +14,7 @@ Game nights usually split information across a group chat, a notes app, handwrit
 
 - **Start** — claim one pre-listed roster name, see the locked teams, and release mistaken claims.
 - **Group Games** — run GeoGuessr, Wordle, Connections, and seven four-minute Jenga matches in a clear order.
-- **Circuit** — show exact Blokus, Mario Strikers, and Flip 7 assignments for four rounds.
+- **Circuit** — show exact Blokus and Mario Strikers assignments plus a live Flip 7 / Magical Athlete choice for four rounds.
 - **Scores** — separate the team championship from individual standings.
 
 The interface uses progressive disclosure: guests see the next action first, while visual rules and scoring details stay collapsed until needed.

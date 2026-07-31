@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useConvexConnectionState, useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api.js'
 import {
@@ -143,7 +143,7 @@ const groupGameLineup = [
   { order: 4, slug: 'jenga', duration: '30 min', location: 'Island', note: 'Run all 7 fixed cross-team matches. Each match has a four-minute hard stop and awards 1 individual + 1 team point.' },
 ]
 
-const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2 }
+const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2, 'magical-athlete': 2, 'table-choice': 2 }
 const groupWinnerRounds = {
   geoguessr: Array.from({ length: 3 }, (_, index) => ({ key: `geoguessr:${index + 1}`, label: `Game ${index + 1}` })),
   wordle: Array.from({ length: 5 }, (_, index) => ({ key: `wordle:${index + 1}`, label: `Word ${index + 1}` })),
@@ -222,9 +222,10 @@ function useRouter() {
   return { path, navigate }
 }
 
-function Avatar({ name, size = 'md' }) {
-  const ghostTone = name.charCodeAt(0) % 4
-  return <span className={`avatar ghost-avatar ghost-${ghostTone} avatar-${size}`} aria-label={name}>{name.slice(0, 1).toUpperCase()}</span>
+function Avatar({ name, team, size = 'md' }) {
+  const rosterTeam = team || defaultPlayers.find(player => player.name === name)?.team
+  const ghostTone = rosterTeam ? `ghost-team-${teamInfo[rosterTeam].color}` : `ghost-${name.charCodeAt(0) % 4}`
+  return <span className={`avatar ghost-avatar ${ghostTone} avatar-${size}`} aria-label={`${name}${rosterTeam ? `, ${teamInfo[rosterTeam].name}` : ''}`}>{name.slice(0, 1).toUpperCase()}</span>
 }
 
 function TeamPill({ team }) {
@@ -403,6 +404,60 @@ function NightOrganizer({ currentEvent, setCurrentEvent, navigate }) {
   )
 }
 
+function RosterNamePicker({ players, value, onChange, describedBy }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef(null)
+  const triggerRef = useRef(null)
+  const labelId = useId()
+  const listId = useId()
+  const selected = players.find(player => player.id === Number(value))
+
+  useEffect(() => {
+    if (!open) return undefined
+    const closeOutside = event => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    const closeWithEscape = event => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeWithEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeWithEscape)
+    }
+  }, [open])
+
+  const choose = player => {
+    if (player.checkedIn) return
+    onChange(String(player.id))
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  return <div className={`roster-name-picker ${open ? 'is-open' : ''}`} ref={rootRef}>
+    <span className="roster-field-label" id={labelId}>Your name</span>
+    <button className="roster-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" aria-controls={listId} aria-describedby={describedBy} onClick={() => setOpen(current => !current)}>
+      <span>{selected ? selected.name : 'Choose your name'}</span>
+      {selected && <small>{teamInfo[selected.team].name}</small>}
+      <ChevronDown size={18} />
+    </button>
+    {open && <div className="roster-picker-popover" id={listId} role="listbox" aria-labelledby={labelId}>
+      <header><span className="picker-pac">●</span><div><strong>Pick your player</strong><small>Your team is already locked in.</small></div></header>
+      <div className="roster-picker-groups">{Object.keys(teamInfo).map(team => <section key={team}>
+        <div className={`picker-team-label ${teamInfo[team].color}`}><span className="team-ghost"><i /><i /></span><strong>{teamInfo[team].name}</strong></div>
+        <div>{players.filter(player => player.team === team).map(player => <button type="button" role="option" aria-selected={player.id === selected?.id} disabled={player.checkedIn} onClick={() => choose(player)} key={player.id}>
+          <Avatar name={player.name} size="sm" />
+          <span><strong>{player.name}</strong><small>{player.checkedIn ? 'Already claimed' : 'Tap to choose'}</small></span>
+          <em>{player.checkedIn ? 'TAKEN' : 'READY'}</em>
+        </button>)}</div>
+      </section>)}</div>
+    </div>}
+  </div>
+}
+
 function GuestJoin({ players, playerIdentity, joinPlayer }) {
   const player = players.find(item => item.checkedIn && item.id === playerIdentity?.id && item.name.toLocaleLowerCase() === playerIdentity.name.toLocaleLowerCase())
   const [playerId, setPlayerId] = useState('')
@@ -434,11 +489,8 @@ function GuestJoin({ players, playerIdentity, joinPlayer }) {
 
   return <section className="guest-join card">
     <div className="guest-join-copy"><span className="join-ghost"><i /><i /></span><div><span className="kicker">READY PLAYER?</span><h2>Claim your name</h2><p>No account or password. Choose your pre-listed name once; the app keeps anyone else from playing as you.</p></div></div>
-    <form onSubmit={submit}>
-      <label className="roster-name-select">
-        <span className="roster-select-title"><span className="select-ghost"><i /><i /></span><span><small>PLAYER SELECT</small><strong>Who are you?</strong></span></span>
-        <span className="roster-select-control"><select value={playerId} onChange={event => { setPlayerId(event.target.value); setError('') }} aria-describedby={error ? 'join-error' : undefined}><option value="">Choose your ghost…</option>{players.map(item => <option value={item.id} disabled={item.checkedIn} key={item.id}>{item.name} · {teamInfo[item.team].name}{item.checkedIn ? ' · already claimed' : ''}</option>)}</select><ChevronDown size={18} /></span>
-      </label>
+    <form className={playerId ? 'has-roster-player' : ''} onSubmit={submit}>
+      <RosterNamePicker players={players} value={playerId} onChange={value => { setPlayerId(value); setError('') }} describedBy={error ? 'join-error' : undefined} />
       {playerId && <div className="selected-roster-team"><span className={`team-ghost ${teamInfo[players.find(item => item.id === Number(playerId))?.team].color}`}><i /><i /></span><div><small>YOUR TEAM</small><strong>{teamInfo[players.find(item => item.id === Number(playerId))?.team].name}</strong></div></div>}
       {error && <p className="join-error" id="join-error" role="alert">{error}</p>}
       <button className="primary join-button" disabled={!playerId || joining}>{joining ? 'Claiming…' : 'Claim this name'} <ArrowRight size={16} /></button>
@@ -529,11 +581,99 @@ function GameHowTo({ game, navigate }) {
 }
 
 function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef(null)
+  const triggerRef = useRef(null)
   const winner = options.find(player => player.id === winnerId)
-  return <label className={`winner-selector ${winner ? `has-winner ${teamInfo[winner.team].color}` : ''}`}>
-    <span><Trophy size={14} /><span><small>{label}</small><strong>{winner ? `${winner.name} · ${teamInfo[winner.team].name}` : 'Choose winner'}</strong></span></span>
-    <span className="winner-select-control"><select value={winnerId || ''} onChange={event => recordGameWinner(winnerKey, event.target.value ? Number(event.target.value) : undefined)}><option value="">No winner yet</option>{options.map(player => <option value={player.id} key={player.id}>{player.name} · {teamInfo[player.team].name}</option>)}</select><ChevronDown size={15} /></span>
-  </label>
+
+  useEffect(() => {
+    if (!open) return undefined
+    const closeOutside = event => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    const closeWithEscape = event => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeWithEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeWithEscape)
+    }
+  }, [open])
+
+  const choose = playerId => {
+    recordGameWinner(winnerKey, playerId)
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  return <div className={`winner-selector ${open ? 'is-open' : ''} ${winner ? `has-winner ${teamInfo[winner.team].color}` : ''}`} ref={rootRef}>
+    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" onClick={() => setOpen(current => !current)}>
+      <Trophy size={15} />
+      <span><small>{label}</small><strong>{winner ? winner.name : 'Choose winner'}</strong>{winner && <em>{teamInfo[winner.team].name}</em>}</span>
+      <ChevronDown size={15} />
+    </button>
+    {open && <div className="winner-picker-popover" role="listbox" aria-label={`${label} winner`}>
+      <header><Trophy size={17} /><span><strong>Who won?</strong><small>{label}</small></span></header>
+      <div>{options.map(player => <button type="button" role="option" aria-selected={player.id === winner?.id} onClick={() => choose(player.id)} key={player.id}>
+        <Avatar name={player.name} team={player.team} size="sm" />
+        <span><strong>{player.name}</strong><small className={teamInfo[player.team].color}>{teamInfo[player.team].name}</small></span>
+        {player.id === winner?.id ? <Trophy size={14} /> : <i />}
+      </button>)}</div>
+      {winner && <button className="clear-winner" type="button" onClick={() => choose(undefined)}>Clear result</button>}
+    </div>}
+  </div>
+}
+
+function TeamWinnerSelector({ label, result, recordResult }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef(null)
+  const triggerRef = useRef(null)
+  const winner = result ? teamInfo[result] : null
+
+  useEffect(() => {
+    if (!open) return undefined
+    const closeOutside = event => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false)
+    }
+    const closeWithEscape = event => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      triggerRef.current?.focus()
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeWithEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeWithEscape)
+    }
+  }, [open])
+
+  const choose = team => {
+    recordResult(team)
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  return <div className={`winner-selector team-winner-selector ${open ? 'is-open' : ''} ${winner ? `has-winner ${winner.color}` : ''}`} ref={rootRef}>
+    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" onClick={() => setOpen(current => !current)}>
+      <Trophy size={15} />
+      <span><small>{label}</small><strong>{winner ? winner.name : 'Choose winning team'}</strong>{winner && <em>+2 team points</em>}</span>
+      <ChevronDown size={15} />
+    </button>
+    {open && <div className="winner-picker-popover team-winner-popover" role="listbox" aria-label={`${label} team winner`}>
+      <header><Trophy size={17} /><span><strong>Which team won?</strong><small>Strikers awards team points only</small></span></header>
+      <div>{Object.entries(teamInfo).map(([team, info]) => <button type="button" role="option" aria-selected={team === result} onClick={() => choose(team)} key={team}>
+        <span className={`team-choice-ghost ${info.color}`}>{info.mascot}</span>
+        <span><strong>{info.name}</strong><small className={info.color}>+2 TEAM POINTS</small></span>
+        {team === result ? <Trophy size={14} /> : <i />}
+      </button>)}</div>
+      {winner && <button className="clear-winner" type="button" onClick={() => choose(undefined)}>Clear result</button>}
+    </div>}
+  </div>
 }
 
 function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
@@ -578,7 +718,7 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
   )
 }
 
-function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, navigate }) {
+function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }) {
   const selectedRound = currentEvent >= 4 && currentEvent <= 7 ? currentEvent - 4 : 0
   const round = circuitRounds[selectedRound]
   const rosterByName = new Map(players.map(player => [player.name, player]))
@@ -588,7 +728,7 @@ function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGa
       <section className="phase-page-hero circuit-hero">
         <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Choose a round, send everyone to the listed station, then record the actual player who won. Each selection updates individual and team scores automatically.</p>
+        <p>Choose a round, send everyone to the listed station, then record the winning player or team. Strikers scores the team only; the tabletop games score both.</p>
         <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>3</strong> stations</span><span><strong>20</strong> min each</span></div>
       </section>
 
@@ -603,14 +743,21 @@ function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGa
 
       <section className="exact-station-grid">
         {round.stations.map(station => {
-          const winnerKey = `${station.slug}:circuit-${selectedRound + 1}`
-          const game = getGame(station.slug)
+          const isStrikers = station.slug === 'mario-strikers-gc'
+          const isTableChoice = station.slug === 'flip-7'
+          const activeSlug = isTableChoice ? (circuitGameChoices[String(selectedRound + 1)] || 'flip-7') : station.slug
+          const winnerKey = isTableChoice ? `table-choice:circuit-${selectedRound + 1}` : `${activeSlug}:circuit-${selectedRound + 1}`
+          const teamResultKey = `${selectedRound + 4}:${activeSlug}`
+          const game = getGame(activeSlug)
           const stationPlayers = station.players.map(name => rosterByName.get(name)).filter(Boolean)
           return <article className="simple-station-card" key={`${selectedRound}-${station.location}`}>
-            <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{station.name}</h2></div><span className="pod-badge">{station.players.length} PLAYERS</span></header>
-            <div className="exact-player-list">{station.players.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}</div>
-            <div className="station-guide-links"><button onClick={() => navigate(`/games/${station.slug}`)}><span>{game.icon}</span><div><strong>{game.name} how-to</strong><small>Rules · play map{station.slug === 'mario-strikers-gc' ? ' · controls' : ''}</small></div><ArrowRight size={14} /></button></div>
-            <div className="station-score"><small>WINNER · +2 INDIVIDUAL · +2 TEAM</small><WinnerSelector label={`${round.label} winner`} winnerKey={winnerKey} options={stationPlayers} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /><p>The player and their team are scored together as soon as you select them.</p></div>
+            <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{game.name}</h2></div><span className="pod-badge">{station.players.length} PLAYERS</span></header>
+            {isTableChoice && <div className="table-game-switch" role="group" aria-label={`Dinner Table #2 game for ${round.label}`}><span>PLAY THIS ROUND</span><div>{['flip-7', 'magical-athlete'].map(slug => { const option = getGame(slug); return <button type="button" className={activeSlug === slug ? 'active' : ''} aria-pressed={activeSlug === slug} onClick={() => setCircuitGameChoice(selectedRound + 1, slug)} key={slug}><span>{option.icon}</span><strong>{option.name}</strong></button> })}</div></div>}
+            <div className="exact-player-list">{station.players.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} team={player?.team} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}</div>
+            <div className="station-guide-links"><button onClick={() => navigate(`/games/${activeSlug}`)}><span>{game.icon}</span><div><strong>{game.name} how-to</strong><small>Rules · play map{isStrikers ? ' · controls' : ''}</small></div><ArrowRight size={14} /></button></div>
+            {isStrikers
+              ? <div className="station-score team-only-score"><small>TEAM WINNER · +2 TEAM · NO INDIVIDUAL POINTS</small><TeamWinnerSelector label={`${round.label} team winner`} result={circuitResults[teamResultKey]} recordResult={result => recordCircuitResult(selectedRound + 4, activeSlug, result)} /><p>Choose the winning house team. No individual player score changes for Strikers.</p></div>
+              : <div className="station-score"><small>WINNER · +2 INDIVIDUAL · +2 TEAM</small><WinnerSelector label={`${round.label} winner`} winnerKey={winnerKey} options={stationPlayers} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /><p>The player and their team are scored together as soon as you select them.</p></div>}
           </article>
         })}
       </section>
@@ -981,7 +1128,7 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate 
       <section className="page-intro score-intro">
         <span className="eyebrow">BRAGGING RIGHTS</span>
         <h1>The scoreboard</h1>
-        <p>Jessa records both the individual score and the player’s team score after every winning round.</p>
+        <p>Most wins score both the player and their team. Mario Strikers is the team-only exception.</p>
         <button className="primary host-plan-link" onClick={() => navigate('/host')}><ListChecks size={16} /> Open Jessa’s host run sheet</button>
       </section>
       <section className="score-board-section team-score-section">
@@ -996,10 +1143,10 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate 
           <div className="section-heading"><div><span className="kicker">LIVE RANKING</span><h2>Player leaderboard</h2></div><span className="muted-chip">Top 8</span></div>
           <div className="standings-list">
             {sorted.slice(0, 8).map((player, index) => (
-              <div key={player.id} className={index < 3 ? 'podium-row' : ''}>
-                <span className={`rank rank-${index + 1}`}>{index === 0 ? <Crown size={16} /> : index + 1}</span>
+              <div key={player.id} className={index < 3 ? `podium-row podium-${index + 1}` : ''}>
+                <span className={`rank rank-${index + 1}`}>{index === 0 ? <Trophy size={22} /> : index + 1}</span>
                 <Avatar name={player.name} />
-                <span className="player-name"><strong>{player.name}</strong><TeamPill team={player.team} /></span>
+                <span className="player-name">{index < 3 && <small className="podium-label">{index === 0 ? 'CURRENT CHAMPION' : index === 1 ? 'SECOND PLACE' : 'THIRD PLACE'}</small>}<strong>{player.name}</strong><TeamPill team={player.team} /></span>
                 <span className="point-stepper"><button aria-label={`Remove one point from ${player.name}`} onClick={() => changePlayerScore(player.id, -1)}><Minus size={13} /></button><strong>{player.points}</strong><button aria-label={`Add one point to ${player.name}`} onClick={() => changePlayerScore(player.id, 1)}><Plus size={13} /></button><small>pts</small></span>
               </div>
             ))}
@@ -1330,6 +1477,7 @@ function LocalApp() {
   const [individualPhaseScores, setIndividualPhaseScores] = useStoredState('tabletop-v2-individual-phase-scores', {})
   const [podAssignments, setPodAssignments] = useStoredState('tabletop-pod-assignments', defaultPodAssignments)
   const [circuitResults, setCircuitResults] = useStoredState('tabletop-v2-circuit-results', {})
+  const [circuitGameChoices, setCircuitGameChoices] = useStoredState('tabletop-v1-circuit-game-choices', {})
   const [gameWinners, setGameWinners] = useStoredState('tabletop-v1-game-winners', {})
   const [dinnerOrder, setDinnerOrder] = useStoredState('tabletop-dinner-order', '')
   const [puzzleResults, setPuzzleResults] = useStoredState('tabletop-v1-puzzle-results', [])
@@ -1375,6 +1523,7 @@ function LocalApp() {
     })
     setScores(previous => ({ meeple: Math.max(0, previous.meeple + delta.meeple), mayhem: Math.max(0, previous.mayhem + delta.mayhem) }))
   }
+  const setCircuitGameChoice = (round, choice) => setCircuitGameChoices(previous => ({ ...previous, [String(round)]: choice }))
   const recordGameWinner = (winnerKey, playerId) => {
     const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
     const points = gamePointValues[slug]
@@ -1397,7 +1546,7 @@ function LocalApp() {
     }))
   }
   const checkedIn = useMemo(() => players.filter(p => p.checkedIn).length, [players])
-  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
+  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setCircuitGameChoices({}); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
   const addPlayer = name => {
     const team = players.filter(player => player.team === 'meeple').length <= players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...players.map(player => player.id)) + 1
@@ -1438,7 +1587,7 @@ function LocalApp() {
     })
   }
 
-  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
@@ -1474,6 +1623,10 @@ function RealtimeApp() {
   const setPlayerPodMutation = useMutation(api.sharedState.setPlayerPod)
   const setPodsMutation = useMutation(api.sharedState.setPods)
   const recordCircuitResultMutation = useMutation(api.sharedState.recordCircuitResult)
+  const setCircuitGameChoiceMutation = useMutation(api.sharedState.setCircuitGameChoice).withOptimisticUpdate((store, args) => {
+    const current = store.getQuery(api.sharedState.get, { eventKey: args.eventKey })
+    if (current) store.setQuery(api.sharedState.get, { eventKey: args.eventKey }, { ...current, circuitGameChoices: { ...(current.circuitGameChoices || {}), [String(args.round)]: args.choice } })
+  })
   const recordGameWinnerMutation = useMutation(api.sharedState.recordGameWinner)
   const addPlayerMutation = useMutation(api.sharedState.addPlayer)
   const joinPlayerMutation = useMutation(api.sharedState.joinPlayer)
@@ -1512,6 +1665,7 @@ function RealtimeApp() {
     commit(setPodsMutation({ eventKey, assignments: shuffled.map((player, index) => ({ playerId: player.id, pod: ['A', 'B', 'C', 'D'][index % 4] })) }))
   }
   const recordCircuitResult = (phase, slug, result) => commit(recordCircuitResultMutation({ eventKey, phase, slug, result: result || undefined }))
+  const setCircuitGameChoice = (round, choice) => commit(setCircuitGameChoiceMutation({ eventKey, round, choice }))
   const recordGameWinner = (winnerKey, playerId) => commit(recordGameWinnerMutation({ eventKey, winnerKey, playerId }))
   const addPlayer = name => commit(addPlayerMutation({ eventKey, name }))
   const joinPlayer = async playerId => {
@@ -1555,13 +1709,13 @@ function RealtimeApp() {
   const resetDemo = () => commit(resetMutation({ eventKey }))
   const checkedIn = state.players.filter(player => player.checkedIn).length
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={{ ...state, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
-  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, gameWinners = {}, dinnerOrder, puzzleResults } = state
-  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
+  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices = {}, gameWinners = {}, dinnerOrder, puzzleResults } = state
+  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
   const gameSlug = path.startsWith('/games/') ? decodeURIComponent(path.slice('/games/'.length)) : null
   const playMode = path.startsWith('/play/') ? path.slice('/play/'.length) : null
 
@@ -1575,7 +1729,7 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
       {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner }} />}
-      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, navigate }} />}
+      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} />}
       {path === '/host' && <HostPlan navigate={navigate} />}

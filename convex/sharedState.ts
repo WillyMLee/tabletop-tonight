@@ -6,6 +6,7 @@ import { initialRoster } from './eventConfig'
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
 const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
+const circuitGameChoice = v.union(v.literal('flip-7'), v.literal('magical-athlete'))
 const gamePointValues: Record<string, number> = {
   geoguessr: 3,
   wordle: 3,
@@ -14,6 +15,8 @@ const gamePointValues: Record<string, number> = {
   blokus: 2,
   'mario-strikers-gc': 2,
   'flip-7': 2,
+  'magical-athlete': 2,
+  'table-choice': 2,
 }
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
@@ -28,6 +31,7 @@ const initialState = (eventKey: string) => ({
   individualPhaseScores: {},
   podAssignments: defaultPodAssignments,
   circuitResults: {},
+  circuitGameChoices: {},
   gameWinners: {},
   dinnerOrder: '',
   updatedAt: Date.now(),
@@ -182,6 +186,19 @@ export const recordCircuitResult = mutation({
       scores: { meeple: clampPoints(state.scores.meeple + delta.meeple), mayhem: clampPoints(state.scores.mayhem + delta.mayhem) },
       updatedAt: Date.now(),
     })
+  },
+})
+
+export const setCircuitGameChoice = mutation({
+  args: { eventKey: v.string(), round: v.number(), choice: circuitGameChoice },
+  handler: async (ctx, { eventKey, round, choice }) => {
+    if (!Number.isInteger(round) || round < 1 || round > 4) throw new Error('Invalid circuit round')
+    const state = await getState(ctx, eventKey)
+    await ctx.db.patch(state._id, {
+      circuitGameChoices: { ...(state.circuitGameChoices ?? {}), [String(round)]: choice },
+      updatedAt: Date.now(),
+    })
+    return null
   },
 })
 

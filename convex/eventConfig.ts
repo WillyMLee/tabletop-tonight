@@ -82,11 +82,12 @@ export const eventTimeline = [
 export const pointRules = [
   { result: 'GeoGuessr, Wordle, or Connections win', individual: 3, team: 3 },
   { result: 'Jenga 1v1 win', individual: 1, team: 1 },
-  { result: 'Blokus, Mario Strikers, or Flip 7 win', individual: 2, team: 2 },
+  { result: 'Blokus, Flip 7, or Magical Athlete win', individual: 2, team: 2 },
+  { result: 'Mario Strikers team win', individual: 0, team: 2 },
 ]
 
 export const envelopeGroups = [
   { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`)] },
-  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Soccer', 'Flip 7'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
+  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
   { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 7 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]
