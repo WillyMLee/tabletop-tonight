@@ -26,9 +26,9 @@ export const jengaMatches = [
   ['Don Robert', 'Willy'],
   ['Melissa', 'Brendan'],
   ['Julie', 'Joanna'],
-  ['Thomas', 'Omar'],
+  ['Thomas', 'Young'],
   ['Valeria', 'Andrew'],
-  ['Annhien', 'Young'],
+  ['Annhien', 'Omar'],
   ['Rebekah', 'Janice'],
 ]
 

@@ -26,6 +26,7 @@ The interface uses progressive disclosure: guests see the next action first, whi
 - Two-step claim release to recover from a wrong name or changed device
 - Four balanced circuit rounds with exact player assignments
 - Atomic manual scoring for hosted games plus automatic Wordle and Connections leader scoring
+- Server-validated, session-only host mode that keeps Jessa's run sheet and manual score controls off guest screens
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
 - Responsive, diagram-based game guides for every scheduled activity, including Flip 7 special-card rules
@@ -69,6 +70,14 @@ Convex writes the deployment values to `.env.local`. Set a unique event key as w
 
 ```dotenv
 VITE_GAME_NIGHT_KEY=my-private-game-night-2026
+```
+
+Create a private host code in each Convex deployment. Keep this value out of
+client-side `VITE_*` variables and out of source control:
+
+```bash
+npx convex env set JESSA_ADMIN_PIN "choose-a-long-private-code"
+npx convex env set --prod JESSA_ADMIN_PIN "choose-a-long-private-code"
 ```
 
 The key is an invite capability, not authentication. Anyone with the deployed app and event key can change the shared night. Use a long, unique value and see [SECURITY.md](SECURITY.md) before adapting this for sensitive or public events.

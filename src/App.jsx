@@ -17,6 +17,7 @@ import {
   Lightbulb,
   Library,
   ListChecks,
+  LockKeyhole,
   Medal,
   Minus,
   PartyPopper,
@@ -24,6 +25,7 @@ import {
   Plus,
   RotateCcw,
   Shuffle,
+  ShieldCheck,
   Sparkles,
   Star,
   Trophy,
@@ -269,7 +271,7 @@ function Nav({ path, navigate }) {
   )
 }
 
-function TeamScores({ scores, onChange, compact = false }) {
+function TeamScores({ scores, onChange, compact = false, editable = true }) {
   return (
     <div className={`team-scores ${compact ? 'compact' : ''}`}>
       {Object.keys(teamInfo).map(team => {
@@ -284,7 +286,7 @@ function TeamScores({ scores, onChange, compact = false }) {
               {leading && <span className="leading"><Crown size={12} /> Leading</span>}
             </div>
             <strong>{scores[team]}</strong>
-            {!compact && <div className="score-controls">
+            {!compact && editable && <div className="score-controls">
               <button onClick={() => onChange(team, -1)} aria-label={`Remove one point from ${info.name}`}><Minus size={16} /></button>
               <button onClick={() => onChange(team, 1)} aria-label={`Add one point to ${info.name}`}><Plus size={16} /></button>
             </div>}
@@ -1135,7 +1137,7 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
   )
 }
 
-function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate }) {
+function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate, isHost }) {
   const sorted = [...players].sort((a, b) => b.points - a.points)
   return (
     <main>
@@ -1143,11 +1145,11 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate 
         <span className="eyebrow">BRAGGING RIGHTS</span>
         <h1>The scoreboard</h1>
         <p>Most wins score both the player and their team. Mario Strikers is the team-only exception.</p>
-        <button className="primary host-plan-link" onClick={() => navigate('/host')}><ListChecks size={16} /> Open Jessa’s host run sheet</button>
+        <button className={`host-plan-link ${isHost ? 'primary' : 'host-access-button'}`} onClick={() => navigate('/host')}>{isHost ? <ListChecks size={16} /> : <LockKeyhole size={15} />} {isHost ? 'Open Jessa’s host run sheet' : 'Host access'}</button>
       </section>
       <section className="score-board-section team-score-section">
         <div className="score-section-heading"><span className="score-section-number">01</span><div><span className="kicker">TEAM SCORE</span><h2>Team Jessa vs. Team Willy</h2><p>Group-game wins add 3, Jenga wins add 1, and main-circuit wins add 2.</p></div></div>
-        <TeamScores scores={scores} onChange={changeScore} />
+        <TeamScores scores={scores} onChange={changeScore} editable={isHost} />
       </section>
 
       <section className="score-board-section individual-score-board-section">
@@ -1161,7 +1163,7 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate 
                 <span className={`rank rank-${index + 1}`}>{index === 0 ? <Trophy size={22} /> : index + 1}</span>
                 <Avatar name={player.name} />
                 <span className="player-name">{index < 3 && <small className="podium-label">{index === 0 ? 'CURRENT CHAMPION' : index === 1 ? 'SECOND PLACE' : 'THIRD PLACE'}</small>}<strong>{player.name}</strong><TeamPill team={player.team} /></span>
-                <span className="point-stepper"><button aria-label={`Remove one point from ${player.name}`} onClick={() => changePlayerScore(player.id, -1)}><Minus size={13} /></button><strong>{player.points}</strong><button aria-label={`Add one point to ${player.name}`} onClick={() => changePlayerScore(player.id, 1)}><Plus size={13} /></button><small>pts</small></span>
+                <span className={`point-stepper ${isHost ? '' : 'read-only'}`}>{isHost && <button aria-label={`Remove one point from ${player.name}`} onClick={() => changePlayerScore(player.id, -1)}><Minus size={13} /></button>}<strong>{player.points}</strong>{isHost && <button aria-label={`Add one point to ${player.name}`} onClick={() => changePlayerScore(player.id, 1)}><Plus size={13} /></button>}<small>pts</small></span>
               </div>
             ))}
           </div>
@@ -1170,6 +1172,31 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore, navigate 
       </section>
     </main>
   )
+}
+
+function HostGate({ hostAccess, navigate }) {
+  const [pin, setPin] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const submit = event => {
+    event.preventDefault()
+    setSubmitted(true)
+    hostAccess.unlock(pin.trim())
+  }
+  return <main className="host-gate-page">
+    <button className="back-link" onClick={() => navigate('/scores')}><ArrowRight size={15} /> Back to scores</button>
+    <section className="host-gate-card">
+      <span className="host-lock"><LockKeyhole size={28} /></span>
+      <span className="eyebrow">JESSA’S PRIVATE HOST MODE</span>
+      <h1>Host access only</h1>
+      <p>The run sheet, prize plan, and manual score controls are hidden from guest devices.</p>
+      <form onSubmit={submit}>
+        <label><span>HOST CODE</span><input type="password" value={pin} onChange={event => { setPin(event.target.value); setSubmitted(false) }} autoComplete="current-password" placeholder="Enter Jessa’s code" /></label>
+        <button className="primary" disabled={!pin.trim() || hostAccess.status === 'checking'}>{hostAccess.status === 'checking' ? 'Checking…' : <><ShieldCheck size={16} /> Unlock host mode</>}</button>
+      </form>
+      {submitted && hostAccess.status === 'denied' && <strong className="host-gate-error" role="alert">That host code didn’t match.</strong>}
+      {hostAccess.status === 'unavailable' && <strong className="host-gate-error">Host Mode requires the live Convex backend.</strong>}
+    </section>
+  </main>
 }
 
 function HostPlan({ navigate }) {
@@ -1605,17 +1632,20 @@ function LocalApp() {
     recordGameWinner(puzzleWinnerKey(game, puzzleId), winner?.playerId)
   }
 
-  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode="local" hostAccess={{ status: 'unavailable', unlock: () => {} }} state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
   const eventKey = import.meta.env.VITE_GAME_NIGHT_KEY || 'tabletop-tonight'
   const guestStorageKey = `tabletop-player-${eventKey}`
+  const hostStorageKey = `tabletop-host-${eventKey}`
   const [guestPlayerIdentity, setGuestPlayerIdentity] = useState(() => storedPlayerIdentity(guestStorageKey))
+  const [hostPin, setHostPin] = useState(() => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(hostStorageKey) || '')
   const queryArgs = { eventKey }
   const connectionState = useConvexConnectionState()
   const state = useQuery(api.sharedState.get, queryArgs)
   const puzzleResults = useQuery(api.puzzleResults.list, queryArgs) || []
+  const hostVerified = useQuery(api.hostAuth.verify, hostPin ? { eventKey, pin: hostPin } : 'skip')
   const ensureState = useMutation(api.sharedState.ensure)
   const [syncError, setSyncError] = useState('')
 
@@ -1726,11 +1756,16 @@ function RealtimeApp() {
   const releasePlayer = playerId => commit(releasePlayerMutation({ eventKey, playerId }))
   const resetDemo = () => commit(resetMutation({ eventKey }))
   const checkedIn = state.players.filter(player => player.checkedIn).length
+  const unlockHost = pin => {
+    setHostPin(pin)
+    if (typeof window !== 'undefined') window.sessionStorage.setItem(hostStorageKey, pin)
+  }
+  const hostAccess = { status: !hostPin ? 'locked' : hostVerified === undefined ? 'checking' : hostVerified ? 'unlocked' : 'denied', unlock: unlockHost }
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} hostAccess={hostAccess} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
-function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMode, syncError = '' }) {
+function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAccess, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
   const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices = {}, gameWinners = {}, dinnerOrder, puzzleResults } = state
   const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
@@ -1749,8 +1784,8 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
       {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults }} />}
       {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
-      {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} />}
-      {path === '/host' && <HostPlan navigate={navigate} />}
+      {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} isHost={hostAccess.status === 'unlocked'} />}
+      {path === '/host' && (hostAccess.status === 'unlocked' ? <HostPlan navigate={navigate} /> : <HostGate hostAccess={hostAccess} navigate={navigate} />)}
       {path === '/teams' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
       {playMode && <Playroom {...{ navigate, players, guestPlayerIdentity, puzzleResults, submitPuzzleResult }} mode={playMode} />}
       <footer><Logo /><p>Made for snacks, friendly rivalries, and questionable strategy.</p><span>Game night, organized.</span></footer>

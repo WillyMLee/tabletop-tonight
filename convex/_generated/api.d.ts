@@ -11,6 +11,7 @@
 import type * as eventConfig from "../eventConfig.js";
 import type * as events from "../events.js";
 import type * as games from "../games.js";
+import type * as hostAuth from "../hostAuth.js";
 import type * as puzzleResults from "../puzzleResults.js";
 import type * as scores from "../scores.js";
 import type * as sharedState from "../sharedState.js";
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   eventConfig: typeof eventConfig;
   events: typeof events;
   games: typeof games;
+  hostAuth: typeof hostAuth;
   puzzleResults: typeof puzzleResults;
   scores: typeof scores;
   sharedState: typeof sharedState;

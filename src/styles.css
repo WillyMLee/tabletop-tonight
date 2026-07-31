@@ -1308,6 +1308,20 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 
 /* Host run sheet */
 .host-plan-link { margin-top: 16px; }
+.host-access-button { background: #111747; border: 1px solid #3550ff; border-radius: 6px; color: #aeb8dc; display: inline-flex; align-items: center; gap: 7px; font: 700 9px 'Chakra Petch','Manrope',sans-serif; padding: 10px 12px; }
+.point-stepper.read-only { grid-template-columns: auto auto; background: #0f133e; border: 1px solid #263a99; border-radius: 7px; padding: 7px 9px; }
+.point-stepper.read-only strong { color: var(--yellow); }
+.host-gate-page { max-width: 720px; margin: 0 auto; }
+.host-gate-card { background: #080a27; border: 2px solid var(--yellow); border-radius: 16px; box-shadow: 0 20px 55px rgba(0,0,0,.42),0 0 30px rgba(255,231,0,.08); display: grid; justify-items: center; margin-top: 30px; padding: 34px; text-align: center; }
+.host-lock { width: 58px; height: 58px; background: var(--yellow); border-radius: 50%; color: #070815; display: grid; place-items: center; margin-bottom: 15px; }
+.host-gate-card h1 { color: white; font-family: 'Chakra Petch','Manrope',sans-serif; font-size: 32px; margin: 7px 0; text-transform: uppercase; }
+.host-gate-card > p { color: #9da9d2; font-size: 11px; line-height: 1.55; margin: 0 0 20px; max-width: 470px; }
+.host-gate-card form { width: min(100%,430px); display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 8px; }
+.host-gate-card label { text-align: left; }
+.host-gate-card label > span { color: #a6afd4; display: block; font: 700 8px 'Chakra Petch','Manrope',sans-serif; margin-bottom: 5px; }
+.host-gate-card input { width: 100%; min-height: 43px; background: #050619; border: 1px solid #3550ff; border-radius: 6px; color: white; padding: 9px 11px; }
+.host-gate-card form button { min-height: 43px; display: inline-flex; align-items: center; gap: 6px; }
+.host-gate-error { color: #ff7898; font-size: 9px; margin-top: 10px; }
 .host-plan-page { max-width: 1180px; }
 .host-plan-section { background: #080a27; border: 1px solid #2448ff; border-radius: 12px; margin-top: 14px; padding: 20px; }
 .host-plan-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 15px; }
@@ -1550,11 +1564,14 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 @media (max-width: 760px) {
   .phase-page-hero { padding: 22px 17px; }
   .phase-page-hero > p { font-size: 12px; }
-  .simple-game-step { grid-template-columns: 34px 44px minmax(0,1fr); gap: 10px; padding: 15px 13px; }
+  .simple-game-step { grid-template-columns: 34px minmax(0,1fr); gap: 10px; padding: 15px 13px; }
+  .flow-number { grid-column: 1; grid-row: 1; }
+  .flow-icon { grid-column: 2; grid-row: 1; }
+  .flow-copy { grid-column: 1 / -1; grid-row: 2; }
   .flow-icon { width: 42px; height: 42px; font-size: 20px; }
   .flow-number { font-size: 15px; padding-top: 10px; }
   .flow-copy h2 { font-size: 19px; }
-  .flow-action { grid-column: 2 / -1; width: 100%; }
+  .flow-action { grid-column: 1 / -1; width: 100%; }
   .circuit-round-picker { display: flex; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
   .circuit-round-picker button { flex: 0 0 142px; scroll-snap-align: start; }
   .simple-station-grid { grid-template-columns: 1fr; }
@@ -1785,4 +1802,19 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   @keyframes winner-menu-in { from { opacity: 0; transform: translateY(-7px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .standings-list > div.podium-1 { grid-template-columns: 42px 38px minmax(0,1fr) auto; padding: 12px 7px; }
   .rank-1 { width: 39px; height: 39px; }
+  .host-gate-card { padding: 25px 17px; }
+  .host-gate-card form { grid-template-columns: 1fr; }
+  .host-gate-card form button { justify-content: center; }
+}
+
+@media (max-width: 520px) {
+  .auto-results-panel { padding: 9px; }
+  .auto-results-panel > header { grid-template-columns: 30px minmax(0,1fr); padding: 9px; }
+  .auto-score-icon { width: 29px; height: 29px; }
+  .puzzle-leaderboard li { grid-template-columns: 18px 27px minmax(0,1fr) auto; grid-template-rows: auto auto; gap: 2px 6px; padding: 8px 2px; }
+  .puzzle-leaderboard li > span { grid-column: 1; grid-row: 1 / 3; align-self: center; }
+  .puzzle-leaderboard li > .avatar { grid-column: 2; grid-row: 1 / 3; }
+  .puzzle-leaderboard li > strong { grid-column: 3; grid-row: 1; align-self: end; overflow-wrap: anywhere; }
+  .puzzle-leaderboard li > small { grid-column: 3; grid-row: 2; justify-self: start; }
+  .puzzle-leaderboard li > b { grid-column: 4; grid-row: 1 / 3; align-self: center; white-space: nowrap; }
 }
