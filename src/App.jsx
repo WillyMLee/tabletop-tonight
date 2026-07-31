@@ -33,24 +33,22 @@ import {
 } from 'lucide-react'
 import { games, getGame, partySlugs, tonightSlugs } from './data/games.js'
 
-const defaultPlayers = [
-  { id: 1, name: 'Maya', team: 'meeple', points: 18, checkedIn: true },
-  { id: 2, name: 'Chris', team: 'mayhem', points: 16, checkedIn: true },
-  { id: 3, name: 'Jordan', team: 'meeple', points: 14, checkedIn: true },
-  { id: 4, name: 'Priya', team: 'mayhem', points: 12, checkedIn: true },
-  { id: 5, name: 'Sam', team: 'meeple', points: 11, checkedIn: true },
-  { id: 6, name: 'Taylor', team: 'mayhem', points: 10, checkedIn: true },
-  { id: 7, name: 'Alex', team: 'meeple', points: 8, checkedIn: true },
-  { id: 8, name: 'Nina', team: 'mayhem', points: 8, checkedIn: true },
-  { id: 9, name: 'Marcus', team: 'meeple', points: 7, checkedIn: true },
-  { id: 10, name: 'Zoe', team: 'mayhem', points: 6, checkedIn: true },
-  { id: 11, name: 'Eli', team: 'meeple', points: 5, checkedIn: true },
-  { id: 12, name: 'Brooke', team: 'mayhem', points: 4, checkedIn: true },
-]
+const defaultPlayers = []
 
-const defaultPodAssignments = {
-  1: 'A', 2: 'A', 3: 'B', 4: 'B', 5: 'C', 6: 'C',
-  7: 'A', 8: 'A', 9: 'B', 10: 'B', 11: 'C', 12: 'C',
+const defaultPodAssignments = {}
+
+const storedPlayerIdentity = storageKey => {
+  if (typeof window === 'undefined') return null
+  try {
+    const value = JSON.parse(window.localStorage.getItem(storageKey))
+    return Number.isInteger(value?.id) && value.id > 0 && typeof value.name === 'string' ? value : null
+  } catch {
+    return null
+  }
+}
+
+const rememberPlayerIdentity = (storageKey, identity) => {
+  if (typeof window !== 'undefined') window.localStorage.setItem(storageKey, JSON.stringify(identity))
 }
 
 const legacyTeamInfo = {
@@ -65,7 +63,7 @@ const legacyItinerary = [
   { time: '8:30', period: 'PM', title: 'Snack + Party Grid', detail: 'Refuel while both teams race through the in-app word wall.', duration: '20 min', points: '10 pts', type: 'app', icon: '🧩' },
   { time: '8:50', period: 'PM', title: 'Team gauntlet', detail: 'Yahtzee relay, Liar’s Dice, and Signal Sprint run simultaneously.', duration: '45 min', points: '30 pts', type: 'group', icon: '⚡' },
   { time: '9:35', period: 'PM', title: 'Finale + awards', detail: 'Captain’s choice challenge, trophy reveal, and ridiculous awards.', duration: '25 min', points: '20 pts', type: 'finale', icon: '🏆' },
-  { time: '10:00', period: 'PM', title: 'After-hours side quests', detail: 'Catan, rematches, or more GameCube for anyone still standing.', duration: 'Optional', type: 'after', icon: '🌙' },
+  { time: '10:00', period: 'PM', title: 'After-hours side quests', detail: 'Hot Streak, Magical Athlete, rematches, or more GameCube for anyone still standing.', duration: 'Optional', type: 'after', icon: '🌙' },
 ]
 
 const legacyRotations = [
@@ -107,7 +105,7 @@ const itinerary = [
 const phaseGuidance = [
   { phase: 'Ready room', objective: 'Get everyone checked in, snacking, and clear on their house team.', everyone: 'Grab food, find your ghost team, and confirm your name on the roster.', blinky: 'Meet the pink captain and help welcome late arrivals.', inky: 'Meet the cyan captain and help welcome late arrivals.', host: 'Balance the teams and explain team points versus individual points.', cta: 'Manage teams', path: '/teams' },
   { phase: 'Two-minute welcome', objective: 'Explain only what people need before the first game.', everyone: 'Listen for the two teams, where scores live, and how the circuits differ.', blinky: 'Confirm the pink captain.', inky: 'Confirm the cyan captain.', host: 'Keep this short: teams, scoring, GeoGuessr, then Random → Choice → Rival Choice.', cta: 'Continue to GeoGuessr', path: '/run-of-show' },
-  { phase: 'Full-group feature', objective: 'Play 3–5 GeoGuessr locations with the whole room split into two house teams.', everyone: 'Gather around the main screen and discuss clues quietly with your team.', blinky: 'Choose one captain device and one final guesser.', inky: 'Choose one captain device and one final guesser.', host: 'Create a GeoGuessr Party, share the join code, and run 60–90 second locations.', cta: 'Open GeoGuessr Party', path: '/games/geoguessr' },
+  { phase: 'Full-group feature', objective: 'Play 3–5 GeoGuessr locations, with Hot Streak, Wavelength, Flip 7, or Herd Mentality ready as the whole-room encore.', everyone: 'Gather around the main screen and discuss clues quietly with your team.', blinky: 'Choose one captain device and one final guesser.', inky: 'Choose one captain device and one final guesser.', host: 'Create a GeoGuessr Party, then read the room: Hot Streak is the fastest high-energy follow-up and Wavelength is the strongest team-vs-team option.', cta: 'Open group game options', path: '/games' },
   { phase: 'Dinner', objective: 'Eat the food that was ordered. Nothing else is scheduled.', everyone: 'Grab dinner and take a real break.', blinky: 'No team task during dinner.', inky: 'No team task during dinner.', host: 'Put the order on screen and quietly reset the three circuit stations.', cta: 'Continue to circuits', path: '/run-of-show' },
   { phase: 'Random circuit', objective: 'Start the circuit with a fair shuffle and zero negotiation.', everyone: 'Go to the pod assigned by the shuffle and stay for the full round.', blinky: 'Record pink individual awards before leaving.', inky: 'Verify the station result before leaving.', host: 'Shuffle pods once, reveal all three stations, and start one 25-minute clock.', cta: 'Shuffle pods', path: '/run-of-show' },
   { phase: 'Player-choice circuit', objective: 'Let guests prioritize the game they most want to play.', everyone: 'Choose an open pod; help keep every pod between three and five players.', blinky: 'Pink players choose first in alternating order.', inky: 'Cyan players choose second in alternating order.', host: 'Close full pods and rebalance only if a station drops below three players.', cta: 'Choose pods', path: '/run-of-show' },
@@ -120,7 +118,7 @@ const phaseGuidance = [
 const phaseLogistics = [
   { games: [], places: [{ group: 'Everyone', location: 'Entry + kitchen', detail: 'Check in, grab snacks and a team color, then meet your captain.' }] },
   { games: [], places: [] },
-  { games: ['geoguessr'], places: [] },
+  { games: ['geoguessr'], alternates: ['hot-streak', 'wavelength', 'flip-7', 'herd-mentality'], places: [] },
   { games: [], places: [] },
   { assignmentMode: 'random', games: ['blokus', 'jenga', 'mario-strikers-gc'], places: [
     { group: 'Pod A', location: 'Dining table', game: 'blokus' }, { group: 'Pod B', location: 'Coffee table', game: 'jenga' }, { group: 'Pod C', location: 'TV station', game: 'mario-strikers-gc' },
@@ -172,7 +170,7 @@ const gridWords = ['TOKEN', 'MARIO', 'BLOCK', 'SCORE', 'LINK', 'CUP', 'PAWN', 'R
 
 const sprintPrompts = [
   'Terrible names for a new board game',
-  'Things you should never say during Catan',
+  'Things you should never yell during Hot Streak',
   'Excuses for knocking over the Jenga tower',
   'Video-game power-ups that would be useless in real life',
   'Things more stressful than the final Yahtzee roll',
@@ -384,11 +382,58 @@ function NightOrganizer({ currentEvent, setCurrentEvent, navigate }) {
   )
 }
 
-function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurrentEvent }) {
+function GuestJoin({ players, playerIdentity, joinPlayer, changePlayerTeam }) {
+  const player = players.find(item => item.id === playerIdentity?.id && item.name.toLocaleLowerCase() === playerIdentity.name.toLocaleLowerCase())
+  const [name, setName] = useState('')
+  const [team, setTeam] = useState('meeple')
+  const [joining, setJoining] = useState(false)
+  const [error, setError] = useState('')
+
+  if (player) {
+    return <section className="player-pass card" aria-label="Your game-night player">
+      <Avatar name={player.name} />
+      <div><span className="kicker">YOU’RE IN</span><strong>{player.name}</strong><small>Choose your ghost team anytime.</small></div>
+      <div className="join-team-picker compact">
+        {Object.keys(teamInfo).map(teamKey => <button type="button" aria-pressed={player.team === teamKey} className={`${teamInfo[teamKey].color} ${player.team === teamKey ? 'selected' : ''}`} onClick={() => changePlayerTeam(player.id, teamKey)} key={teamKey}><span className="team-ghost"><i /><i /></span>{teamInfo[teamKey].name}</button>)}
+      </div>
+    </section>
+  }
+
+  const submit = async event => {
+    event.preventDefault()
+    if (!name.trim() || joining) return
+    setJoining(true)
+    setError('')
+    try {
+      await joinPlayer(name.trim(), team)
+      setName('')
+    } catch (joinError) {
+      setError(joinError.message || 'Could not join the game night')
+    } finally {
+      setJoining(false)
+    }
+  }
+
+  return <section className="guest-join card">
+    <div className="guest-join-copy"><span className="join-ghost"><i /><i /></span><div><span className="kicker">READY PLAYER?</span><h2>Join game night</h2><p>No account or password. Add your name, pick a ghost team, and you’re on the live roster.</p></div></div>
+    <form onSubmit={submit}>
+      <label><span>Your name</span><input value={name} onChange={event => setName(event.target.value)} maxLength={40} autoComplete="name" placeholder="Enter your name" aria-describedby={error ? 'join-error' : undefined} /></label>
+      <fieldset><legend>Choose a team</legend><div className="join-team-picker">{Object.keys(teamInfo).map(teamKey => {
+        const teamCount = players.filter(item => item.team === teamKey).length
+        return <button type="button" aria-pressed={team === teamKey} className={`${teamInfo[teamKey].color} ${team === teamKey ? 'selected' : ''}`} onClick={() => setTeam(teamKey)} key={teamKey}><span className="team-ghost"><i /><i /></span><span><strong>{teamInfo[teamKey].name}</strong><small>{teamCount} {teamCount === 1 ? 'player' : 'players'}</small></span></button>
+      })}</div></fieldset>
+      {error && <p className="join-error" id="join-error" role="alert">{error}</p>}
+      <button className="primary join-button" disabled={!name.trim() || joining}>{joining ? 'Joining…' : 'Join the game'} <ArrowRight size={16} /></button>
+    </form>
+  </section>
+}
+
+function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurrentEvent, guestPlayerIdentity, joinPlayer, changePlayerTeam }) {
   const activePlayers = players.filter(player => player.checkedIn)
   const current = itinerary[currentEvent] || itinerary[0]
   return (
     <main className="live-hub">
+      <GuestJoin players={players} playerIdentity={guestPlayerIdentity} joinPlayer={joinPlayer} changePlayerTeam={changePlayerTeam} />
       <section className="pac-section score-zone">
         <div className="pac-section-head">
           <div><span className="kicker"><span className="live-dot" /> LIVE SCORE</span><h1>Team championship</h1><p>{current.title} is live · {current.time} {current.period}</p></div>
@@ -400,7 +445,7 @@ function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurr
       </section>
 
       <section className="pac-section teams-zone">
-        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h2>Teams</h2><p>{activePlayers.length} players are ready to chase the high score.</p></div><button className="pixel-button" onClick={() => navigate('/teams')}>MANAGE TEAMS <ChevronRight size={15} /></button></div>
+        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h2>Teams</h2><p>{activePlayers.length} {activePlayers.length === 1 ? 'player is' : 'players are'} ready to chase the high score.</p></div><button className="pixel-button" onClick={() => navigate('/teams')}>MANAGE TEAMS <ChevronRight size={15} /></button></div>
         <div className="ghost-team-grid">
           {Object.keys(teamInfo).map(team => {
             const info = teamInfo[team]
@@ -674,7 +719,7 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
       <section className="page-intro">
         <span className="eyebrow">THE GAME PLAN</span>
         <h1>A full night, <em>zero benchwarmers.</em></h1>
-        <p>The core schedule keeps all 12 players active. With 10–14 guests, use 3–5 people at each station and keep the same rotations.</p>
+        <p>The core schedule keeps all 14 players active. With 10–14 guests, use 3–5 people at each station and keep the same rotations.</p>
       </section>
 
       <section className="schedule-layout">
@@ -693,8 +738,8 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
         <aside className="card host-note">
           <Lightbulb size={24} />
           <span className="kicker">HOST NOTE</span>
-          <h3>Keep Catan after hours</h3>
-          <p>One copy seats only 3–4 and usually takes 60–120 minutes. Making it an optional side quest prevents eight people from waiting.</p>
+          <h3>Race at the right scale</h3>
+          <p>Hot Streak works as the loud full-room race. Magical Athlete stays in a 4–6-player pod where every power remains readable.</p>
           <div className="mini-rule"><span>Core-night rule</span><strong>No one sits out longer than 5 min.</strong></div>
         </aside>
       </section>
@@ -940,7 +985,7 @@ function Roster({ players, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTea
       <section className="page-intro roster-intro">
         <span className="eyebrow">THE CREW</span>
         <h1>Teams & players</h1>
-        <p>Check guests in, balance the two house teams, and replace the sample names with your actual group.</p>
+        <p>Guests can join from the home page with only their name. Use this page to check attendance and rebalance the two ghost teams.</p>
       </section>
       <div className="roster-actions card">
         <form onSubmit={submitPlayer}><UserPlus size={18} /><input aria-label="Player name" value={newName} onChange={e => setNewName(e.target.value)} placeholder="Add a player" /><button className="primary">Add</button></form>
@@ -956,15 +1001,17 @@ function Roster({ players, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTea
           </div>
         })}
       </section>
-      <button className="reset-demo" onClick={onReset}><RotateCcw size={15} /> Reset demo data</button>
+      <button className="reset-demo" onClick={onReset}><RotateCcw size={15} /> Reset game night</button>
     </main>
   )
 }
 
 function LocalApp() {
-  const [scores, setScores] = useStoredState('tabletop-scores', { meeple: 65, mayhem: 60 })
-  const [players, setPlayers] = useStoredState('tabletop-players', defaultPlayers)
-  const [currentEvent, setCurrentEvent] = useStoredState('tabletop-current-event', 2)
+  const guestStorageKey = 'tabletop-v3-local-player'
+  const [guestPlayerIdentity, setGuestPlayerIdentity] = useState(() => storedPlayerIdentity(guestStorageKey))
+  const [scores, setScores] = useStoredState('tabletop-v3-scores', { meeple: 0, mayhem: 0 })
+  const [players, setPlayers] = useStoredState('tabletop-v3-players', defaultPlayers)
+  const [currentEvent, setCurrentEvent] = useStoredState('tabletop-v3-current-event', 0)
   const [phaseScores, setPhaseScores] = useStoredState('tabletop-v2-phase-scores', {})
   const [individualPhaseScores, setIndividualPhaseScores] = useStoredState('tabletop-v2-individual-phase-scores', {})
   const [podAssignments, setPodAssignments] = useStoredState('tabletop-pod-assignments', defaultPodAssignments)
@@ -1013,7 +1060,7 @@ function LocalApp() {
     setScores(previous => ({ meeple: Math.max(0, previous.meeple + delta.meeple), mayhem: Math.max(0, previous.mayhem + delta.mayhem) }))
   }
   const checkedIn = useMemo(() => players.filter(p => p.checkedIn).length, [players])
-  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 65, mayhem: 60 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setDinnerOrder(''); setCurrentEvent(2) }
+  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setDinnerOrder(''); setCurrentEvent(0) }
   const addPlayer = name => {
     const team = players.filter(player => player.team === 'meeple').length <= players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...players.map(player => player.id)) + 1
@@ -1030,12 +1077,26 @@ function LocalApp() {
   const toggleCheckIn = playerId => setPlayers(previous => previous.map(player => player.id === playerId ? { ...player, checkedIn: !player.checkedIn } : player))
   const movePlayerTeam = (playerId, team) => setPlayers(previous => previous.map(player => player.id === playerId ? { ...player, team } : player))
   const removePlayer = playerId => setPlayers(previous => previous.filter(player => player.id !== playerId))
+  const joinPlayer = async (name, team) => {
+    const cleanName = name.trim().replace(/\s+/g, ' ').slice(0, 40)
+    const existing = players.find(player => player.name.toLocaleLowerCase() === cleanName.toLocaleLowerCase())
+    const id = existing?.id ?? Math.max(0, ...players.map(player => player.id)) + 1
+    setPlayers(previous => existing
+      ? previous.map(player => player.id === id ? { ...player, name: cleanName, team, checkedIn: true } : player)
+      : [...previous, { id, name: cleanName, team, points: 0, checkedIn: true }])
+    const identity = { id, name: cleanName }
+    setGuestPlayerIdentity(identity)
+    rememberPlayerIdentity(guestStorageKey, identity)
+    return id
+  }
 
-  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo }} checkedIn={checkedIn} />
+  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
   const eventKey = import.meta.env.VITE_GAME_NIGHT_KEY || 'tabletop-tonight'
+  const guestStorageKey = `tabletop-player-${eventKey}`
+  const [guestPlayerIdentity, setGuestPlayerIdentity] = useState(() => storedPlayerIdentity(guestStorageKey))
   const queryArgs = { eventKey }
   const connectionState = useConvexConnectionState()
   const state = useQuery(api.sharedState.get, queryArgs)
@@ -1065,6 +1126,7 @@ function RealtimeApp() {
   const setPodsMutation = useMutation(api.sharedState.setPods)
   const recordCircuitResultMutation = useMutation(api.sharedState.recordCircuitResult)
   const addPlayerMutation = useMutation(api.sharedState.addPlayer)
+  const joinPlayerMutation = useMutation(api.sharedState.joinPlayer)
   const toggleCheckInMutation = useMutation(api.sharedState.toggleCheckIn)
   const removePlayerMutation = useMutation(api.sharedState.removePlayer)
   const setTeamAssignmentsMutation = useMutation(api.sharedState.setTeamAssignments)
@@ -1099,6 +1161,19 @@ function RealtimeApp() {
   }
   const recordCircuitResult = (phase, slug, result) => commit(recordCircuitResultMutation({ eventKey, phase, slug, result: result || undefined }))
   const addPlayer = name => commit(addPlayerMutation({ eventKey, name }))
+  const joinPlayer = async (name, team) => {
+    setSyncError('')
+    try {
+      const playerId = await joinPlayerMutation({ eventKey, name, team })
+      const identity = { id: playerId, name: name.trim().replace(/\s+/g, ' ').slice(0, 40) }
+      setGuestPlayerIdentity(identity)
+      rememberPlayerIdentity(guestStorageKey, identity)
+      return playerId
+    } catch (error) {
+      setSyncError(error.message || 'Could not join the game night')
+      throw error
+    }
+  }
   const shuffleTeams = () => {
     const shuffled = [...state.players]
     for (let index = shuffled.length - 1; index > 0; index -= 1) {
@@ -1113,13 +1188,13 @@ function RealtimeApp() {
   const resetDemo = () => commit(resetMutation({ eventKey }))
   const checkedIn = state.players.filter(player => player.checkedIn).length
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={state} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo }} checkedIn={checkedIn} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={state} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
-function GameNightShell({ state, actions, checkedIn, syncMode, syncError = '' }) {
+function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
   const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder } = state
-  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo } = actions
+  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, resetDemo } = actions
   const gameSlug = path.startsWith('/games/') ? decodeURIComponent(path.slice('/games/'.length)) : null
   const playMode = path.startsWith('/play/') ? path.slice('/play/'.length) : null
 
@@ -1131,7 +1206,7 @@ function GameNightShell({ state, actions, checkedIn, syncMode, syncError = '' })
         <div className={`header-status ${syncMode === 'realtime' ? 'is-synced' : syncMode === 'connecting' ? 'is-connecting' : ''}`} title={syncMode === 'realtime' ? 'Updates sync live across devices' : syncMode === 'connecting' ? 'Reconnecting to live sync' : 'Stored on this device'}><span className="live-dot" /><strong>{checkedIn}</strong> checked in {syncMode !== 'local' && <small>{syncMode === 'realtime' ? 'LIVE SYNC' : 'CONNECTING'}</small>}</div>
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
-      {path === '/' && <Tonight {...{ scores, changeScore, players, navigate, currentEvent, setCurrentEvent }} />}
+      {path === '/' && <Tonight {...{ scores, changeScore, players, navigate, currentEvent, setCurrentEvent, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
       {path === '/games' && <GameLibrary navigate={navigate} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {(path === '/run-of-show' || path === '/lineup') && <RunOfShow {...{ currentEvent, setCurrentEvent, players, scores, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, navigate }} />}

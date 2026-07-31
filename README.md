@@ -5,6 +5,7 @@ A mobile-first, Pac-Man-inspired game-night planner and live scoreboard for a 10
 ## What is included
 
 - Live two-team scorekeeping and an individual leaderboard
+- No-account guest check-in: enter a name, choose a ghost team, and join the shared roster
 - A ten-phase run of show from check-in through the optional Secret Hitler finale
 - Full-group GeoGuessr instructions for 3–5 shared rounds
 - Three configurable circuit rounds with random, player-choice, and rival-choice assignments
@@ -34,7 +35,7 @@ When `VITE_CONVEX_URL` is configured, every screen subscribes to one shared game
 
 Without `VITE_CONVEX_URL`, the app intentionally falls back to browser-local persistence so frontend development is not blocked. The header identifies the active mode as `LIVE SYNC`, `CONNECTING`, or local device storage.
 
-`VITE_GAME_NIGHT_KEY` selects the shared event. Treat it as an invite-link capability: use a long, unique value and share the deployed URL only with guests. This party build allows guests with the link to update the night. Add full identity-based host roles before using the same model for public or sensitive events.
+`VITE_GAME_NIGHT_KEY` selects the shared event. Treat it as an invite-link capability: use a long, unique value and share the deployed URL only with guests. This party build intentionally has no account flow: guests with the link can join by name, select a team, and update the night. Add identity-based host roles before using the same model for public or sensitive events.
 
 ## Recommended hosting: Cloudflare Workers
 

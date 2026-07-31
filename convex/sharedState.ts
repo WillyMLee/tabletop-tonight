@@ -7,32 +7,15 @@ const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
 const pods = ['A', 'B', 'C'] as const
 
-const defaultPlayers = [
-  { id: 1, name: 'Maya', team: 'meeple' as const, points: 18, checkedIn: true },
-  { id: 2, name: 'Chris', team: 'mayhem' as const, points: 16, checkedIn: true },
-  { id: 3, name: 'Jordan', team: 'meeple' as const, points: 14, checkedIn: true },
-  { id: 4, name: 'Priya', team: 'mayhem' as const, points: 12, checkedIn: true },
-  { id: 5, name: 'Sam', team: 'meeple' as const, points: 11, checkedIn: true },
-  { id: 6, name: 'Taylor', team: 'mayhem' as const, points: 10, checkedIn: true },
-  { id: 7, name: 'Alex', team: 'meeple' as const, points: 8, checkedIn: true },
-  { id: 8, name: 'Nina', team: 'mayhem' as const, points: 8, checkedIn: true },
-  { id: 9, name: 'Marcus', team: 'meeple' as const, points: 7, checkedIn: true },
-  { id: 10, name: 'Zoe', team: 'mayhem' as const, points: 6, checkedIn: true },
-  { id: 11, name: 'Eli', team: 'meeple' as const, points: 5, checkedIn: true },
-  { id: 12, name: 'Brooke', team: 'mayhem' as const, points: 4, checkedIn: true },
-]
+const defaultPlayers: Doc<'sharedGameNights'>['players'] = []
 
-const defaultPodAssignments = {
-  '1': 'A' as const, '2': 'A' as const, '3': 'B' as const, '4': 'B' as const,
-  '5': 'C' as const, '6': 'C' as const, '7': 'A' as const, '8': 'A' as const,
-  '9': 'B' as const, '10': 'B' as const, '11': 'C' as const, '12': 'C' as const,
-}
+const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
 
 const initialState = (eventKey: string) => ({
   eventKey,
-  scores: { meeple: 65, mayhem: 60 },
+  scores: { meeple: 0, mayhem: 0 },
   players: defaultPlayers,
-  currentEvent: 2,
+  currentEvent: 0,
   phaseScores: {},
   individualPhaseScores: {},
   podAssignments: defaultPodAssignments,
@@ -207,6 +190,29 @@ export const addPlayer = mutation({
     const team = state.players.filter(player => player.team === 'meeple').length <= state.players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...state.players.map(player => player.id)) + 1
     await ctx.db.patch(state._id, { players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }], podAssignments: { ...state.podAssignments, [String(id)]: pods[id % 3] }, updatedAt: Date.now() })
+  },
+})
+
+export const joinPlayer = mutation({
+  args: { eventKey: v.string(), name: v.string(), team: teamSlug },
+  handler: async (ctx, { eventKey, name, team }) => {
+    const cleanName = name.trim().replace(/\s+/g, ' ').slice(0, 40)
+    if (!cleanName) throw new Error('Your name is required')
+    const state = await getState(ctx, eventKey)
+    const existing = state.players.find(player => player.name.toLocaleLowerCase() === cleanName.toLocaleLowerCase())
+    if (existing) {
+      const players = state.players.map(player => player.id === existing.id ? { ...player, name: cleanName, team, checkedIn: true } : player)
+      await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
+      return existing.id
+    }
+    if (state.players.length >= 30) throw new Error('The game-night roster is full')
+    const id = Math.max(0, ...state.players.map(player => player.id)) + 1
+    await ctx.db.patch(state._id, {
+      players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }],
+      podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % 3] },
+      updatedAt: Date.now(),
+    })
+    return id
   },
 })
 

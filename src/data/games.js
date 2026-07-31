@@ -65,13 +65,13 @@ export const games = [
     hostTip: 'Use ones, sixes, three-of-a-kind, full house, small straight, and Yahtzee.',
   }),
   game({
-    slug: 'settlers-of-catan', name: 'Settlers of Catan', icon: '⬡', category: 'Tabletop', format: 'Trading strategy', players: '3–4', duration: '60–120 min', difficulty: 'Medium', status: 'After-hours quest', color: 'pink',
-    summary: 'Trade resources, build a network, and be first to settle the island.',
-    why: 'It is excellent for a committed small group after the scored program, but too limited for the full 10–14-person agenda.',
-    setup: ['Build the beginner map.', 'Give each player roads, settlements, and a building-cost card.', 'Use suggested starting positions for new players.'],
-    rules: ['Roll for resource production.', 'Trade with players or the bank.', 'Build roads, settlements, cities, or development cards.', 'The first player to 10 victory points wins.'],
-    scoring: 'Keep it outside the team championship; log the winner for season history.',
-    hostTip: 'Share a rules video before the party and start it only after awards.',
+    slug: 'hot-streak', name: 'Hot Streak', icon: '🏁', category: 'Party', format: 'Betting race', players: '2–9+', duration: '20 min', difficulty: 'Easy', status: 'Full-group spectacle', color: 'pink',
+    summary: 'Bet on four wildly unreliable mascots, lock in the strategy, and watch the race erupt.',
+    why: 'It scales beyond nine, resolves in about twenty minutes, and keeps all fourteen guests engaged because the race itself is loud, fast, and easy to watch.',
+    setup: ['Unroll the track and place the four mascot figures at the start.', 'Prepare the race deck for the group size.', 'Give each player their betting pieces and draft tickets before the race begins.'],
+    rules: ['Choose bets and make every strategic decision before the race.', 'Reveal the race deck without pausing for new decisions.', 'Move mascots and resolve card effects as they appear.', 'Pay winning tickets after the finish, then start the next race.'],
+    scoring: 'Run three races. Add each player’s payout to their house team; the higher team total earns 10 championship points and the top bettor earns 5 individual points.',
+    hostTip: 'Use it with the whole room. Keep the race deck moving continuously—the cheering and shared reveal are the point.',
   }),
   game({
     slug: 'flip-7', name: 'Flip 7', icon: '⑦', category: 'Party', format: 'Push your luck', players: '3–18', duration: '20 min', difficulty: 'Easy', status: 'Circuit + party', color: 'cyan',
@@ -83,13 +83,13 @@ export const games = [
     hostTip: 'This is the most flexible physical party game in the lineup—keep it ready when attendance changes.',
   }),
   game({
-    slug: 'magical-athlete', name: 'Magical Athlete', icon: '★', category: 'Party', format: 'Chaotic racing', players: '2–6', duration: '60 min', difficulty: 'Easy', status: 'Party split', color: 'yellow',
+    slug: 'magical-athlete', name: 'Magical Athlete', icon: '★', category: 'Party', format: 'Chaotic racing', players: '2–6', duration: '30 min', difficulty: 'Easy', status: 'Circuit game', color: 'yellow',
     summary: 'Draft bizarre racers, roll the die, and let game-breaking powers create the chaos.',
-    why: 'A six-player table pairs neatly with a second party-game table for a 10–14-person crowd.',
+    why: 'Its six-player cap and asymmetric racers make it ideal for one circuit pod, where everyone gets a character and the chaos remains readable.',
     setup: ['Lay out the race track and racer cards.', 'Draft a team of magical athletes.', 'Choose the first racer each player will enter.'],
     rules: ['Roll one die and move your racer.', 'Resolve the racer’s unique ability whenever it applies.', 'Finish positions earn trophies or points.', 'Compete across four races; most points wins.'],
     scoring: 'Winning player earns 8 individual points and 10 for their house team.',
-    hostTip: 'The current edition supports 2–6 players; run it beside Secret Hitler rather than forcing the full room into one game.',
+    hostTip: 'Keep this to one 4–6-player pod. For fourteen guests, Hot Streak is the better full-room racing game.',
   }),
   game({
     slug: 'secret-hitler', name: 'Secret Hitler', icon: '◉', category: 'Party', format: 'Social deduction', players: '5–10', duration: '45 min', difficulty: 'Medium', status: 'Party split', color: 'pink',
@@ -147,6 +147,6 @@ export const games = [
   }),
 ]
 
-export const tonightSlugs = ['geoguessr', 'wavelength', 'blokus', 'jenga', 'mario-strikers-gc', 'mario-tennis-gc', 'yahtzee', 'flip-7', 'settlers-of-catan']
-export const partySlugs = ['geoguessr', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections']
+export const tonightSlugs = ['geoguessr', 'hot-streak', 'wavelength', 'blokus', 'jenga', 'mario-strikers-gc', 'mario-tennis-gc', 'yahtzee', 'magical-athlete', 'flip-7']
+export const partySlugs = ['geoguessr', 'hot-streak', 'wavelength', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections']
 export const getGame = slug => games.find(item => item.slug === slug)
