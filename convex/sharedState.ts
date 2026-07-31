@@ -4,6 +4,7 @@ import { v } from 'convex/values'
 import { initialRoster } from './eventConfig'
 
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
+const puzzleGame = v.union(v.literal('wordle'), v.literal('connections'))
 const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
 const circuitGameChoice = v.union(v.literal('flip-7'), v.literal('magical-athlete'))
@@ -18,7 +19,6 @@ const gamePointValues: Record<string, number> = {
   'magical-athlete': 2,
   'table-choice': 2,
 }
-const groupGameSlugs = new Set(['geoguessr', 'wordle', 'connections', 'jenga'])
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
@@ -243,45 +243,35 @@ export const recordGameWinner = mutation({
   },
 })
 
-export const resetGroupGameScores = mutation({
-  args: { eventKey: v.string(), playerId: v.number(), claimToken: v.string() },
-  handler: async (ctx, { eventKey, playerId, claimToken }) => {
+export const resetPuzzleRound = mutation({
+  args: { eventKey: v.string(), playerId: v.number(), claimToken: v.string(), game: puzzleGame, puzzleId: v.string() },
+  handler: async (ctx, { eventKey, playerId, claimToken, game, puzzleId }) => {
     if (!Number.isInteger(playerId) || playerId < 1 || !/^[a-zA-Z0-9-]{16,128}$/.test(claimToken)) throw new Error('Invalid player claim')
+    const match = game === 'wordle' ? puzzleId.match(/^wordle-pool-v1-([1-5])$/) : puzzleId.match(/^connections-nyc-([1-3])$/)
+    if (!match) throw new Error('Choose a valid puzzle round')
     const state = await getState(ctx, eventKey)
     const willy = state.players.find(player => player.id === playerId && player.name === 'Willy')
-    if (!willy?.checkedIn || willy.claimToken !== claimToken) throw new Error('Only the claimed Willy profile can reset group-game scores')
+    if (!willy?.checkedIn || willy.claimToken !== claimToken) throw new Error('Only the claimed Willy profile can reset puzzle rounds')
 
     const gameWinners = { ...(state.gameWinners ?? {}) }
-    const removedByPlayer = new Map<number, number>()
-    const removedByTeam = { meeple: 0, mayhem: 0 }
-    let clearedRounds = 0
-
-    for (const [winnerKey, winnerId] of Object.entries(gameWinners)) {
-      const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
-      if (!groupGameSlugs.has(slug)) continue
-      const winner = state.players.find(player => player.id === winnerId)
-      const points = gamePointValues[slug] ?? 0
-      if (winner && points) {
-        removedByPlayer.set(winner.id, (removedByPlayer.get(winner.id) ?? 0) + points)
-        removedByTeam[winner.team] += points
-      }
-      delete gameWinners[winnerKey]
-      clearedRounds += 1
-    }
-
-    const puzzleResults = await ctx.db.query('puzzleResults').withIndex('by_event_key', q => q.eq('eventKey', state.eventKey)).take(200)
+    const winnerKey = `${game}:${match[1]}`
+    const winner = state.players.find(player => player.id === gameWinners[winnerKey])
+    delete gameWinners[winnerKey]
+    const puzzleResults = await ctx.db.query('puzzleResults')
+      .withIndex('by_event_key_and_game_and_puzzle_id', q => q.eq('eventKey', state.eventKey).eq('game', game).eq('puzzleId', puzzleId))
+      .take(20)
     for (const result of puzzleResults) await ctx.db.delete('puzzleResults', result._id)
 
     await ctx.db.patch(state._id, {
       gameWinners,
-      players: state.players.map(player => ({ ...player, points: clampPoints(player.points - (removedByPlayer.get(player.id) ?? 0)) })),
+      players: state.players.map(player => player.id === winner?.id ? { ...player, points: clampPoints(player.points - 3) } : player),
       scores: {
-        meeple: clampPoints(state.scores.meeple - removedByTeam.meeple),
-        mayhem: clampPoints(state.scores.mayhem - removedByTeam.mayhem),
+        meeple: clampPoints(state.scores.meeple - (winner?.team === 'meeple' ? 3 : 0)),
+        mayhem: clampPoints(state.scores.mayhem - (winner?.team === 'mayhem' ? 3 : 0)),
       },
       updatedAt: Date.now(),
     })
-    return { clearedRounds, clearedPuzzleResults: puzzleResults.length }
+    return { clearedPuzzleResults: puzzleResults.length }
   },
 })
 

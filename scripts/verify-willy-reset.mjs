@@ -24,30 +24,33 @@ try {
   await client.mutation(api.sharedState.recordGameWinner, { eventKey, winnerKey: 'geoguessr:1', playerId: opponent.id })
   await client.mutation(api.sharedState.recordGameWinner, { eventKey, winnerKey: 'jenga:1', playerId: willy.id })
   await client.mutation(api.puzzleResults.submit, { eventKey, playerId: willy.id, claimToken: willyToken, game: 'wordle', puzzleId: 'wordle-pool-v1-1', metric: 4 })
+  await client.mutation(api.puzzleResults.submit, { eventKey, playerId: opponent.id, claimToken: opponentToken, game: 'wordle', puzzleId: 'wordle-pool-v1-2', metric: 3 })
+  await client.mutation(api.puzzleResults.submit, { eventKey, playerId: opponent.id, claimToken: opponentToken, game: 'connections', puzzleId: 'connections-nyc-1', metric: 45 })
   await client.mutation(api.sharedState.recordGameWinner, { eventKey, winnerKey: 'blokus:1', playerId: opponent.id })
 
   let unauthorizedResetRejected = false
   try {
-    await client.mutation(api.sharedState.resetGroupGameScores, { eventKey, playerId: opponent.id, claimToken: opponentToken })
+    await client.mutation(api.sharedState.resetPuzzleRound, { eventKey, playerId: opponent.id, claimToken: opponentToken, game: 'wordle', puzzleId: 'wordle-pool-v1-1' })
   } catch {
     unauthorizedResetRejected = true
   }
-  if (!unauthorizedResetRejected) throw new Error('A non-Willy profile was allowed to reset group-game scores')
+  if (!unauthorizedResetRejected) throw new Error('A non-Willy profile was allowed to reset a puzzle round')
 
-  const result = await client.mutation(api.sharedState.resetGroupGameScores, { eventKey, playerId: willy.id, claimToken: willyToken })
+  const result = await client.mutation(api.sharedState.resetPuzzleRound, { eventKey, playerId: willy.id, claimToken: willyToken, game: 'wordle', puzzleId: 'wordle-pool-v1-1' })
   const state = await client.query(api.sharedState.get, { eventKey })
   const puzzleResults = await client.query(api.puzzleResults.list, { eventKey })
   const remainingWilly = state?.players.find(player => player.id === willy.id)
   const remainingOpponent = state?.players.find(player => player.id === opponent.id)
 
-  if (result.clearedRounds !== 3 || result.clearedPuzzleResults !== 1) throw new Error('The group reset did not report the expected cleared results')
-  if (puzzleResults.length) throw new Error('The group reset left puzzle leaderboard results behind')
-  if (state?.gameWinners?.['geoguessr:1'] || state?.gameWinners?.['jenga:1'] || state?.gameWinners?.['wordle:1']) throw new Error('The group reset left a group-game winner behind')
+  if (result.clearedPuzzleResults !== 1) throw new Error('The round reset did not report the expected cleared result')
+  if (puzzleResults.length !== 2 || puzzleResults.some(item => item.puzzleId === 'wordle-pool-v1-1')) throw new Error('The round reset did not isolate one puzzle leaderboard')
+  if (state?.gameWinners?.['wordle:1']) throw new Error('The selected Wordle winner was not cleared')
+  for (const key of ['geoguessr:1', 'jenga:1', 'wordle:2', 'connections:1', 'blokus:1']) if (!state?.gameWinners?.[key]) throw new Error(`The round reset removed ${key}`)
   if (state?.gameWinners?.['blokus:1'] !== opponent.id) throw new Error('The group reset removed a circuit winner')
-  if (state?.scores.meeple !== 2 || state?.scores.mayhem !== 0 || remainingOpponent?.points !== 2 || remainingWilly?.points !== 0) throw new Error('The group reset did not preserve only circuit points')
-  if (!remainingWilly?.checkedIn || !remainingOpponent?.checkedIn) throw new Error('The group reset checked players out')
+  if (state?.scores.meeple !== 11 || state?.scores.mayhem !== 1 || remainingOpponent?.points !== 11 || remainingWilly?.points !== 1) throw new Error('The round reset changed another round’s points')
+  if (!remainingWilly?.checkedIn || !remainingOpponent?.checkedIn) throw new Error('The round reset checked players out')
 
-  console.log('Willy reset verified; unauthorized profiles are rejected and circuit state is preserved.')
+  console.log('Willy round reset verified; one puzzle round clears while every other result stays intact.')
 } finally {
   await client.mutation(api.sharedState.reset, { eventKey })
 }

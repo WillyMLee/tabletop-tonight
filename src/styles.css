@@ -1832,7 +1832,13 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .willy-group-admin > div > strong, .willy-group-admin > div > small { display: block; }
 .willy-group-admin > div > strong { color: white; font: 700 13px 'Chakra Petch','Manrope',sans-serif; margin: 2px 0; }
 .willy-group-admin > div > small { color: #a7b3d9; font-size: 9px; line-height: 1.45; }
-.willy-group-admin > button { background: transparent; border: 1px solid #21ddeb; border-radius: 6px; color: #7ff4fa; display: inline-flex; align-items: center; gap: 6px; font: 700 9px 'Chakra Petch','Manrope',sans-serif; padding: 10px 12px; }
+.willy-round-reset-picker { min-width: 292px; display: grid; gap: 6px; }
+.willy-reset-games { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.willy-reset-games button, .willy-reset-rounds button { background: #101541; border: 1px solid #3048d8; border-radius: 5px; color: #aeb8dc; font: 700 8px 'Chakra Petch','Manrope',sans-serif; padding: 7px; }
+.willy-reset-games button.active, .willy-reset-rounds button.active { background: var(--yellow); border-color: var(--yellow); color: #070815; }
+.willy-reset-rounds { display: flex; gap: 5px; }
+.willy-reset-rounds button { width: 30px; height: 30px; padding: 0; }
+.willy-reset-trigger { background: transparent; border: 1px solid #21ddeb; border-radius: 6px; color: #7ff4fa; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 700 9px 'Chakra Petch','Manrope',sans-serif; padding: 9px 12px; }
 .willy-reset-confirm { background: #080a27; border: 1px solid #ff7898; border-radius: 8px; padding: 9px; }
 .willy-reset-confirm > strong { color: white; display: block; font-size: 9px; margin-bottom: 7px; }
 .willy-reset-confirm > span { display: flex; gap: 5px; }
@@ -1850,7 +1856,8 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .puzzle-leaderboard li { gap: 3px 7px; padding: 8px 7px; }
   .willy-group-admin { grid-template-columns: 38px minmax(0,1fr); padding: 13px; }
   .willy-admin-icon { width: 36px; height: 36px; }
-  .willy-group-admin > button, .willy-reset-confirm { grid-column: 1 / -1; justify-content: center; width: 100%; }
+  .willy-round-reset-picker { grid-column: 1 / -1; min-width: 0; width: 100%; }
+  .willy-reset-confirm { width: 100%; }
   .willy-reset-confirm > span { justify-content: stretch; }
   .willy-reset-confirm button { flex: 1; }
   .willy-group-admin > em { grid-column: 1 / -1; }
