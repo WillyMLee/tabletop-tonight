@@ -3,8 +3,8 @@ import { ConvexHttpClient } from 'convex/browser'
 import { api } from '../convex/_generated/api.js'
 
 const deploymentUrl = process.argv.find(argument => argument.startsWith('https://'))
-if (!deploymentUrl || !process.argv.includes('--confirm')) {
-  throw new Error('Usage: npm run reset:live -- https://your-production.convex.cloud --confirm')
+if (!deploymentUrl || !process.argv.some(argument => argument === '--confirm' || argument === 'confirm')) {
+  throw new Error('Usage: npm run reset:live -- https://your-production.convex.cloud confirm')
 }
 
 const envFile = await readFile(new URL('../.env.local', import.meta.url), 'utf8')
