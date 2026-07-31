@@ -1292,3 +1292,113 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .circuit-now-bar { align-items: stretch; flex-direction: column; }
   .circuit-now-bar button { justify-content: center; }
 }
+
+/* Clear score hierarchy */
+.score-board-section { background: rgba(6,7,27,.94); border: 2px solid #2448ff; border-radius: 15px; padding: 24px; margin-bottom: 22px; box-shadow: 0 0 24px rgba(36,72,255,.14); }
+.score-section-heading { display: grid; grid-template-columns: 44px minmax(0,1fr); align-items: start; gap: 13px; border-bottom: 1px solid #1d2f97; padding-bottom: 17px; margin-bottom: 20px; }
+.score-section-number { width: 40px; height: 40px; background: var(--yellow); border-radius: 50%; color: #070815; display: grid; place-items: center; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 13px; font-weight: 700; }
+.score-section-heading h2 { color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 25px; margin: 3px 0 4px; text-transform: uppercase; }
+.score-section-heading p { color: #9ca8d5; font-size: 11px; line-height: 1.5; margin: 0; max-width: 680px; }
+.team-score-section .team-scores { max-width: none; margin-bottom: 8px; }
+.individual-score-board-section .scoreboard-grid { margin-top: 0; }
+.individual-score-board-section .standings { background: #080a27; border-color: #1d2f97; }
+
+/* Visual, progressive-disclosure how-to guides */
+.visual-how-to { border-top: 1px solid #1c2d91; margin-top: 13px; padding-top: 10px; }
+.visual-how-to summary, .station-rules summary { color: var(--yellow); cursor: pointer; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 11px; font-weight: 700; list-style-position: inside; }
+.how-to-layout { display: grid; grid-template-columns: minmax(190px,.72fr) minmax(0,1.28fr); align-items: start; gap: 14px; margin-top: 12px; }
+.how-to-copy ol, .station-how-to-game ol { color: #bdc5e2; font-size: 10px; line-height: 1.5; margin: 0; padding-left: 18px; }
+.how-to-copy li, .station-how-to-game li { margin-bottom: 5px; }
+.how-to-copy p, .station-how-to-game > p { background: #111642; border-left: 3px solid var(--yellow); color: #aeb8dc; font-size: 10px; line-height: 1.45; margin: 10px 0 0; padding: 8px 9px; }
+.how-to-copy p strong, .station-how-to-game > p b { color: var(--yellow); }
+.station-how-to-game { border-top: 1px dashed #2d43cd; padding-top: 12px; margin-top: 12px; }
+.station-how-to-game:first-of-type { border-top: 0; }
+.station-how-to-game > strong { color: white; display: block; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 13px; margin-bottom: 8px; }
+.station-how-to-game .how-diagram { margin-bottom: 10px; }
+.how-diagram { min-height: 128px; background: #0e123b; border: 1px solid #3048d8; border-radius: 8px; color: white; overflow: hidden; padding: 12px; position: relative; }
+.how-diagram small { color: #97a5d5; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 8px; font-weight: 700; }
+
+.geo-diagram { display: grid; align-content: center; gap: 7px; }
+.geo-diagram > div { display: grid; grid-template-columns: 50px 1fr; align-items: center; gap: 7px; }
+.geo-diagram strong { color: #21ddeb; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 8px; }
+.geo-diagram > div > span { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; }
+.geo-diagram i { aspect-ratio: 1; background: #17266f; border: 1px solid #3550ff; border-radius: 50%; display: grid; place-items: center; color: var(--yellow); font-size: 8px; font-style: normal; }
+
+.wordle-how-diagram { display: grid; align-content: center; justify-items: center; gap: 12px; }
+.wordle-how-diagram > div { display: grid; grid-template-columns: repeat(5,34px); gap: 5px; }
+.wordle-how-diagram span { aspect-ratio: 1; border: 2px solid #4d578b; display: grid; place-items: center; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 15px; font-weight: 700; }
+.wordle-how-diagram .hit, .wordle-how-diagram b.hit { background: #20c778; border-color: #20c778; }
+.wordle-how-diagram .near, .wordle-how-diagram b.near { background: #d2ad00; border-color: var(--yellow); }
+.wordle-how-diagram .miss, .wordle-how-diagram b.miss { background: #34395e; border-color: #50577e; }
+.wordle-how-diagram small { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 8px; }
+.wordle-how-diagram small b { width: 8px; height: 8px; display: inline-block; }
+
+.connections-how-diagram { display: grid; grid-template-columns: 1fr 23px .75fr; align-items: center; gap: 8px; }
+.connections-how-diagram > div { display: grid; grid-template-columns: repeat(4,1fr); gap: 3px; }
+.connections-how-diagram > div i { aspect-ratio: 1.35; background: #283164; border-radius: 2px; }
+.connections-how-diagram > span { color: var(--yellow); font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 7px; line-height: 1.2; text-align: center; }
+.connections-how-diagram section { display: grid; gap: 5px; }
+.connections-how-diagram section b { height: 18px; border-radius: 3px; }
+.connections-how-diagram .yellow { background: var(--yellow); }
+.connections-how-diagram .green { background: #21ddeb; }
+.connections-how-diagram .blue { background: #2448ff; }
+.connections-how-diagram .purple { background: #a65cff; }
+
+.tennis-diagram { background: #17725a; border-color: #30e3b0; min-height: 150px; }
+.tennis-diagram::before { content: ''; position: absolute; inset: 13px; border: 2px solid rgba(255,255,255,.8); background: linear-gradient(90deg,transparent 49.5%,rgba(255,255,255,.7) 49.5%,rgba(255,255,255,.7) 50.5%,transparent 50.5%); }
+.tennis-diagram::after { content: ''; position: absolute; left: 13px; right: 13px; top: 50%; border-top: 2px solid rgba(255,255,255,.7); }
+.court-net { position: absolute; top: 13px; bottom: 13px; left: 50%; border-left: 3px dashed white; z-index: 1; }
+.player-dot { width: 25px; height: 25px; border: 2px solid white; border-radius: 50%; display: grid; place-items: center; color: #070815; font-size: 8px; font-style: normal; font-weight: 800; position: absolute; z-index: 2; }
+.player-dot.pink { background: #ff3b6b; left: 18%; }
+.player-dot.cyan { background: #21ddeb; right: 18%; }
+.player-dot.front { top: 28%; }
+.player-dot.back { bottom: 20%; }
+.tennis-diagram small { background: rgba(5,6,24,.8); bottom: 5px; left: 50%; padding: 3px 5px; position: absolute; transform: translateX(-50%); white-space: nowrap; z-index: 3; }
+
+.jenga-diagram { display: grid; place-items: center; padding-bottom: 23px; }
+.jenga-diagram > div { width: 104px; display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; transform: perspective(200px) rotateX(-4deg); }
+.jenga-diagram i { height: 15px; background: #d8a561; border: 1px solid #f0c889; border-radius: 2px; }
+.jenga-diagram i:nth-child(6n+1), .jenga-diagram i:nth-child(6n+2), .jenga-diagram i:nth-child(6n+3) { transform: rotate(1deg); }
+.move-block { color: var(--yellow); font-size: 24px; position: absolute; right: 26px; top: 35px; }
+.jenga-diagram small { bottom: 7px; position: absolute; }
+
+.blokus-diagram { display: grid; justify-items: center; gap: 7px; }
+.blokus-diagram > div { width: 104px; display: grid; grid-template-columns: repeat(8,1fr); border: 1px solid #6175e8; }
+.blokus-diagram i { aspect-ratio: 1; background: #111642; border: .5px solid #263aaf; }
+.blokus-diagram i.corner { background: var(--yellow); }
+.blokus-diagram i.path { background: #21ddeb; box-shadow: 5px 5px 0 #21ddeb; }
+.blokus-diagram small { text-align: center; }
+
+.flip-diagram { display: grid; align-content: center; justify-items: center; gap: 8px; }
+.flip-diagram > div { display: flex; gap: 6px; }
+.flip-diagram i { width: 31px; height: 43px; background: white; border: 2px solid #21ddeb; border-radius: 5px; color: #07102a; display: grid; place-items: center; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-style: normal; font-weight: 700; }
+.flip-diagram i.duplicate { background: #ff3b6b; border-color: #ff3b6b; transform: rotate(7deg); }
+.flip-diagram strong { color: #ff7898; font-size: 10px; }
+.athlete-diagram { display: grid; align-content: center; gap: 11px; }
+.athlete-diagram .track { height: 62px; border: 2px solid #d59b5a; border-left: 0; border-radius: 0 30px 30px 0; position: relative; background: repeating-linear-gradient(0deg,#5a321d 0,#5a321d 27px,#d59b5a 27px,#d59b5a 29px); }
+.athlete-diagram .racer { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; position: absolute; color: #070815; font-style: normal; }
+.athlete-diagram .racer.one { background: var(--yellow); left: 45%; top: 2px; }
+.athlete-diagram .racer.two { background: #21ddeb; left: 24%; bottom: 2px; }
+.athlete-diagram .finish { color: white; font-size: 7px; font-style: normal; position: absolute; right: 6px; top: 23px; transform: rotate(90deg); }
+.athlete-diagram > strong { color: var(--yellow); font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 9px; text-align: center; }
+
+/* Puzzle outcomes and long-word fitting */
+.wordle-result.wordle-lost { background: #32102a; border: 1px solid #ff3b6b; border-radius: 7px; color: white; display: grid; gap: 4px; padding: 11px; }
+.wordle-result.wordle-lost span { color: #ff7898; font-size: 10px; }
+.wordle-result.wordle-lost strong { color: var(--yellow); font-size: 17px; letter-spacing: .08em; }
+.party-grid-game .word-grid button { min-height: 60px; aspect-ratio: auto; font-size: clamp(8px, 1.15vw, 12px); line-height: 1.08; padding: 7px 4px; overflow: hidden; overflow-wrap: anywhere; word-break: normal; text-wrap: balance; }
+.party-grid-game .word-grid button.long-word { font-size: 8px; letter-spacing: -.02em; white-space: nowrap; }
+.party-grid-game .word-grid button.very-long-word { font-size: 7px; letter-spacing: -.04em; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .score-board-section { padding: 17px 13px; }
+  .score-section-heading { grid-template-columns: 36px minmax(0,1fr); }
+  .score-section-number { width: 33px; height: 33px; }
+  .score-section-heading h2 { font-size: 20px; }
+  .how-to-layout { grid-template-columns: 1fr; }
+  .how-diagram { min-height: 135px; }
+  .party-grid-game .word-grid { gap: 4px; }
+  .party-grid-game .word-grid button { min-height: 57px; aspect-ratio: auto; font-size: clamp(7px, 2.35vw, 10px); padding: 5px 2px; }
+  .party-grid-game .word-grid button.long-word { font-size: 7px; }
+  .party-grid-game .word-grid button.very-long-word { font-size: 6px; }
+}

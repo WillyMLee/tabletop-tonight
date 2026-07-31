@@ -461,6 +461,22 @@ function Tonight({ players, guestPlayerIdentity, joinPlayer, changePlayerTeam })
   )
 }
 
+function GameDiagram({ slug }) {
+  if (slug === 'geoguessr') return <div className="how-diagram geo-diagram" role="img" aria-label="Three GeoGuessr games with five rounds in each game">{[1, 2, 3].map(game => <div key={game}><strong>GAME {game}</strong><span>{[1, 2, 3, 4, 5].map(round => <i key={round}>{round}</i>)}</span></div>)}</div>
+  if (slug === 'wordle') return <div className="how-diagram wordle-how-diagram" role="img" aria-label="Wordle feedback example showing correct, present, and absent letters"><div>{[['C', 'hit'], ['R', 'near'], ['A', 'miss'], ['N', 'hit'], ['E', 'miss']].map(([letter, state]) => <span className={state} key={letter}>{letter}</span>)}</div><small><b className="hit" /> correct <b className="near" /> elsewhere <b className="miss" /> absent</small></div>
+  if (slug === 'connections') return <div className="how-diagram connections-how-diagram" role="img" aria-label="Sixteen words sorted into four groups of four"><div>{Array.from({ length: 16 }, (_, index) => <i key={index} />)}</div><span>4 WORDS × 4 GROUPS</span><section>{['yellow', 'green', 'blue', 'purple'].map(color => <b className={color} key={color} />)}</section></div>
+  if (slug === 'mario-tennis-gc') return <div className="how-diagram tennis-diagram" role="img" aria-label="Doubles tennis court with one front and one back player on each team"><div className="court-net" /><i className="player-dot pink front">A</i><i className="player-dot pink back">B</i><i className="player-dot cyan front">A</i><i className="player-dot cyan back">B</i><small>ONE UP · ONE BACK</small></div>
+  if (slug === 'jenga') return <div className="how-diagram jenga-diagram" role="img" aria-label="Jenga tower showing a block moving from the tower to the top"><span className="move-block">↑</span><div>{Array.from({ length: 15 }, (_, index) => <i key={index} />)}</div><small>PULL ONE · STACK ON TOP</small></div>
+  if (slug === 'blokus') return <div className="how-diagram blokus-diagram" role="img" aria-label="Blokus board showing pieces beginning in corners and touching only corner to corner"><div>{Array.from({ length: 64 }, (_, index) => <i className={[0, 7, 56, 63].includes(index) ? 'corner' : [9, 18, 27, 36].includes(index) ? 'path' : ''} key={index} />)}</div><small>START IN A CORNER · TOUCH YOUR COLOR AT CORNERS ONLY</small></div>
+  if (slug === 'flip-7') return <div className="how-diagram flip-diagram" role="img" aria-label="Flip 7 cards showing a repeated number causing a bust"><div><i>2</i><i>5</i><i>7</i><i className="duplicate">5</i></div><strong>DUPLICATE = BUST</strong><small>HIT for another card · STAY to bank points</small></div>
+  if (slug === 'magical-athlete') return <div className="how-diagram athlete-diagram" role="img" aria-label="Magical Athlete race track showing racers moving by a die roll"><div className="track"><i className="racer one">★</i><i className="racer two">●</i><i className="finish">FINISH</i></div><strong>ROLL → MOVE → USE YOUR POWER</strong></div>
+  return null
+}
+
+function GameHowTo({ game }) {
+  return <details className="visual-how-to"><summary>How to play</summary><div className="how-to-layout"><GameDiagram slug={game.slug} /><div className="how-to-copy"><ol>{game.rules.slice(0, 4).map(rule => <li key={rule}>{rule}</li>)}</ol><p><strong>Scoring:</strong> {game.scoring}</p></div></div></details>
+}
+
 function GroupGames({ navigate }) {
   return (
     <main className="phase-page group-games-page">
@@ -483,7 +499,7 @@ function GroupGames({ navigate }) {
               <h2>{game.name}</h2>
               <p>{item.note}</p>
               <div className="flow-score"><Trophy size={15} /><span>{isGeoGuessr ? 'Three separate individual podiums: 5–3–1 points.' : item.slug === 'wordle' ? 'Fewest attempts leads the round.' : 'Fastest successful solve leads the round.'}</span></div>
-              <details><summary>Quick rules</summary><ol>{game.rules.slice(0, 3).map(rule => <li key={rule}>{rule}</li>)}</ol></details>
+              <GameHowTo game={game} />
             </div>
             {game.externalUrl ? <a className="flow-action" href={game.externalUrl} target="_blank" rel="noreferrer">Open GeoGuessr <ArrowRight size={15} /></a> : <button className="flow-action" onClick={() => navigate(`/play/${game.playable}`)}>Play now <ArrowRight size={15} /></button>}
           </article>
@@ -534,7 +550,7 @@ function Circuit({ currentEvent, setCurrentEvent, players, podAssignments, circu
             <div className="pod-roster">
               {(pods[station.pod] || []).length ? pods[station.pod].map(player => <div key={player.id}><Avatar name={player.name} size="sm" /><span><strong>{player.name}</strong><small>{teamInfo[player.team].short}</small></span><select value={station.pod} onChange={event => movePlayerToPod(player.id, event.target.value)} aria-label={`Move ${player.name} to another pod`}>{['A', 'B', 'C', 'D'].map(pod => <option value={pod} key={pod}>Pod {pod}</option>)}</select></div>) : <p>No players assigned yet.</p>}
             </div>
-            <details className="station-rules"><summary>Setup + quick rules</summary>{gamesAtStation.map(slug => { const game = getGame(slug); return <div key={slug}><strong>{game.name}</strong><ol>{game.rules.slice(0, 3).map(rule => <li key={rule}>{rule}</li>)}</ol></div> })}</details>
+            <details className="station-rules"><summary>How to play</summary>{gamesAtStation.map(slug => { const game = getGame(slug); return <div className="station-how-to-game" key={slug}><strong>{game.name}</strong><GameDiagram slug={slug} /><ol>{game.rules.slice(0, 4).map(rule => <li key={rule}>{rule}</li>)}</ol><p><b>Scoring:</b> {game.scoring}</p></div> })}</details>
             <div className="station-score"><small>RECORD RESULT · 10 POINTS</small><div><button className={result === 'meeple' ? 'active blinky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'meeple' ? '' : 'meeple')}>Blinky</button><button className={result === 'split' ? 'active split' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'split' ? '' : 'split')}>Split</button><button className={result === 'mayhem' ? 'active inky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'mayhem' ? '' : 'mayhem')}>Inky</button></div></div>
           </article>
         })}
@@ -886,11 +902,16 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore }) {
         <h1>The scoreboard</h1>
         <p>Team victories matter most. Individual points recognize standout performances along the way.</p>
       </section>
-      <TeamScores scores={scores} onChange={changeScore} />
+      <section className="score-board-section team-score-section">
+        <div className="score-section-heading"><span className="score-section-number">01</span><div><span className="kicker">TEAM SCORE</span><h2>Team championship</h2><p>Circuit wins add to the shared team total. Use the controls only when the host needs to correct or award points.</p></div></div>
+        <TeamScores scores={scores} onChange={changeScore} />
+      </section>
 
-      <section className="scoreboard-grid single-panel">
+      <section className="score-board-section individual-score-board-section">
+        <div className="score-section-heading"><span className="score-section-number">02</span><div><span className="kicker">INDIVIDUAL SCORE</span><h2>Player standings</h2><p>Personal points recognize podiums and standout performances without changing team assignments.</p></div></div>
+      <div className="scoreboard-grid single-panel">
         <div className="card standings">
-          <div className="section-heading"><div><span className="kicker">INDIVIDUAL POINTS</span><h2>Player leaderboard</h2></div><span className="muted-chip">Top 8</span></div>
+          <div className="section-heading"><div><span className="kicker">LIVE RANKING</span><h2>Player leaderboard</h2></div><span className="muted-chip">Top 8</span></div>
           <div className="standings-list">
             {sorted.slice(0, 8).map((player, index) => (
               <div key={player.id} className={index < 3 ? 'podium-row' : ''}>
@@ -902,6 +923,7 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore }) {
             ))}
           </div>
         </div>
+      </div>
       </section>
     </main>
   )
@@ -933,7 +955,7 @@ function PartyGrid({ onWin }) {
         {solved.map(label => { const group = gridGroups.find(g => g.label === label); return <div className={group.color} key={label}><strong>{label}</strong><span>{group.words.join(' · ')}</span></div> })}
       </div>
       <div className="word-grid">
-        {remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={selected.includes(word) ? 'selected' : ''} onClick={() => toggle(word)}>{word}</button>)}
+        {remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={`${selected.includes(word) ? 'selected ' : ''}${word.replace(/\s/g, '').length >= 11 ? 'very-long-word' : word.replace(/\s/g, '').length >= 9 ? 'long-word' : ''}`} onClick={() => toggle(word)}>{word}</button>)}
       </div>
       {solved.length === gridGroups.length && !awarded ? <div className="winner-pick"><strong>Puzzle solved! Award 10 points:</strong><button onClick={() => { onWin('meeple'); setAwarded(true) }}>◆ Team Meeple</button><button onClick={() => { onWin('mayhem'); setAwarded(true) }}>✦ Team Mayhem</button></div> : null}
       <div className="game-footer"><span>Mistakes {[0, 1, 2].map(index => <i className={index < mistakes ? 'lost' : ''} key={index} />)}</span><button className="primary" disabled={selected.length !== 4} onClick={submit}>Submit four</button></div>
@@ -947,7 +969,7 @@ function PuzzleLeaderboard({ game, puzzleId, results }) {
   const leaders = results.filter(result => result.game === game && result.puzzleId === puzzleId).sort((a, b) => Number(a.completed === false) - Number(b.completed === false) || a.metric - b.metric || a.playerName.localeCompare(b.playerName))
   const finishers = leaders.filter(result => result.completed !== false)
   return <aside className="puzzle-leaderboard">
-    <div><span className="kicker">LIVE LEADERBOARD</span><h3>{game === 'wordle' ? 'Fewest attempts' : 'Fastest solves + DNFs'}</h3></div>
+    <div><span className="kicker">LIVE LEADERBOARD</span><h3>{game === 'wordle' ? 'Fewest attempts + DNFs' : 'Fastest solves + DNFs'}</h3></div>
     {leaders.length ? <ol>{leaders.map(result => { const completed = result.completed !== false; return <li className={!completed ? 'dnf' : ''} key={`${result.playerId}-${result.puzzleId}`}><span>{completed ? finishers.findIndex(item => item.metric === result.metric) + 1 : '—'}</span><Avatar name={result.playerName} size="sm" /><strong>{result.playerName}</strong><small className={teamInfo[result.team].color}>{teamInfo[result.team].short}</small><b>{completed ? (game === 'wordle' ? `${result.metric}/6` : formatPuzzleTime(result.metric)) : 'DNF'}</b></li> })}</ol> : <div className="empty-leaderboard"><Trophy size={22} /><p>No attempts yet. Be the first name on the board.</p></div>}
   </aside>
 }
@@ -1002,7 +1024,7 @@ function ConnectionsRound({ puzzle, onComplete, results }) {
   return <div className="puzzle-with-board"><div className="party-grid-game">
       <div className="game-head"><div><span className="kicker">{puzzle.label.toUpperCase()} · {formatPuzzleTime(resultMetric || elapsed)}</span><h2>Connections: {puzzle.title}</h2><p>Find four groups of four. You have four mistakes; your time records when the last group locks.</p></div><button className="icon-button light" aria-label="Restart Connections puzzle" onClick={reset}><RotateCcw size={18} /></button></div>
       <div className="solved-groups">{solved.map(label => { const group = puzzle.groups.find(item => item.label === label); return <div className={group.color} key={label}><strong>{label}</strong><span>{group.words.join(' · ')}</span></div> })}</div>
-      {!lost && <div className="word-grid">{remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={selected.includes(word) ? 'selected' : ''} onClick={() => toggle(word)}>{word}</button>)}</div>}
+      {!lost && <div className="word-grid">{remaining.map(word => <button key={word} aria-pressed={selected.includes(word)} className={`${selected.includes(word) ? 'selected ' : ''}${word.replace(/\s/g, '').length >= 11 ? 'very-long-word' : word.replace(/\s/g, '').length >= 9 ? 'long-word' : ''}`} onClick={() => toggle(word)}>{word}</button>)}</div>}
       {resultMetric && <p className="wordle-result" aria-live="polite">Maze cleared in {formatPuzzleTime(resultMetric)}. Your best time is live.</p>}
       {lost && <section className="connections-reveal" aria-live="polite"><div><strong>Game over</strong><p>Four misses used. Here are the answers:</p></div>{puzzle.groups.map(group => <div className={group.color} key={group.label}><strong>{group.label}</strong><span>{group.words.join(' · ')}</span></div>)}</section>}
       <div className="game-footer"><span>Mistakes {[0, 1, 2, 3].map(index => <i className={index < mistakes ? 'lost' : ''} key={index} />)}</span><button className="primary" disabled={selected.length !== 4 || Boolean(resultMetric) || lost} onClick={submit}>{lost ? 'Round over' : 'Submit four'}</button></div>
@@ -1041,12 +1063,15 @@ function WordleRound({ puzzle, onComplete, results }) {
     if (!validWordleGuesses.has(word)) { setWordError(`${word} is not in the Wordle word list.`); setValidating(false); return }
     setValidating(false)
     const solved = word === target
-    setGuesses([...guesses, { word, result: grade(word) }])
+    const nextGuesses = [...guesses, { word, result: grade(word) }]
+    setGuesses(nextGuesses)
     setEntry('')
     if (solved) {
-      const attempts = guesses.length + 1
+      const attempts = nextGuesses.length
       setWinner(true)
       await onComplete(attempts)
+    } else if (nextGuesses.length === 6) {
+      await onComplete(6, false)
     }
   }
   const submit = event => { event.preventDefault(); submitGuess() }
@@ -1069,14 +1094,14 @@ function WordleRound({ puzzle, onComplete, results }) {
       {wordError && <p className="wordle-error" role="alert">{wordError}</p>}
       <div className="wordle-keyboard" aria-label="Wordle keyboard">{['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].map((row, index) => <div key={row}>{index === 2 && <button className="wide" disabled={entry.length !== 5 || finished || validating} onClick={submitGuess}>Enter</button>}{row.split('').map(letter => <button className={letterStates[letter] || ''} disabled={finished || validating} onClick={() => typeLetter(letter)} key={letter}>{letter}</button>)}{index === 2 && <button className="wide" disabled={!entry.length || finished || validating} aria-label="Backspace" onClick={eraseLetter}>⌫</button>}</div>)}</div>
       {winner && <p className="wordle-result" aria-live="polite">Solved in {guesses.length} {guesses.length === 1 ? 'attempt' : 'attempts'}. Your best run is live.</p>}
-      {!winner && guesses.length === 6 && <p className="wordle-result" aria-live="polite">Round over. The word was <strong>{target}</strong>. Tap restart to try again.</p>}
+      {!winner && guesses.length === 6 && <p className="wordle-result wordle-lost" aria-live="polite"><span>DIDN’T FINISH · DNF RECORDED</span>The solution was <strong>{target}</strong>.</p>}
     </div><PuzzleLeaderboard game="wordle" puzzleId={puzzle.id} results={results} /></div>
 }
 
 function WordleGame({ onComplete, results }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const puzzle = wordleRounds[roundIndex]
-  return <><PuzzleRoundPicker rounds={wordleRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><WordleRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={metric => onComplete(puzzle.id, metric)} /></>
+  return <><PuzzleRoundPicker rounds={wordleRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><WordleRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={(metric, completed = true) => onComplete(puzzle.id, metric, completed)} /></>
 }
 
 function SignalSprint({ onPoint }) {
@@ -1134,7 +1159,7 @@ function Playroom({ mode = 'connections', navigate, players, guestPlayerIdentity
       <button aria-pressed={gameMode === 'wordle'} className={gameMode === 'wordle' ? 'active' : ''} onClick={() => setGameMode('wordle')}><span>▣</span><div><strong>Wordle</strong><small>Five letters · 10 min</small></div></button>
       <button aria-pressed={gameMode === 'connections'} className={gameMode === 'connections' ? 'active' : ''} onClick={() => setGameMode('connections')}><span>▦</span><div><strong>Connections</strong><small>Four groups · 10 min</small></div></button>
     </div>
-    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={(puzzleId, metric, completed) => complete('connections', puzzleId, metric, completed)} /> : <WordleGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('wordle', puzzleId, metric)} />}</section>}
+    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={(puzzleId, metric, completed) => complete('connections', puzzleId, metric, completed)} /> : <WordleGame results={puzzleResults} onComplete={(puzzleId, metric, completed) => complete('wordle', puzzleId, metric, completed)} />}</section>}
     <section className="fair-play-note"><CircleHelp size={20} /><div><strong>One honest run at a time</strong><p>Play quietly on your own device. Replays are allowed, and the board keeps only your best completed result.</p></div></section>
   </main>
 }
