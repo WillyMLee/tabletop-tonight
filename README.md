@@ -13,8 +13,8 @@ A mobile-first, arcade-inspired game-night hub for preset teams, live scoring, p
 Game nights usually split information across a group chat, a notes app, handwritten scores, and one person repeatedly explaining where everyone should go. Tabletop Tonight turns that into four focused views:
 
 - **Start** — claim one pre-listed roster name, see the locked teams, and release mistaken claims.
-- **Group Games** — run GeoGuessr, Wordle, and Connections in a clear order.
-- **Circuit** — run seven Jenga matches, then show exact Blokus, Mario Strikers, and Flip 7 assignments for four rounds.
+- **Group Games** — run GeoGuessr, Wordle, Connections, and seven four-minute Jenga matches in a clear order.
+- **Circuit** — show exact Blokus, Mario Strikers, and Flip 7 assignments for four rounds.
 - **Scores** — separate the team championship from individual standings.
 
 The interface uses progressive disclosure: guests see the next action first, while visual rules and scoring details stay collapsed until needed.
@@ -25,10 +25,10 @@ The interface uses progressive disclosure: guests see the next action first, whi
 - No-password guest check-in with atomic, one-device-per-name claims
 - Two-step claim release to recover from a wrong name or changed device
 - Four balanced circuit rounds with exact player assignments
-- Atomic team, circuit, and individual score updates
+- Atomic winner selection that updates both individual and team scores
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
-- Responsive, diagram-based game guides for every scheduled activity
+- Responsive, diagram-based game guides for every scheduled activity, including Flip 7 special-card rules
 - Optimistic score updates for immediate feedback
 - Cloudflare Workers Static Assets deployment with SPA fallback and security headers
 - Browser-local fallback when Convex is not configured
@@ -90,6 +90,7 @@ Keep puzzle IDs stable after guests begin playing; changing an ID intentionally 
 npm run verify:puzzles  # validates all puzzle content
 npm run check           # Convex TypeScript + production frontend build
 npm run verify:join     # optional live guest-flow check
+npm run verify:winners  # verifies atomic player + team winner scoring
 npm run verify:live -- https://your-deployment.convex.cloud
 ```
 

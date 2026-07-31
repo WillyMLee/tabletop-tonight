@@ -6,6 +6,7 @@ import {
   Award,
   CalendarDays,
   Check,
+  ChevronDown,
   ChevronRight,
   CircleHelp,
   Clock3,
@@ -139,7 +140,15 @@ const groupGameLineup = [
   { order: 1, slug: 'geoguessr', duration: '25 min', location: 'Everyone’s phone', note: 'Play 3 separate games of 5 locations. Each round winner receives 3 individual and 3 team points.' },
   { order: 2, slug: 'wordle', duration: '25 min', location: 'Everyone’s phone', note: 'Play all 5 words. Fewest attempts wins each word and earns 3 individual and 3 team points.' },
   { order: 3, slug: 'connections', duration: '20 min', location: 'Everyone’s phone', note: 'Play 3 rounds. Fastest successful solve earns 3 individual and 3 team points.' },
+  { order: 4, slug: 'jenga', duration: '30 min', location: 'Island', note: 'Run all 7 fixed cross-team matches. Each match has a four-minute hard stop and awards 1 individual + 1 team point.' },
 ]
+
+const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2 }
+const groupWinnerRounds = {
+  geoguessr: Array.from({ length: 3 }, (_, index) => ({ key: `geoguessr:${index + 1}`, label: `Game ${index + 1}` })),
+  wordle: Array.from({ length: 5 }, (_, index) => ({ key: `wordle:${index + 1}`, label: `Word ${index + 1}` })),
+  connections: Array.from({ length: 3 }, (_, index) => ({ key: `connections:${index + 1}`, label: `Round ${index + 1}` })),
+}
 
 const phaseLogistics = [
   { games: [], places: [{ group: 'Everyone', location: 'Entry + kitchen', detail: 'Check in, grab snacks and a team color, then meet your captain.' }] },
@@ -426,7 +435,10 @@ function GuestJoin({ players, playerIdentity, joinPlayer }) {
   return <section className="guest-join card">
     <div className="guest-join-copy"><span className="join-ghost"><i /><i /></span><div><span className="kicker">READY PLAYER?</span><h2>Claim your name</h2><p>No account or password. Choose your pre-listed name once; the app keeps anyone else from playing as you.</p></div></div>
     <form onSubmit={submit}>
-      <label className="roster-name-select"><span>Your name</span><select value={playerId} onChange={event => { setPlayerId(event.target.value); setError('') }} aria-describedby={error ? 'join-error' : undefined}><option value="">Choose your name…</option>{players.map(item => <option value={item.id} disabled={item.checkedIn} key={item.id}>{item.name} · {teamInfo[item.team].name}{item.checkedIn ? ' · already claimed' : ''}</option>)}</select></label>
+      <label className="roster-name-select">
+        <span className="roster-select-title"><span className="select-ghost"><i /><i /></span><span><small>PLAYER SELECT</small><strong>Who are you?</strong></span></span>
+        <span className="roster-select-control"><select value={playerId} onChange={event => { setPlayerId(event.target.value); setError('') }} aria-describedby={error ? 'join-error' : undefined}><option value="">Choose your ghost…</option>{players.map(item => <option value={item.id} disabled={item.checkedIn} key={item.id}>{item.name} · {teamInfo[item.team].name}{item.checkedIn ? ' · already claimed' : ''}</option>)}</select><ChevronDown size={18} /></span>
+      </label>
       {playerId && <div className="selected-roster-team"><span className={`team-ghost ${teamInfo[players.find(item => item.id === Number(playerId))?.team].color}`}><i /><i /></span><div><small>YOUR TEAM</small><strong>{teamInfo[players.find(item => item.id === Number(playerId))?.team].name}</strong></div></div>}
       {error && <p className="join-error" id="join-error" role="alert">{error}</p>}
       <button className="primary join-button" disabled={!playerId || joining}>{joining ? 'Claiming…' : 'Claim this name'} <ArrowRight size={16} /></button>
@@ -516,20 +528,29 @@ function GameHowTo({ game, navigate }) {
   return <button className="guide-page-link" onClick={() => navigate(`/games/${game.slug}`)}><span><strong>How to play</strong><small>Open the full rules and visual play map</small></span><ArrowRight size={15} /></button>
 }
 
-function GroupGames({ navigate }) {
+function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner }) {
+  const winner = options.find(player => player.id === winnerId)
+  return <label className={`winner-selector ${winner ? `has-winner ${teamInfo[winner.team].color}` : ''}`}>
+    <span><Trophy size={14} /><span><small>{label}</small><strong>{winner ? `${winner.name} · ${teamInfo[winner.team].name}` : 'Choose winner'}</strong></span></span>
+    <span className="winner-select-control"><select value={winnerId || ''} onChange={event => recordGameWinner(winnerKey, event.target.value ? Number(event.target.value) : undefined)}><option value="">No winner yet</option>{options.map(player => <option value={player.id} key={player.id}>{player.name} · {teamInfo[player.team].name}</option>)}</select><ChevronDown size={15} /></span>
+  </label>
+}
+
+function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
+  const rosterByName = new Map(players.map(player => [player.name, player]))
   return (
     <main className="phase-page group-games-page">
       <section className="phase-page-hero">
-        <span className="eyebrow">6:20–7:30 PM · EVERYONE PLAYS</span>
+        <span className="eyebrow">6:20–8:00 PM · EVERYONE PLAYS</span>
         <h1>Group Games</h1>
-        <p>Three individual challenges, played together in one room. Start at the top and move on when the host calls time.</p>
-        <div className="phase-summary"><span><strong>3</strong> games</span><span><strong>70</strong> minutes</span><span><strong>1</strong> phone per player</span></div>
+        <p>Three personal challenges followed by seven fast Jenga matchups. Start at the top and move on when the host calls time.</p>
+        <div className="phase-summary"><span><strong>4</strong> games</span><span><strong>100</strong> minutes</span><span><strong>18</strong> winners</span></div>
       </section>
 
       <section className="simple-game-flow" aria-label="Group game order">
         {groupGameLineup.map(item => {
           const game = getGame(item.slug)
-          const isGeoGuessr = item.slug === 'geoguessr'
+          const isJenga = item.slug === 'jenga'
           return <article className={`simple-game-step ${game.color}`} key={item.slug}>
             <span className="flow-number">{String(item.order).padStart(2, '0')}</span>
             <span className="flow-icon">{game.icon}</span>
@@ -537,19 +558,27 @@ function GroupGames({ navigate }) {
               <small>{item.duration} · {item.location}</small>
               <h2>{game.name}</h2>
               <p>{item.note}</p>
-              <div className="flow-score"><Trophy size={15} /><span>{isGeoGuessr ? 'Three round winners · 3 individual + 3 team points each.' : item.slug === 'wordle' ? 'Five word winners · 3 individual + 3 team points each.' : 'Three round winners · 3 individual + 3 team points each.'}</span></div>
+              <div className="flow-score"><Trophy size={15} /><span>{isJenga ? 'Seven match winners · 1 individual + 1 team point each.' : item.slug === 'wordle' ? 'Five word winners · 3 individual + 3 team points each.' : 'Three round winners · 3 individual + 3 team points each.'}</span></div>
               <GameHowTo game={game} navigate={navigate} />
+              {!isJenga && <div className="game-winner-panel"><div><span className="kicker">RECORD RESULTS</span><strong>Winner selector</strong><small>Picking a player updates both scoreboards.</small></div><div className="winner-selector-grid">{groupWinnerRounds[item.slug].map(round => <WinnerSelector label={round.label} winnerKey={round.key} options={players} winnerId={gameWinners[round.key]} recordGameWinner={recordGameWinner} key={round.key} />)}</div></div>}
+              {isJenga && <section className="jenga-match-block group-jenga-block">
+                <div className="circuit-section-heading"><div><span className="kicker">7:30–8:00 PM · ISLAND</span><h2>Seven 1v1 matchups</h2><p>Each match gets four minutes. A fallen tower loses; at the buzzer, tallest stable tower wins.</p></div></div>
+                <div className="jenga-match-grid">{jengaMatches.map(([jessaName, willyName], index) => {
+                  const options = [rosterByName.get(jessaName), rosterByName.get(willyName)].filter(Boolean)
+                  const winnerKey = `jenga:${index + 1}`
+                  return <article className="has-winner-control" key={jessaName}><span>{index + 1}</span><div><strong>{jessaName}</strong><small>TEAM JESSA</small></div><b>VS</b><div><strong>{willyName}</strong><small>TEAM WILLY</small></div><WinnerSelector label={`Match ${index + 1}`} winnerKey={winnerKey} options={options} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /></article>
+                })}</div>
+              </section>}
             </div>
-            {game.externalUrl ? <a className="flow-action" href={game.externalUrl} target="_blank" rel="noreferrer">Open GeoGuessr <ArrowRight size={15} /></a> : <button className="flow-action" onClick={() => navigate(`/play/${game.playable}`)}>Play now <ArrowRight size={15} /></button>}
+            {game.externalUrl ? <a className="flow-action" href={game.externalUrl} target="_blank" rel="noreferrer">Open GeoGuessr <ArrowRight size={15} /></a> : game.playable ? <button className="flow-action" onClick={() => navigate(`/play/${game.playable}`)}>Play now <ArrowRight size={15} /></button> : null}
           </article>
         })}
       </section>
-      <section className="host-voice-note"><Lightbulb size={20} /><div><strong>Host handoff</strong><p>Explain one game at a time. Guests only need to tap the next card when you are ready to move on.</p></div></section>
     </main>
   )
 }
 
-function Circuit({ currentEvent, setCurrentEvent, players, circuitResults, recordCircuitResult, navigate }) {
+function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, navigate }) {
   const selectedRound = currentEvent >= 4 && currentEvent <= 7 ? currentEvent - 4 : 0
   const round = circuitRounds[selectedRound]
   const rosterByName = new Map(players.map(player => [player.name, player]))
@@ -557,18 +586,11 @@ function Circuit({ currentEvent, setCurrentEvent, players, circuitResults, recor
   return (
     <main className="phase-page circuit-page">
       <section className="phase-page-hero circuit-hero">
-        <span className="eyebrow">7:30–9:50 PM · HEAD-TO-HEAD + FOUR ROUNDS</span>
+        <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Start with seven quick Jenga matches. After the snack reset, follow the exact assignment shown for each circuit round.</p>
-        <div className="phase-summary"><span><strong>7</strong> Jenga matches</span><span><strong>3</strong> circuit stations</span><span><strong>20</strong> min each</span></div>
+        <p>Choose a round, send everyone to the listed station, then record the actual player who won. Each selection updates individual and team scores automatically.</p>
+        <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>3</strong> stations</span><span><strong>20</strong> min each</span></div>
       </section>
-
-      <section className="jenga-match-block">
-        <div className="circuit-section-heading"><div><span className="kicker">7:30–8:00 PM · ISLAND</span><h2>Jenga 1v1 matchups</h2><p>Four-minute hard stop. If time expires, the tallest stable tower wins.</p></div><button className="guide-page-link compact" onClick={() => navigate('/games/jenga')}><span><strong>Jenga guide</strong><small>Rules and tower map</small></span><ArrowRight size={14} /></button></div>
-        <div className="jenga-match-grid">{jengaMatches.map(([jessaPlayer, willyPlayer], index) => <article key={jessaPlayer}><span>{index + 1}</span><div><strong>{jessaPlayer}</strong><small>TEAM JESSA</small></div><b>VS</b><div><strong>{willyPlayer}</strong><small>TEAM WILLY</small></div></article>)}</div>
-      </section>
-
-      <div className="circuit-reset-note"><Clock3 size={18} /><div><strong>8:00–8:15 PM · Snack and score reset</strong><p>Jessa updates both scoreboards, refills drinks, and calls everyone back for Circuit 1.</p></div></div>
 
       <nav className="circuit-round-picker" aria-label="Circuit rounds">
         {circuitRounds.map((item, index) => <button className={selectedRound === index ? 'active' : ''} aria-current={selectedRound === index ? 'step' : undefined} onClick={() => setCurrentEvent(index + 4)} key={item.label}><span>{index + 1}</span><strong>{item.label}</strong><small>{item.time}</small></button>)}
@@ -581,14 +603,14 @@ function Circuit({ currentEvent, setCurrentEvent, players, circuitResults, recor
 
       <section className="exact-station-grid">
         {round.stations.map(station => {
-          const resultKey = `${selectedRound + 4}:${station.slug}`
-          const result = circuitResults[resultKey] || ''
+          const winnerKey = `${station.slug}:circuit-${selectedRound + 1}`
           const game = getGame(station.slug)
+          const stationPlayers = station.players.map(name => rosterByName.get(name)).filter(Boolean)
           return <article className="simple-station-card" key={`${selectedRound}-${station.location}`}>
             <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{station.name}</h2></div><span className="pod-badge">{station.players.length} PLAYERS</span></header>
             <div className="exact-player-list">{station.players.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}</div>
             <div className="station-guide-links"><button onClick={() => navigate(`/games/${station.slug}`)}><span>{game.icon}</span><div><strong>{game.name} how-to</strong><small>Rules · play map{station.slug === 'mario-strikers-gc' ? ' · controls' : ''}</small></div><ArrowRight size={14} /></button></div>
-            <div className="station-score"><small>TEAM RESULT · 2 TEAM POINTS</small><div><button className={result === 'meeple' ? 'active blinky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'meeple' ? '' : 'meeple')}>Team Jessa</button><button className={result === 'split' ? 'active split' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'split' ? '' : 'split')}>Tie</button><button className={result === 'mayhem' ? 'active inky' : ''} onClick={() => recordCircuitResult(selectedRound + 4, station.slug, result === 'mayhem' ? '' : 'mayhem')}>Team Willy</button></div><p>Jessa also awards 2 individual points to the table winner on Scores.</p></div>
+            <div className="station-score"><small>WINNER · +2 INDIVIDUAL · +2 TEAM</small><WinnerSelector label={`${round.label} winner`} winnerKey={winnerKey} options={stationPlayers} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /><p>The player and their team are scored together as soon as you select them.</p></div>
           </article>
         })}
       </section>
@@ -636,6 +658,24 @@ function GameLibrary({ navigate }) {
   )
 }
 
+function Flip7SpecialCards() {
+  const actions = [
+    { symbol: '❄', name: 'Freeze', copy: 'Choose any active player, including yourself. They immediately bank their current points and leave the round.' },
+    { symbol: '③', name: 'Flip Three', copy: 'Choose any active player, including yourself. They take the next three cards, stopping early only if they bust or complete Flip 7.' },
+    { symbol: '♥', name: 'Second Chance', copy: 'Give it to any active player. It cancels one repeated number by discarding the duplicate and this card; each player can hold only one.' },
+  ]
+  return <section className="flip-special-card-guide">
+    <div className="detail-play-map-heading"><div><span className="kicker">SPECIAL CARDS</span><h2>Action and modifier cheat sheet</h2></div><p>Action and Modifier cards never count toward seven unique numbers and cannot make you bust.</p></div>
+    <div className="flip-action-grid">{actions.map(card => <article className={card.name.toLowerCase().replaceAll(' ', '-')} key={card.name}><span>{card.symbol}</span><div><strong>{card.name}</strong><p>{card.copy}</p></div></article>)}</div>
+    <div className="flip-modifier-row">
+      <div><span className="flip-card-stack"><b>+2</b><b>+4</b><b>+6</b><b>+8</b><b>+10</b></span><p><strong>Bonus modifiers</strong>Add the printed bonus after totaling your Number cards.</p></div>
+      <div><span className="flip-x2-card">×2</span><p><strong>Double modifier</strong>Double the Number-card subtotal first, then add every + bonus.</p></div>
+      <div className="flip-score-example"><small>EXAMPLE</small><strong>(8 + 6 + 3) × 2 + 4 = 38</strong><span>Number total → ×2 → + modifiers</span></div>
+    </div>
+    <p className="flip-rule-footnote"><strong>Flip Three timing:</strong> all three revealed cards count toward the sequence. Set aside another Freeze or Flip Three and resolve it after the three-card sequence, provided the target has not busted.</p>
+  </section>
+}
+
 function GameDetail({ game, navigate }) {
   if (!game) return <main><section className="page-intro"><h1>Game not found</h1><button className="primary" onClick={() => navigate('/games')}>Back to games</button></section></main>
   return (
@@ -646,18 +686,17 @@ function GameDetail({ game, navigate }) {
         <div><span className="eyebrow">{game.status}</span><h1>{game.name}</h1><p>{game.summary}</p><div className="detail-specs"><span><Users size={15} /> {game.players}</span><span><Clock3 size={15} /> {game.duration}</span><span><Star size={15} /> {game.difficulty}</span></div></div>
         {game.playable && <button className="primary" onClick={() => navigate(`/play/${game.playable}`)}>Launch game <Play size={16} /></button>}
       </section>
-      <section className="why-card card"><Lightbulb /><div><span className="kicker">WHY IT FITS THIS NIGHT</span><p>{game.why}</p></div></section>
       <section className="detail-play-map card">
         <div className="detail-play-map-heading"><div><span className="kicker">VISUAL QUICK START</span><h2>{game.slug === 'mario-strikers-gc' ? 'Field positioning' : 'How the game flows'}</h2></div><p>Use this picture for the fast explanation, then follow the numbered rules below.</p></div>
         <GameDiagram slug={game.slug} />
       </section>
+      {game.slug === 'flip-7' && <Flip7SpecialCards />}
       {game.slug === 'mario-strikers-gc' && <StrikersControllerMap />}
       <section className="guide-grid">
         <div className="card guide-section"><span className="guide-number">01</span><div><span className="kicker">BEFORE YOU START</span><h2>Set it up</h2></div><ol>{game.setup.map(step => <li key={step}>{step}</li>)}</ol></div>
         <div className="card guide-section rules-guide"><span className="guide-number">02</span><div><span className="kicker">THE SHORT VERSION</span><h2>How to play</h2></div><ol>{game.rules.map(step => <li key={step}>{step}</li>)}</ol></div>
         <div className="card guide-section"><span className="guide-number">03</span><div><span className="kicker">HOUSE FORMAT</span><h2>Score the night</h2></div><p>{game.scoring}</p></div>
       </section>
-      <section className="host-tip-banner"><span>💡</span><div><small>HOST TIP</small><strong>{game.hostTip}</strong></div></section>
       <div className="detail-footer-actions"><button className="secondary" onClick={() => navigate('/run-of-show')}><ListChecks size={16} /> See where it fits</button><button className="primary" onClick={() => navigate('/games')}>Choose another game <Library size={16} /></button></div>
     </main>
   )
@@ -978,7 +1017,7 @@ function HostPlan({ navigate }) {
     <section className="phase-page-hero host-plan-hero">
       <span className="eyebrow">HOST / SCOREKEEPER · JESSA</span>
       <h1>Game Night Run Sheet</h1>
-      <p>{eventDetails.date} · {eventDetails.playerCount} players · four hours from arrival to final prizes.</p>
+      <p>{eventDetails.date} · {eventDetails.playerCount} players · three hours and fifty minutes from arrival to final prizes.</p>
       <div className="phase-summary"><span><strong>$70</strong> prize cash</span><span><strong>38</strong> envelopes</span><span><strong>2</strong> scoreboards</span></div>
     </section>
 
@@ -989,7 +1028,7 @@ function HostPlan({ navigate }) {
     </section>
 
     <section className="host-plan-section">
-      <div className="host-plan-heading"><span>02</span><div><small>6:00–10:05 PM</small><h2>Timeline and host cues</h2></div></div>
+      <div className="host-plan-heading"><span>02</span><div><small>6:00–9:50 PM</small><h2>Timeline and host cues</h2></div></div>
       <div className="host-timeline">{eventTimeline.map(item => <article key={item.time}><time>{item.time}</time><div><strong>{item.activity}</strong><p>{item.detail}</p></div></article>)}</div>
     </section>
 
@@ -1001,7 +1040,7 @@ function HostPlan({ navigate }) {
 
     <section className="host-plan-section host-shortcuts">
       <div className="host-plan-heading"><span>04</span><div><small>QUICK LINKS</small><h2>Run the room</h2></div></div>
-      <div><button onClick={() => navigate('/group-games')}><Gamepad2 size={18} /><span><strong>Group Games</strong><small>GeoGuessr, Wordle, Connections</small></span><ArrowRight size={15} /></button><button onClick={() => navigate('/circuit')}><Shuffle size={18} /><span><strong>Competition Circuit</strong><small>Jenga matchups and exact assignments</small></span><ArrowRight size={15} /></button><button onClick={() => navigate('/scores')}><Trophy size={18} /><span><strong>Scores</strong><small>Individual and team totals</small></span><ArrowRight size={15} /></button></div>
+      <div><button onClick={() => navigate('/group-games')}><Gamepad2 size={18} /><span><strong>Group Games</strong><small>GeoGuessr, Wordle, Connections, Jenga</small></span><ArrowRight size={15} /></button><button onClick={() => navigate('/circuit')}><Shuffle size={18} /><span><strong>Competition Circuit</strong><small>Four rounds and exact assignments</small></span><ArrowRight size={15} /></button><button onClick={() => navigate('/scores')}><Trophy size={18} /><span><strong>Scores</strong><small>Individual and team totals</small></span><ArrowRight size={15} /></button></div>
     </section>
   </main>
 }
@@ -1291,6 +1330,7 @@ function LocalApp() {
   const [individualPhaseScores, setIndividualPhaseScores] = useStoredState('tabletop-v2-individual-phase-scores', {})
   const [podAssignments, setPodAssignments] = useStoredState('tabletop-pod-assignments', defaultPodAssignments)
   const [circuitResults, setCircuitResults] = useStoredState('tabletop-v2-circuit-results', {})
+  const [gameWinners, setGameWinners] = useStoredState('tabletop-v1-game-winners', {})
   const [dinnerOrder, setDinnerOrder] = useStoredState('tabletop-dinner-order', '')
   const [puzzleResults, setPuzzleResults] = useStoredState('tabletop-v1-puzzle-results', [])
   const changeScore = (team, delta) => setScores(previous => ({ ...previous, [team]: Math.max(0, previous[team] + delta) }))
@@ -1335,8 +1375,29 @@ function LocalApp() {
     })
     setScores(previous => ({ meeple: Math.max(0, previous.meeple + delta.meeple), mayhem: Math.max(0, previous.mayhem + delta.mayhem) }))
   }
+  const recordGameWinner = (winnerKey, playerId) => {
+    const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
+    const points = gamePointValues[slug]
+    const previousPlayer = players.find(player => player.id === gameWinners[winnerKey])
+    const nextPlayer = players.find(player => player.id === playerId)
+    if (!points || previousPlayer?.id === nextPlayer?.id) return
+    setGameWinners(previous => {
+      const next = { ...previous }
+      if (nextPlayer) next[winnerKey] = nextPlayer.id
+      else delete next[winnerKey]
+      return next
+    })
+    setPlayers(previous => previous.map(player => {
+      const delta = (player.id === nextPlayer?.id ? points : 0) - (player.id === previousPlayer?.id ? points : 0)
+      return delta ? { ...player, points: Math.max(0, player.points + delta) } : player
+    }))
+    setScores(previous => ({
+      meeple: Math.max(0, previous.meeple + (nextPlayer?.team === 'meeple' ? points : 0) - (previousPlayer?.team === 'meeple' ? points : 0)),
+      mayhem: Math.max(0, previous.mayhem + (nextPlayer?.team === 'mayhem' ? points : 0) - (previousPlayer?.team === 'mayhem' ? points : 0)),
+    }))
+  }
   const checkedIn = useMemo(() => players.filter(p => p.checkedIn).length, [players])
-  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
+  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
   const addPlayer = name => {
     const team = players.filter(player => player.team === 'meeple').length <= players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...players.map(player => player.id)) + 1
@@ -1377,7 +1438,7 @@ function LocalApp() {
     })
   }
 
-  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
@@ -1413,6 +1474,7 @@ function RealtimeApp() {
   const setPlayerPodMutation = useMutation(api.sharedState.setPlayerPod)
   const setPodsMutation = useMutation(api.sharedState.setPods)
   const recordCircuitResultMutation = useMutation(api.sharedState.recordCircuitResult)
+  const recordGameWinnerMutation = useMutation(api.sharedState.recordGameWinner)
   const addPlayerMutation = useMutation(api.sharedState.addPlayer)
   const joinPlayerMutation = useMutation(api.sharedState.joinPlayer)
   const toggleCheckInMutation = useMutation(api.sharedState.toggleCheckIn)
@@ -1450,6 +1512,7 @@ function RealtimeApp() {
     commit(setPodsMutation({ eventKey, assignments: shuffled.map((player, index) => ({ playerId: player.id, pod: ['A', 'B', 'C', 'D'][index % 4] })) }))
   }
   const recordCircuitResult = (phase, slug, result) => commit(recordCircuitResultMutation({ eventKey, phase, slug, result: result || undefined }))
+  const recordGameWinner = (winnerKey, playerId) => commit(recordGameWinnerMutation({ eventKey, winnerKey, playerId }))
   const addPlayer = name => commit(addPlayerMutation({ eventKey, name }))
   const joinPlayer = async playerId => {
     setSyncError('')
@@ -1492,13 +1555,13 @@ function RealtimeApp() {
   const resetDemo = () => commit(resetMutation({ eventKey }))
   const checkedIn = state.players.filter(player => player.checkedIn).length
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={{ ...state, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} state={{ ...state, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
-  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, dinnerOrder, puzzleResults } = state
-  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
+  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, gameWinners = {}, dinnerOrder, puzzleResults } = state
+  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
   const gameSlug = path.startsWith('/games/') ? decodeURIComponent(path.slice('/games/'.length)) : null
   const playMode = path.startsWith('/play/') ? path.slice('/play/'.length) : null
 
@@ -1511,8 +1574,8 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
-      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames navigate={navigate} />}
-      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, podAssignments, circuitResults, movePlayerToPod, randomizePods, recordCircuitResult, navigate }} />}
+      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner }} />}
+      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} />}
       {path === '/host' && <HostPlan navigate={navigate} />}

@@ -6,6 +6,15 @@ import { initialRoster } from './eventConfig'
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
 const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
+const gamePointValues: Record<string, number> = {
+  geoguessr: 3,
+  wordle: 3,
+  connections: 3,
+  jenga: 1,
+  blokus: 2,
+  'mario-strikers-gc': 2,
+  'flip-7': 2,
+}
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
@@ -19,6 +28,7 @@ const initialState = (eventKey: string) => ({
   individualPhaseScores: {},
   podAssignments: defaultPodAssignments,
   circuitResults: {},
+  gameWinners: {},
   dinnerOrder: '',
   updatedAt: Date.now(),
 })
@@ -172,6 +182,46 @@ export const recordCircuitResult = mutation({
       scores: { meeple: clampPoints(state.scores.meeple + delta.meeple), mayhem: clampPoints(state.scores.mayhem + delta.mayhem) },
       updatedAt: Date.now(),
     })
+  },
+})
+
+export const recordGameWinner = mutation({
+  args: { eventKey: v.string(), winnerKey: v.string(), playerId: v.optional(v.number()) },
+  handler: async (ctx, { eventKey, winnerKey, playerId }) => {
+    if (!/^[a-z0-9-]{2,64}:[a-z0-9-]{1,64}$/.test(winnerKey)) throw new Error('Invalid game winner key')
+    const gameSlug = winnerKey.slice(0, winnerKey.indexOf(':'))
+    const points = gamePointValues[gameSlug]
+    if (!points) throw new Error('That game is not part of tonight’s scoring')
+
+    const state = await getState(ctx, eventKey)
+    const gameWinners = { ...(state.gameWinners ?? {}) }
+    const previousPlayerId = gameWinners[winnerKey]
+    const previousPlayer = state.players.find(player => player.id === previousPlayerId)
+    const nextPlayer = playerId === undefined ? undefined : state.players.find(player => player.id === playerId)
+    if (playerId !== undefined && !nextPlayer) throw new Error('Choose a player from tonight’s roster')
+    if (previousPlayerId === playerId) return null
+
+    if (nextPlayer) gameWinners[winnerKey] = nextPlayer.id
+    else delete gameWinners[winnerKey]
+
+    const players = state.players.map(player => {
+      const delta = (player.id === nextPlayer?.id ? points : 0) - (player.id === previousPlayer?.id ? points : 0)
+      return delta ? { ...player, points: clampPoints(player.points + delta) } : player
+    })
+    const scoreDelta = { meeple: 0, mayhem: 0 }
+    if (previousPlayer) scoreDelta[previousPlayer.team] -= points
+    if (nextPlayer) scoreDelta[nextPlayer.team] += points
+
+    await ctx.db.patch(state._id, {
+      gameWinners,
+      players,
+      scores: {
+        meeple: clampPoints(state.scores.meeple + scoreDelta.meeple),
+        mayhem: clampPoints(state.scores.mayhem + scoreDelta.mayhem),
+      },
+      updatedAt: Date.now(),
+    })
+    return null
   },
 })
 

@@ -96,6 +96,7 @@ export default defineSchema({
     individualPhaseScores: v.record(v.string(), v.record(v.string(), v.number())),
     podAssignments: v.record(v.string(), v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))),
     circuitResults: v.record(v.string(), v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))),
+    gameWinners: v.optional(v.record(v.string(), v.number())),
     dinnerOrder: v.string(),
     updatedAt: v.number(),
   }).index('by_event_key', ['eventKey']),

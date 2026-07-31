@@ -34,7 +34,7 @@ export const jengaMatches = [
 
 export const circuitRounds = [
   {
-    label: 'Circuit 1', time: '8:15–8:35 PM',
+    label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Julie', 'Young', 'Janice'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Melissa', 'Annhien', 'Willy', 'Andrew'] },
@@ -42,7 +42,7 @@ export const circuitRounds = [
     ],
   },
   {
-    label: 'Circuit 2', time: '8:40–9:00 PM',
+    label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Rebekah', 'Willy', 'Joanna'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Melissa', 'Valeria', 'Brendan', 'Young'] },
@@ -50,7 +50,7 @@ export const circuitRounds = [
     ],
   },
   {
-    label: 'Circuit 3', time: '9:05–9:25 PM',
+    label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Thomas', 'Willy', 'Omar'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Rebekah', 'Brendan', 'Janice'] },
@@ -58,7 +58,7 @@ export const circuitRounds = [
     ],
   },
   {
-    label: 'Circuit 4', time: '9:30–9:50 PM',
+    label: 'Circuit 4', time: '9:15–9:35 PM',
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Valeria', 'Annhien', 'Brendan', 'Andrew'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Thomas', 'Joanna', 'Omar'] },
@@ -74,10 +74,9 @@ export const eventTimeline = [
   { time: '6:45–7:10', activity: 'Wordle', detail: 'Five words; one envelope after each word.' },
   { time: '7:10–7:30', activity: 'Connections', detail: 'Three fastest-solve rounds; one envelope after each round.' },
   { time: '7:30–8:00', activity: 'Jenga head-to-head', detail: 'Seven cross-team matches with a four-minute hard stop.' },
-  { time: '8:00–8:15', activity: 'Snack and score reset', detail: 'Update the board, refill drinks, and reset the circuit.' },
-  { time: '8:15–9:50', activity: 'Main circuit', detail: 'Four 20-minute rounds with a five-minute switch after rounds 1–3.' },
-  { time: '9:50–10:00', activity: 'Final scoring', detail: 'Add points and run one sudden-death tie-breaker only if needed.' },
-  { time: '10:00–10:05', activity: 'Final prizes', detail: 'Award the individual champion and every winning-team member.' },
+  { time: '8:00–9:35', activity: 'Main circuit', detail: 'Four 20-minute rounds with a five-minute switch after rounds 1–3.' },
+  { time: '9:35–9:45', activity: 'Final scoring', detail: 'Add points and run one sudden-death tie-breaker only if needed.' },
+  { time: '9:45–9:50', activity: 'Final prizes', detail: 'Award the individual champion and every winning-team member.' },
 ]
 
 export const pointRules = [
@@ -87,8 +86,7 @@ export const pointRules = [
 ]
 
 export const envelopeGroups = [
-  { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner'] },
-  { title: 'Jenga 1v1', amount: '$1', labels: Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`) },
+  { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`)] },
   { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Soccer', 'Flip 7'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
   { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 7 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]
