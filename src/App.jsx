@@ -146,9 +146,10 @@ const groupGameLineup = [
 const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2, 'magical-athlete': 2, 'table-choice': 2 }
 const groupWinnerRounds = {
   geoguessr: Array.from({ length: 3 }, (_, index) => ({ key: `geoguessr:${index + 1}`, label: `Game ${index + 1}` })),
-  wordle: Array.from({ length: 5 }, (_, index) => ({ key: `wordle:${index + 1}`, label: `Word ${index + 1}` })),
-  connections: Array.from({ length: 3 }, (_, index) => ({ key: `connections:${index + 1}`, label: `Round ${index + 1}` })),
 }
+
+const puzzleWinnerKey = (game, puzzleId) => `${game}:${puzzleId.match(/-(\d+)$/)?.[1]}`
+const rankedPuzzleResults = results => [...results].sort((a, b) => Number(a.completed === false) - Number(b.completed === false) || a.metric - b.metric || (a.updatedAt || 0) - (b.updatedAt || 0) || a.playerName.localeCompare(b.playerName))
 
 const phaseLogistics = [
   { games: [], places: [{ group: 'Everyone', location: 'Entry + kitchen', detail: 'Check in, grab snacks and a team color, then meet your captain.' }] },
@@ -676,7 +677,18 @@ function TeamWinnerSelector({ label, result, recordResult }) {
   </div>
 }
 
-function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
+function AutoPuzzleResults({ game, results }) {
+  const [roundIndex, setRoundIndex] = useState(0)
+  const rounds = game === 'wordle' ? wordleRounds : connectionsRounds
+  const round = rounds[roundIndex]
+  return <div className="auto-results-panel">
+    <header><span className="auto-score-icon"><Sparkles size={17} /></span><div><span className="kicker">AUTO-SCORED LIVE RESULTS</span><strong>No winner selection needed</strong><small>The leaderboard and both scoreboards update from submitted results.</small></div></header>
+    <nav aria-label={`${game} leaderboard rounds`}>{rounds.map((item, index) => <button type="button" className={roundIndex === index ? 'active' : ''} aria-current={roundIndex === index ? 'true' : undefined} onClick={() => setRoundIndex(index)} key={item.id}><span>{index + 1}</span>{item.label}</button>)}</nav>
+    <PuzzleLeaderboard game={game} puzzleId={round.id} results={results} />
+  </div>
+}
+
+function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleResults }) {
   const rosterByName = new Map(players.map(player => [player.name, player]))
   return (
     <main className="phase-page group-games-page">
@@ -691,6 +703,7 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
         {groupGameLineup.map(item => {
           const game = getGame(item.slug)
           const isJenga = item.slug === 'jenga'
+          const isAutoScored = item.slug === 'wordle' || item.slug === 'connections'
           return <article className={`simple-game-step ${game.color}`} key={item.slug}>
             <span className="flow-number">{String(item.order).padStart(2, '0')}</span>
             <span className="flow-icon">{game.icon}</span>
@@ -700,7 +713,8 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner }) {
               <p>{item.note}</p>
               <div className="flow-score"><Trophy size={15} /><span>{isJenga ? 'Seven match winners · 1 individual + 1 team point each.' : item.slug === 'wordle' ? 'Five word winners · 3 individual + 3 team points each.' : 'Three round winners · 3 individual + 3 team points each.'}</span></div>
               <GameHowTo game={game} navigate={navigate} />
-              {!isJenga && <div className="game-winner-panel"><div><span className="kicker">RECORD RESULTS</span><strong>Winner selector</strong><small>Picking a player updates both scoreboards.</small></div><div className="winner-selector-grid">{groupWinnerRounds[item.slug].map(round => <WinnerSelector label={round.label} winnerKey={round.key} options={players} winnerId={gameWinners[round.key]} recordGameWinner={recordGameWinner} key={round.key} />)}</div></div>}
+              {!isJenga && !isAutoScored && <div className="game-winner-panel"><div><span className="kicker">HOST RECORDS GEOGUESSR</span><strong>Winner selector</strong><small>Pick each game winner after GeoGuessr finishes.</small></div><div className="winner-selector-grid">{groupWinnerRounds[item.slug].map(round => <WinnerSelector label={round.label} winnerKey={round.key} options={players} winnerId={gameWinners[round.key]} recordGameWinner={recordGameWinner} key={round.key} />)}</div></div>}
+              {isAutoScored && <AutoPuzzleResults game={item.slug} results={puzzleResults} />}
               {isJenga && <section className="jenga-match-block group-jenga-block">
                 <div className="circuit-section-heading"><div><span className="kicker">7:30–8:00 PM · ISLAND</span><h2>Seven 1v1 matchups</h2><p>Each match gets four minutes. A fallen tower loses; at the buzzer, tallest stable tower wins.</p></div></div>
                 <div className="jenga-match-grid">{jengaMatches.map(([jessaName, willyName], index) => {
@@ -1229,11 +1243,11 @@ function PartyGrid({ onWin }) {
 const formatPuzzleTime = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
 
 function PuzzleLeaderboard({ game, puzzleId, results }) {
-  const leaders = results.filter(result => result.game === game && result.puzzleId === puzzleId).sort((a, b) => Number(a.completed === false) - Number(b.completed === false) || a.metric - b.metric || a.playerName.localeCompare(b.playerName))
+  const leaders = rankedPuzzleResults(results.filter(result => result.game === game && result.puzzleId === puzzleId))
   const finishers = leaders.filter(result => result.completed !== false)
   return <aside className="puzzle-leaderboard">
     <div><span className="kicker">LIVE LEADERBOARD</span><h3>{game === 'wordle' ? 'Fewest attempts + DNFs' : 'Fastest solves + DNFs'}</h3></div>
-    {leaders.length ? <ol>{leaders.map(result => { const completed = result.completed !== false; return <li className={!completed ? 'dnf' : ''} key={`${result.playerId}-${result.puzzleId}`}><span>{completed ? finishers.findIndex(item => item.metric === result.metric) + 1 : '—'}</span><Avatar name={result.playerName} size="sm" /><strong>{result.playerName}</strong><small className={teamInfo[result.team].color}>{teamInfo[result.team].short}</small><b>{completed ? (game === 'wordle' ? `${result.metric}/6` : formatPuzzleTime(result.metric)) : 'DNF'}</b></li> })}</ol> : <div className="empty-leaderboard"><Trophy size={22} /><p>No attempts yet. Be the first name on the board.</p></div>}
+    {leaders.length ? <ol>{leaders.map(result => { const completed = result.completed !== false; const rank = completed ? finishers.findIndex(item => item.playerId === result.playerId) + 1 : null; return <li className={`${!completed ? 'dnf' : ''} ${rank === 1 ? 'round-leader' : ''}`} key={`${result.playerId}-${result.puzzleId}`}><span>{rank || '—'}</span><Avatar name={result.playerName} team={result.team} size="sm" /><strong>{result.playerName}</strong><small className={teamInfo[result.team].color}>{teamInfo[result.team].short}</small><b>{completed ? (game === 'wordle' ? `${result.metric}/6` : formatPuzzleTime(result.metric)) : 'DNF'}</b></li> })}</ol> : <div className="empty-leaderboard"><Trophy size={22} /><p>No attempts yet. Be the first name on the board.</p></div>}
   </aside>
 }
 
@@ -1578,13 +1592,17 @@ function LocalApp() {
   const submitPuzzleResult = async (playerId, game, puzzleId, metric, completed = true) => {
     const player = players.find(item => item.id === playerId)
     if (!player) throw new Error('Join the game night before submitting a result')
-    setPuzzleResults(previous => {
-      const existing = previous.find(result => result.playerId === playerId && result.game === game && result.puzzleId === puzzleId)
-      const existingCompleted = existing?.completed !== false
-      const keepExistingFinish = existing && existingCompleted && !completed
-      const value = { playerId, playerName: player.name, team: player.team, game, puzzleId, metric: keepExistingFinish ? existing.metric : existing && existingCompleted === completed && completed ? Math.min(existing.metric, metric) : metric, completed: keepExistingFinish ? true : completed }
-      return existing ? previous.map(result => result === existing ? value : result) : [...previous, value]
-    })
+    const existing = puzzleResults.find(result => result.playerId === playerId && result.game === game && result.puzzleId === puzzleId)
+    const existingCompleted = existing?.completed !== false
+    const keepExistingFinish = existing && existingCompleted && !completed
+    const nextMetric = keepExistingFinish ? existing.metric : existing && existingCompleted === completed && completed ? Math.min(existing.metric, metric) : metric
+    const nextCompleted = keepExistingFinish ? true : completed
+    const changed = !existing || existing.metric !== nextMetric || existing.completed !== nextCompleted
+    const value = { playerId, playerName: player.name, team: player.team, game, puzzleId, metric: nextMetric, completed: nextCompleted, updatedAt: existing && !changed ? existing.updatedAt : Date.now() }
+    const nextResults = existing ? puzzleResults.map(result => result === existing ? value : result) : [...puzzleResults, value]
+    setPuzzleResults(nextResults)
+    const winner = rankedPuzzleResults(nextResults.filter(result => result.game === game && result.puzzleId === puzzleId && result.completed !== false))[0]
+    recordGameWinner(puzzleWinnerKey(game, puzzleId), winner?.playerId)
   }
 
   return <GameNightShell syncMode="local" state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
@@ -1728,7 +1746,7 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
-      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner }} />}
+      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults }} />}
       {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} />}

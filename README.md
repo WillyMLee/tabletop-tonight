@@ -25,7 +25,7 @@ The interface uses progressive disclosure: guests see the next action first, whi
 - No-password guest check-in with atomic, one-device-per-name claims
 - Two-step claim release to recover from a wrong name or changed device
 - Four balanced circuit rounds with exact player assignments
-- Atomic winner selection that updates both individual and team scores
+- Atomic manual scoring for hosted games plus automatic Wordle and Connections leader scoring
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
 - Responsive, diagram-based game guides for every scheduled activity, including Flip 7 special-card rules

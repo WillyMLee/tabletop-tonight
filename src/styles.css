@@ -1402,6 +1402,18 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .game-winner-panel > div:first-child > strong, .game-winner-panel > div:first-child > small { display: block; }
 .game-winner-panel > div:first-child > strong { color: white; font: 700 12px 'Chakra Petch','Manrope',sans-serif; margin: 3px 0; }
 .game-winner-panel > div:first-child > small { color: #8e9bca; font-size: 8px; line-height: 1.4; }
+.auto-results-panel { background: #060820; border: 1px solid #243992; border-radius: 10px; margin-top: 12px; overflow: hidden; padding: 12px; }
+.auto-results-panel > header { background: linear-gradient(100deg,#151b52,#0d1036); border: 1px solid #2c43ad; border-radius: 8px; display: grid; grid-template-columns: 34px minmax(0,1fr); align-items: center; gap: 9px; padding: 10px 12px; }
+.auto-score-icon { width: 32px; height: 32px; background: var(--yellow); border-radius: 50%; color: #070815; display: grid; place-items: center; box-shadow: 0 0 14px rgba(255,231,0,.2); }
+.auto-results-panel header strong, .auto-results-panel header small { display: block; }
+.auto-results-panel header strong { color: white; font: 700 12px 'Chakra Petch','Manrope',sans-serif; margin: 2px 0; }
+.auto-results-panel header small { color: #9aa7d4; font-size: 8px; line-height: 1.4; }
+.auto-results-panel > nav { display: flex; gap: 5px; overflow-x: auto; padding: 9px 0; scrollbar-width: thin; }
+.auto-results-panel > nav button { flex: 0 0 auto; background: #101541; border: 1px solid #3048d8; border-radius: 6px; color: #aeb8dc; display: inline-flex; align-items: center; gap: 6px; font: 700 8px 'Chakra Petch','Manrope',sans-serif; padding: 7px 9px; }
+.auto-results-panel > nav button span { width: 18px; height: 18px; border: 1px solid currentColor; border-radius: 50%; display: grid; place-items: center; font-size: 7px; }
+.auto-results-panel > nav button.active { background: var(--yellow); border-color: var(--yellow); color: #070815; }
+.auto-results-panel .puzzle-leaderboard { margin-top: 1px; }
+.puzzle-leaderboard li.round-leader { background: linear-gradient(90deg,rgba(255,231,0,.14),transparent); box-shadow: inset 3px 0 var(--yellow); }
 .winner-selector-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
 .winner-selector { min-width: 0; background: #101541; border: 1px solid #2943ad; border-radius: 7px; display: grid; gap: 7px; padding: 8px; }
 .winner-selector.has-winner.coral { border-color: #ff3b6b; box-shadow: inset 3px 0 #ff3b6b; }
@@ -1669,9 +1681,11 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 }
 
 /* Animated player menus: quiet when closed, playful when opened */
-.guest-join { overflow: visible; }
+.guest-join { overflow: visible; z-index: 2; }
+.guest-join:has(.roster-name-picker.is-open) { z-index: 100; }
 .guest-join form:not(.has-roster-player) .roster-name-picker { grid-column: 1 / -1; }
 .roster-name-picker { min-width: 0; position: relative; }
+.roster-name-picker.is-open { z-index: 110; }
 .roster-field-label { color: #a6afd4; display: block; font: 700 9px 'Chakra Petch','Manrope',sans-serif; letter-spacing: .08em; margin-bottom: 6px; text-transform: uppercase; }
 .roster-picker-trigger { width: 100%; min-height: 50px; background: #070923; border: 2px solid #3550ff; border-radius: 8px; color: white; display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 8px; padding: 10px 12px; text-align: left; }
 .roster-picker-trigger > span { font: 700 12px 'Chakra Petch','Manrope',sans-serif; }
