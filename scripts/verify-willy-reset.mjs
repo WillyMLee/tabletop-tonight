@@ -3,7 +3,7 @@ import { ConvexHttpClient } from 'convex/browser'
 import { api } from '../convex/_generated/api.js'
 
 const envFile = await readFile(new URL('../.env.local', import.meta.url), 'utf8')
-const deploymentUrl = envFile.match(/^VITE_CONVEX_URL=(.+)$/m)?.[1]?.trim()
+const deploymentUrl = process.argv.find(argument => argument.startsWith('https://')) || envFile.match(/^VITE_CONVEX_URL=(.+)$/m)?.[1]?.trim()
 if (!deploymentUrl) throw new Error('VITE_CONVEX_URL is missing from .env.local')
 
 const eventKey = 'tabletop-tonight-willy-reset-check'
