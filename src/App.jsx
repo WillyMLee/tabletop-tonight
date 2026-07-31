@@ -92,26 +92,28 @@ const teamInfo = {
 }
 
 const itinerary = [
-  { time: '6:30', period: 'PM', title: 'Players ready up', detail: 'Snacks, check-in, teams, and ghost colors.', duration: '20 min', type: 'welcome', icon: '●' },
-  { time: '6:50', period: 'PM', title: 'Welcome + quick intro', detail: 'A short explanation of teams, group games, scoring, and the four circuit stations.', duration: '10 min', type: 'welcome', icon: '◌' },
-  { time: '7:00', period: 'PM', title: 'Full-group game session', detail: 'GeoGuessr, Wordle, Connections, Hot Streak, then Flip 7—with the entire room playing.', duration: '90 min', points: 'Group points', type: 'group', icon: '◎' },
-  { time: '8:30', period: 'PM', title: 'Dinner', detail: 'Eat what was ordered, relax, and reset the four stations.', duration: '45 min', type: 'break', icon: '☕' },
-  { time: '9:15', period: 'PM', title: 'Group Circuit 1 · Random', detail: 'Shuffle everyone across Couch, Island, and the two dinner tables.', duration: '25 min', points: '40 pts', type: 'circuit', icon: 'Ⅰ' },
-  { time: '9:45', period: 'PM', title: 'Group Circuit 2 · Choice', detail: 'Players choose one of the four stations based on the game they want.', duration: '25 min', points: '40 pts', type: 'circuit', icon: 'Ⅱ' },
-  { time: '10:15', period: 'PM', title: 'Group Circuit 3 · Rival choice', detail: 'The opposing team assigns each player’s final station.', duration: '25 min', points: '40 pts', type: 'circuit', icon: 'Ⅲ' },
-  { time: '10:40', period: 'PM', title: 'Dessert + chill', detail: 'Dessert, leaderboard reveal, and a breather.', duration: '25 min', type: 'break', icon: '▣' },
-  { time: '11:05', period: 'PM', title: 'Optional Secret Hitler', detail: 'One last social-deduction game for anyone who wants in.', duration: '45 min', points: '10 pts', type: 'group', icon: '◉' },
-  { time: '11:50', period: 'PM', title: 'Homeee', detail: 'Final scores, leftovers, rides, cleanup, and victory laps.', duration: '10 min', type: 'finale', icon: '⌂' },
+  { time: '6:00', period: 'PM', title: 'Players ready up', detail: 'Snacks, check-in, teams, and ghost colors.', duration: '20 min', type: 'welcome', icon: '●' },
+  { time: '6:20', period: 'PM', title: 'Welcome + quick intro', detail: 'Finish the 30-minute welcome block with teams, scoring, and the four-station circuit.', duration: '10 min', type: 'welcome', icon: '◌' },
+  { time: '6:30', period: 'PM', title: 'Group game session', detail: 'GeoGuessr, Wordle, then Connections. Each player records their own result.', duration: '50 min', points: 'Individual results', type: 'group', icon: '◎' },
+  { time: '7:20', period: 'PM', title: 'Quick dinner', detail: 'Eat what was ordered while the host finishes resetting the four stations.', duration: '10 min', type: 'break', icon: '☕' },
+  { time: '7:30', period: 'PM', title: 'Circuit 1 · Starting stations', detail: 'Shuffle once and send every pod to its first location.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅰ' },
+  { time: '7:50', period: 'PM', title: 'Circuit 2 · Rotate', detail: 'Keep the same pod and move clockwise to the next station.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅱ' },
+  { time: '8:10', period: 'PM', title: 'Circuit 3 · Rotate', detail: 'Move clockwise again; everyone reaches a third game.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅲ' },
+  { time: '8:30', period: 'PM', title: 'Circuit 4 · Final rotation', detail: 'Complete the loop at the one station your pod has not played.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅳ' },
+  { time: '8:50', period: 'PM', title: 'Dessert + chill', detail: 'Dessert, leaderboard reveal, and a breather.', duration: '30 min', type: 'break', icon: '▣' },
+  { time: '9:20', period: 'PM', title: 'Optional Secret Hitler', detail: 'One last social-deduction game for anyone who wants in.', duration: '45 min', points: '10 pts', type: 'group', icon: '◉' },
+  { time: '10:05', period: 'PM', title: 'Homeee', detail: 'Final scores, leftovers, rides, cleanup, and victory laps.', duration: '10 min', type: 'finale', icon: '⌂' },
 ]
 
 const phaseGuidance = [
   { phase: 'Ready room', objective: 'Get everyone checked in, snacking, and clear on their house team.', everyone: 'Grab food, find your ghost team, and confirm your name on the roster.', blinky: 'Meet the pink captain and help welcome late arrivals.', inky: 'Meet the cyan captain and help welcome late arrivals.', host: 'Balance the teams and explain team points versus individual points.', cta: 'Manage teams', path: '/teams' },
-  { phase: 'Two-minute welcome', objective: 'Explain only what people need before the first game.', everyone: 'Listen for the two teams, the five-game group session, and the four circuit locations.', blinky: 'Confirm the pink captain.', inky: 'Confirm the cyan captain.', host: 'Keep it short: group session, dinner, then Random → Choice → Rival Choice across four stations.', cta: 'Continue to group games', path: '/run-of-show' },
-  { phase: 'Full-group arcade', objective: 'Move the whole room through GeoGuessr, Wordle, Connections, Hot Streak, and Flip 7 in order.', everyone: 'Stay together for physical games; use your own device for Wordle and Connections.', blinky: 'Choose the GeoGuessr captain device and help record the team total.', inky: 'Choose the GeoGuessr captain device and help record the team total.', host: 'Launch each game from the lineup below and keep transitions under two minutes.', cta: 'Open group game lineup', path: '/run-of-show' },
+  { phase: 'Quick welcome', objective: 'Explain only what people need before the first game.', everyone: 'Listen for individual puzzle scores, team circuit points, and the four locations.', blinky: 'Confirm the pink captain.', inky: 'Confirm the cyan captain.', host: 'Keep the full ready-up and welcome block to 30 minutes, then launch GeoGuessr at 6:30.', cta: 'Continue to group games', path: '/run-of-show' },
+  { phase: 'Individual arcade', objective: 'Play GeoGuessr, Wordle, and Connections in that order during one 50-minute block.', everyone: 'Use your own device and record your own result in all three games.', blinky: 'Help teammates join the correct GeoGuessr lobby without sharing guesses.', inky: 'Help teammates join the correct GeoGuessr lobby without sharing guesses.', host: 'Run three GeoGuessr games of five rounds, then launch Wordle and Connections from the lineup.', cta: 'Open group game lineup', path: '/run-of-show' },
   { phase: 'Dinner', objective: 'Eat the food that was ordered. Nothing else is scheduled.', everyone: 'Grab dinner and take a real break.', blinky: 'No team task during dinner.', inky: 'No team task during dinner.', host: 'Put the order on screen and quietly reset all four circuit stations.', cta: 'Continue to circuits', path: '/run-of-show' },
-  { phase: 'Random circuit', objective: 'Start the circuit with a fair four-way shuffle and zero negotiation.', everyone: 'Go to the location shown beside your name and stay for the full round.', blinky: 'Record pink individual awards before leaving.', inky: 'Verify the station result before leaving.', host: 'Shuffle once, reveal Couch, Island, Dinner Table #1, and Dinner Table #2, then start one 25-minute clock.', cta: 'Shuffle stations', path: '/run-of-show' },
-  { phase: 'Player-choice circuit', objective: 'Let guests prioritize the game they most want to play.', everyone: 'Choose an open station; aim for three or four players at each location.', blinky: 'Pink players choose first in alternating order.', inky: 'Cyan players choose second in alternating order.', host: 'Close stations at four and rebalance only if a station drops below three players.', cta: 'Choose stations', path: '/run-of-show' },
-  { phase: 'Rival-choice circuit', objective: 'Finish with playful counter-picks while keeping assignments fair.', everyone: 'Wait for the opposing captain to assign your pod, then report there.', blinky: 'Blinky captain assigns Inky players across the four stations.', inky: 'Inky captain assigns Blinky players across the four stations.', host: 'Reject any assignment that creates a station outside the three-to-four target.', cta: 'Assign rivals', path: '/run-of-show' },
+  { phase: 'Starting circuit', objective: 'Create four balanced pods and start them at four different games.', everyone: 'Go to the location shown beside your pod and stay for the full 20-minute round.', blinky: 'Record pink individual awards before rotating.', inky: 'Verify the station result before rotating.', host: 'Shuffle once, reveal the four starting locations, and run one 20-minute clock.', cta: 'Shuffle pods', path: '/run-of-show' },
+  { phase: 'Second circuit', objective: 'Keep pods together and rotate every group clockwise.', everyone: 'Move to the next location shown for your pod.', blinky: 'Carry only score notes; leave game pieces reset.', inky: 'Help reset the station before moving.', host: 'Call time at 20 minutes and allow a fast handoff only.', cta: 'View rotation', path: '/run-of-show' },
+  { phase: 'Third circuit', objective: 'Continue the fixed rotation so every pod reaches a third game.', everyone: 'Stay with your pod and follow the circuit map.', blinky: 'Confirm the prior station result is recorded.', inky: 'Confirm the next game is ready.', host: 'Start the next 20-minute clock as soon as groups are seated.', cta: 'View rotation', path: '/run-of-show' },
+  { phase: 'Final circuit', objective: 'Complete the loop at the one remaining station for each pod.', everyone: 'Play the final game on your pod’s route.', blinky: 'Record the final individual awards.', inky: 'Verify the final team result.', host: 'Close the circuit after 20 minutes and move everyone to dessert.', cta: 'Finish circuit', path: '/run-of-show' },
   { phase: 'Dessert reset', objective: 'Give the room a real breather before the optional finale.', everyone: 'Grab dessert and check the Wordle and Connections leaderboards.', blinky: 'Nominate an MVP and sportsmanship pick.', inky: 'Nominate an MVP and sportsmanship pick.', host: 'Project the live puzzle standings and the team scoreboard.', cta: 'Open Wordle leaderboard', path: '/play/wordle' },
   { phase: 'Optional social deduction', objective: 'Offer one final high-energy game without trapping tired guests.', everyone: 'Opt in before roles are dealt; everyone else can chill or head out.', blinky: 'House teams pause—Secret Hitler uses its own hidden sides.', inky: 'House teams pause—Secret Hitler uses its own hidden sides.', host: 'Only award house points if both teams have similar representation.', cta: 'Open game guide', path: '/games/secret-hitler' },
   { phase: 'Closeout', objective: 'End on time with clear winners and an easy exit.', everyone: 'Collect belongings, leftovers, and rides; help with one cleanup task.', blinky: 'Captain confirms the final team score.', inky: 'Captain confirms the final team score.', host: 'Announce champions and individual awards, then close the scoreboard.', cta: 'Open scoreboard', path: '/scores' },
@@ -121,28 +123,34 @@ const circuitStations = [
   { pod: 'A', location: 'Couch', name: 'Mario Power Tennis', slug: 'mario-tennis-gc', icon: '🎾' },
   { pod: 'B', location: 'Island', name: 'Jenga', slug: 'jenga', icon: '▥' },
   { pod: 'C', location: 'Dinner Table #1', name: 'Blokus', slug: 'blokus', icon: '▦' },
-  { pod: 'D', location: 'Dinner Table #2', name: 'Tabletop choice', slug: 'dinner-table-2', icon: '★', options: ['magical-athlete', 'yahtzee', 'scout'] },
+  { pod: 'D', location: 'Dinner Table #2', name: 'Flip 7 or Magical Athlete', slug: 'magical-athlete', icon: '★', options: ['flip-7', 'magical-athlete'] },
+]
+
+const rotationStations = offset => circuitStations.map((station, locationIndex) => ({ ...station, pod: ['A', 'B', 'C', 'D'][(locationIndex - offset + 4) % 4] }))
+
+const rotations = [
+  { round: 'Circuit 1 · Start', time: '7:30–7:50', stations: rotationStations(0) },
+  { round: 'Circuit 2 · Rotate', time: '7:50–8:10', stations: rotationStations(1) },
+  { round: 'Circuit 3 · Rotate', time: '8:10–8:30', stations: rotationStations(2) },
+  { round: 'Circuit 4 · Finish', time: '8:30–8:50', stations: rotationStations(3) },
 ]
 
 const groupGameLineup = [
-  { order: 1, slug: 'geoguessr', duration: '25 min', location: 'Couch + main screen', note: 'Play 3–5 locations as two house teams.' },
+  { order: 1, slug: 'geoguessr', duration: '30 min', location: 'Everyone’s phone', note: 'Play 3 separate games of 5 rounds. Each player keeps an individual score.' },
   { order: 2, slug: 'wordle', duration: '8 min', location: 'Everyone’s phone', note: 'Each player gets one run; fewest attempts leads.' },
   { order: 3, slug: 'connections', duration: '10 min', location: 'Everyone’s phone', note: 'The timer starts on launch; fastest solve leads.' },
-  { order: 4, slug: 'hot-streak', duration: '20 min', location: 'Island', note: 'Bring the room together around the race.' },
-  { order: 5, slug: 'flip-7', duration: '20 min', location: 'Dinner tables combined', note: 'Finish with one quick full-room card session.' },
 ]
 
 const phaseLogistics = [
   { games: [], places: [{ group: 'Everyone', location: 'Entry + kitchen', detail: 'Check in, grab snacks and a team color, then meet your captain.' }] },
   { games: [], places: [] },
-  { games: ['geoguessr', 'wordle', 'connections', 'hot-streak', 'flip-7'], places: [] },
+  { games: ['geoguessr', 'wordle', 'connections'], places: [] },
   { games: [], places: [] },
-  ...['random', 'choice', 'rival'].map((assignmentMode, index) => ({
-    assignmentMode,
-    games: ['mario-tennis-gc', 'jenga', 'blokus', 'magical-athlete'],
-    alternates: ['yahtzee', 'scout'],
-    stations: circuitStations,
-    places: circuitStations.map(station => ({ group: `Pod ${station.pod}`, location: station.location, game: station.slug === 'dinner-table-2' ? 'magical-athlete' : station.slug, detail: station.options ? 'Choose Magical Athlete, Yahtzee Relay, or SCOUT before the timer starts.' : `Play ${station.name} here for the full circuit.` })),
+  ...rotations.map((rotation, index) => ({
+    assignmentMode: index === 0 ? 'random' : 'rotation',
+    games: ['mario-tennis-gc', 'jenga', 'blokus', 'magical-athlete', 'flip-7'],
+    stations: rotation.stations,
+    places: rotation.stations.map(station => ({ group: `Pod ${station.pod}`, location: station.location, game: station.slug, detail: station.options ? 'Choose Flip 7 or Magical Athlete before the timer starts.' : `Play ${station.name} here for the full circuit.` })),
     rotationRange: [index, index],
   })),
   { games: [], places: [{ group: 'Everyone', location: 'Dessert table + living room', detail: 'Chill, check scores, and reveal the live Wordle and Connections leaders.' }] },
@@ -153,20 +161,15 @@ const phaseLogistics = [
 const phaseScoring = [
   { mode: 'none', note: 'Ready-up is unscored.', individual: 'No individual points during check-in.' },
   { mode: 'none', note: 'The welcome is unscored.', individual: 'No individual points during the intro.' },
-  { mode: 'group', award: 10, note: 'Use the five game cards below for scoring. Wordle and Connections also maintain individual live leaderboards.', individual: 'Puzzle results are recorded automatically; use +3 only for physical-game MVPs.' },
+  { mode: 'individual', note: 'GeoGuessr, Wordle, and Connections are individual challenges. Team totals do not change in this phase.', individual: 'For each 5-round GeoGuessr game award 5–3–1 to the top three. Puzzle results record automatically.' },
   { mode: 'none', note: 'Dinner is a true scoring break.', individual: 'No individual points during dinner.' },
-  { mode: 'circuit', award: 10, note: 'Each of the four random circuit stations is worth 10 team points; a split is 5–5.', individual: 'Use the game guide for podiums, clean pulls, and winning pairs.' },
-  { mode: 'circuit', award: 10, note: 'Each player-choice station is worth 10 team points; a split is 5–5.', individual: 'Award the game-specific result plus any listed bonus.' },
-  { mode: 'circuit', award: 10, note: 'Each rival-choice station is worth 10 team points; a split is 5–5.', individual: 'Award +3 for a standout performance under the counter-pick.' },
+  { mode: 'circuit', award: 10, note: 'Each starting station is worth 10 team points; a split is 5–5.', individual: 'Use the game guide for podiums, clean pulls, and winning pairs.' },
+  { mode: 'circuit', award: 10, note: 'Each second-rotation station is worth 10 team points; a split is 5–5.', individual: 'Award the game-specific result plus any listed bonus.' },
+  { mode: 'circuit', award: 10, note: 'Each third-rotation station is worth 10 team points; a split is 5–5.', individual: 'Award +3 for a standout performance.' },
+  { mode: 'circuit', award: 10, note: 'Each final-rotation station is worth 10 team points; a split is 5–5.', individual: 'Award the final game-specific result and any listed bonus.' },
   { mode: 'none', note: 'Dessert and optional puzzles do not change the championship.', individual: 'No individual points during the chill block.' },
   { mode: 'group', award: 10, note: 'If played and teams are balanced, the winning side contributes 10 house points.', individual: 'Optional: +3 for the best deduction or bluff.' },
   { mode: 'none', note: 'The closeout reveals points; it does not add new ones.', individual: 'Awards are labels only unless the host explicitly adds a bonus.' },
-]
-
-const rotations = [
-  { round: 'Circuit 1 · Random', time: '9:15–9:40', stations: circuitStations },
-  { round: 'Circuit 2 · Choice', time: '9:45–10:10', stations: circuitStations },
-  { round: 'Circuit 3 · Rival choice', time: '10:15–10:40', stations: circuitStations },
 ]
 
 const gridGroups = activeConnections.groups
@@ -467,11 +470,11 @@ function Tonight({ scores, changeScore, players, navigate, currentEvent, setCurr
 }
 
 function GameLibrary({ navigate }) {
-  const groupGames = ['geoguessr', 'wordle', 'connections', 'hot-streak', 'flip-7'].map(getGame).filter(Boolean)
+  const groupGames = ['geoguessr', 'wordle', 'connections'].map(getGame).filter(Boolean)
   const teamLocations = [
     { location: 'Couch', note: 'GameCube doubles', games: ['mario-tennis-gc'] },
     { location: 'Dinner Table #1', note: 'Four-player strategy', games: ['blokus'] },
-    { location: 'Dinner Table #2', note: 'Choose one tabletop game', games: ['magical-athlete', 'yahtzee', 'scout'] },
+    { location: 'Dinner Table #2', note: 'Choose one tabletop game', games: ['flip-7', 'magical-athlete'] },
     { location: 'Island', note: 'Dexterity station', games: ['jenga'] },
   ]
   const GameCard = ({ game, compact = false }) => <article className={`library-game-card card ${game.color} ${compact ? 'compact' : ''}`}>
@@ -536,7 +539,6 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
   const phaseScore = phaseScores[currentEvent] || { meeple: 0, mayhem: 0 }
   const scoring = phaseScoring[currentEvent] || phaseScoring[0]
   const individualScore = individualPhaseScores[currentEvent] || {}
-  const [geoRounds, setGeoRounds] = useState(5)
   const activePhaseRef = useRef(null)
   const pods = useMemo(() => {
     const active = players.filter(player => player.checkedIn)
@@ -597,8 +599,8 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
             <div className="simple-intro-heading"><span className="kicker">WELCOME · KEEP IT QUICK</span><h2>Tonight in 60 seconds</h2><p>Grab everyone’s attention, explain the arc of the night, and start playing.</p></div>
             <div className="intro-simple-steps">
               <article><span>01</span><div><strong>Two ghost teams</strong><p>Pink Blinky and Cyan Inky collect team points all night.</p></div></article>
-              <article><span>02</span><div><strong>GeoGuessr starts us together</strong><p>Everyone helps read the clues; each team captain locks the final guess.</p></div></article>
-              <article><span>03</span><div><strong>Three circuits after dinner</strong><p>Random pods, then player choice, then your rivals choose the final station.</p></div></article>
+              <article><span>02</span><div><strong>Three individual challenges</strong><p>GeoGuessr, Wordle, and Connections each produce an individual result.</p></div></article>
+              <article><span>03</span><div><strong>Four circuits after dinner</strong><p>Pods start at one station, then rotate clockwise until every game is complete.</p></div></article>
             </div>
             <button className="intro-next" onClick={() => setCurrentEvent(2)}>Ready? Start GeoGuessr <ArrowRight size={15} /></button>
           </section> : currentEvent === 3 ? <section className="dinner-order-panel">
@@ -606,7 +608,7 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
             <p>This block is only for eating and catching up. Add the order here so everyone knows what arrived.</p>
             <label htmlFor="dinner-order">Dinner order</label>
             <textarea id="dinner-order" value={dinnerOrder} onChange={event => setDinnerOrder(event.target.value)} placeholder="Example: 2 pizzas, wings, salad, and one gluten-free order…" />
-            <small>Next up: Circuit 1 · Random at 8:35 PM</small>
+            <small>Next up: Circuit 1 · Starting stations at 7:30 PM</small>
           </section> : <>
           <div className="phase-command-grid">
             <article className="phase-directions">
@@ -637,6 +639,7 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
                   return <div className="station-result-row" key={station.slug}><span>{station.icon} {station.location}</span><div><button className={result === 'meeple' ? 'active blinky' : ''} onClick={() => recordCircuitResult(currentEvent, station.slug, result === 'meeple' ? '' : 'meeple')}>Blinky</button><button className={result === 'split' ? 'active split' : ''} onClick={() => recordCircuitResult(currentEvent, station.slug, result === 'split' ? '' : 'split')}>Split</button><button className={result === 'mayhem' ? 'active inky' : ''} onClick={() => recordCircuitResult(currentEvent, station.slug, result === 'mayhem' ? '' : 'mayhem')}>Inky</button></div></div>
                 })}
               </div>}
+              {scoring.mode === 'individual' && <div className="unscored-phase"><Medal size={15} /> Team scores stay put. Record GeoGuessr podium points below; Wordle and Connections update their own leaderboards.</div>}
               {scoring.mode === 'none' && <div className="unscored-phase"><Check size={15} /> No championship points are recorded in this phase.</div>}
               <button className="view-full-score" onClick={() => navigate('/scores')}>Open full scoreboard <ChevronRight size={14} /></button>
             </article>
@@ -644,21 +647,20 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
 
           {currentEvent === 2 && <section className="phase-detail-section geo-group-format">
             <div className="geo-format-heading">
-              <div><span className="kicker">FULL-GROUP FORMAT</span><h2>Play {geoRounds} GeoGuessr locations</h2><p>Both teams investigate the same place at the same time. Every voice has a useful clue to contribute.</p></div>
-              <div className="geo-round-picker" role="group" aria-label="Number of GeoGuessr locations"><small>LOCATIONS</small><div>{[3, 4, 5].map(rounds => <button className={geoRounds === rounds ? 'active' : ''} onClick={() => setGeoRounds(rounds)} key={rounds}>{rounds}</button>)}</div></div>
+              <div><span className="kicker">INDIVIDUAL GEOGRAPHY FORMAT</span><h2>3 games × 5 GeoGuessr rounds</h2><p>Everyone plays on their own device. Each five-round game produces a separate individual podium.</p></div>
+              <span className="muted-chip">15 locations total</span>
             </div>
             <div className="geo-format-steps">
-              <article><span>01</span><strong>Join the Party</strong><p>Host shares the room link or code. Put both captain devices where teammates can see them.</p></article>
-              <article><span>02</span><strong>Explore together</strong><p>Take 60–90 seconds to scan signs, language, road lines, buildings, and landscape.</p></article>
-              <article><span>03</span><strong>Lock the guesses</strong><p>Each captain listens to the team and places one marker before the timer ends.</p></article>
-              <article><span>04</span><strong>Reveal + record</strong><p>Add each displayed score. After {geoRounds} locations, the highest total wins the phase.</p></article>
+              <article><span>01</span><strong>Join individually</strong><p>Host shares the lobby link or code and every player joins on their own phone.</p></article>
+              <article><span>02</span><strong>Play five rounds</strong><p>Scan signs, language, road lines, buildings, and landscape without sharing answers.</p></article>
+              <article><span>03</span><strong>Record the podium</strong><p>After round five, award 5–3–1 individual points to first, second, and third.</p></article>
+              <article><span>04</span><strong>Repeat three times</strong><p>Start a fresh five-round game and score a new podium each time.</p></article>
             </div>
-            <div className="geo-captains"><div className="coral"><span className="team-ghost"><i /><i /></span><div><small>PINK TEAM</small><strong>Blinky captain device</strong></div></div><div className="lime"><span className="team-ghost"><i /><i /></span><div><small>CYAN TEAM</small><strong>Inky captain device</strong></div></div></div>
-            <div className="geo-launch"><p><strong>House points:</strong> 15 to the higher GeoGuessr total, 5 to the runner-up, and +3 individual points for each team’s navigator MVP.</p><a href="https://www.geoguessr.com/party" target="_blank" rel="noreferrer">Open GeoGuessr Party <ArrowRight size={14} /></a></div>
+            <div className="geo-launch"><p><strong>Scoring:</strong> three separate 5–3–1 podiums. GeoGuessr does not add team points during this block.</p><a href="https://www.geoguessr.com/party" target="_blank" rel="noreferrer">Open GeoGuessr Party <ArrowRight size={14} /></a></div>
           </section>}
 
           {currentEvent === 2 && <section className="phase-detail-section group-game-run">
-            <div className="section-heading"><div><span className="kicker">PLAY IN THIS ORDER</span><h2>Five-game full-room lineup</h2><p>Keep everyone together and move straight down this list.</p></div><span className="muted-chip">90-minute block</span></div>
+            <div className="section-heading"><div><span className="kicker">PLAY IN THIS ORDER</span><h2>Three-game individual lineup</h2><p>Everyone plays the same challenge, but each player records their own result.</p></div><span className="muted-chip">50-minute block</span></div>
             <div className="group-game-run-list">{groupGameLineup.map(item => {
               const game = getGame(item.slug)
               return <article key={item.slug}>
@@ -671,11 +673,11 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
           </section>}
 
           {phaseRounds.length > 0 && <section className="phase-detail-section pod-manager-section">
-            <div className="section-heading"><div><span className="kicker">STATION MANAGER</span><h2>Move players between locations</h2><p>{logistics.assignmentMode === 'random' ? 'Shuffle once, then reveal the assignments.' : logistics.assignmentMode === 'choice' ? 'Players choose an open station; aim for 3–4 at each location.' : 'Each captain assigns players from the opposing team.'}</p></div>{logistics.assignmentMode === 'random' ? <button className="pod-randomize" onClick={randomizePods}><Shuffle size={14} /> Randomize stations</button> : <span className="muted-chip">{logistics.assignmentMode === 'choice' ? 'Player choice' : 'Opponent choice'}</span>}</div>
-            <div className="pod-manager-grid">{circuitStations.map((station, podIndex) => <article key={station.pod}>
+            <div className="section-heading"><div><span className="kicker">STATION MANAGER</span><h2>Pods at this rotation</h2><p>{logistics.assignmentMode === 'random' ? 'Shuffle once, then keep these pods together for all four circuits.' : 'Pods stay together and move clockwise to the location shown below.'}</p></div>{logistics.assignmentMode === 'random' ? <button className="pod-randomize" onClick={randomizePods}><Shuffle size={14} /> Randomize pods</button> : <span className="muted-chip">Clockwise rotation</span>}</div>
+            <div className="pod-manager-grid">{logistics.stations.map(station => { const podIndex = ['A', 'B', 'C', 'D'].indexOf(station.pod); return <article key={`${station.pod}-${station.location}`}>
               <header><div><small>POD {station.pod} · {station.location}</small><h3>{station.name}</h3></div><strong>{pods[podIndex].length} players</strong></header>
-              <div>{pods[podIndex].map(player => <div className="pod-manager-player" key={player.id}><Avatar name={player.name} size="sm" /><span><strong>{player.name}</strong><small>{teamInfo[player.team].name}</small></span><select value={station.pod} onChange={event => movePlayerToPod(player.id, event.target.value)} aria-label={`Move ${player.name} to another station`}>{circuitStations.map(option => <option value={option.pod} key={option.pod}>{option.pod} · {option.location}</option>)}</select></div>)}</div>
-            </article>)}</div>
+              <div>{pods[podIndex].map(player => <div className="pod-manager-player" key={player.id}><Avatar name={player.name} size="sm" /><span><strong>{player.name}</strong><small>{teamInfo[player.team].name}</small></span><select value={station.pod} onChange={event => movePlayerToPod(player.id, event.target.value)} aria-label={`Move ${player.name} to another pod`}>{['A', 'B', 'C', 'D'].map(option => <option value={option} key={option}>Pod {option}</option>)}</select></div>)}</div>
+            </article>})}</div>
           </section>}
 
           <section className="phase-detail-section individual-score-section">
@@ -694,7 +696,7 @@ function RunOfShow({ currentEvent, setCurrentEvent, players, scores, phaseScores
                 const game = place.game ? getGame(place.game) : null
                 return <article className="destination-card" key={`${place.group}-${place.location}`}>
                   <span className="destination-number">{String(index + 1).padStart(2, '0')}</span>
-                  <div><small>{place.group}</small><h3>{place.location}</h3>{game && <strong>{game.icon} {game.name}</strong>}<p>{place.detail || (game ? (phaseRounds.length === 1 ? 'Stay here for the full 25-minute circuit.' : 'Start here, then rotate when the host calls time.') : '')}</p></div>
+                  <div><small>{place.group}</small><h3>{place.location}</h3>{game && <strong>{game.icon} {place.detail ? circuitStations.find(station => station.location === place.location)?.name || game.name : game.name}</strong>}<p>{place.detail || (game ? 'Stay here for the full 20-minute circuit.' : '')}</p></div>
                   {podIndex >= 0 && <div className="pod-player-chips">{pods[podIndex].map(player => <span key={player.id}><Avatar name={player.name} size="sm" /> {player.name}</span>)}</div>}
                 </article>
               })}
@@ -761,14 +763,14 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
         <aside className="card host-note">
           <Lightbulb size={24} />
           <span className="kicker">HOST NOTE</span>
-          <h3>Race at the right scale</h3>
-          <p>Hot Streak works as the loud full-room race. Magical Athlete stays in a 4–6-player pod where every power remains readable.</p>
+          <h3>Keep the pods moving</h3>
+          <p>Use the first shuffle to create balanced pods, then keep them together through all four clockwise rotations.</p>
           <div className="mini-rule"><span>Core-night rule</span><strong>No one sits out longer than 5 min.</strong></div>
         </aside>
       </section>
 
       <section className="section-block">
-        <div className="section-heading"><div><span className="kicker">7:10–9:15 PM</span><h2>Two-part rotation circuit</h2></div><span className="all-active"><Users size={15} /> All players active</span></div>
+        <div className="section-heading"><div><span className="kicker">7:30–8:50 PM</span><h2>Four-game rotation circuit</h2></div><span className="all-active"><Users size={15} /> All players active</span></div>
         <div className="round-tabs">
           {rotations.map((item, i) => <button key={item.round} className={round === i ? 'active' : ''} onClick={() => setRound(i)}>{item.round}<small>{item.time}</small></button>)}
         </div>
@@ -880,10 +882,11 @@ function PartyGrid({ onWin }) {
 const formatPuzzleTime = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
 
 function PuzzleLeaderboard({ game, puzzleId, results }) {
-  const leaders = results.filter(result => result.game === game && result.puzzleId === puzzleId).sort((a, b) => a.metric - b.metric || a.playerName.localeCompare(b.playerName))
+  const leaders = results.filter(result => result.game === game && result.puzzleId === puzzleId).sort((a, b) => Number(a.completed === false) - Number(b.completed === false) || a.metric - b.metric || a.playerName.localeCompare(b.playerName))
+  const finishers = leaders.filter(result => result.completed !== false)
   return <aside className="puzzle-leaderboard">
-    <div><span className="kicker">LIVE LEADERBOARD</span><h3>{game === 'wordle' ? 'Fewest attempts' : 'Fastest solves'}</h3></div>
-    {leaders.length ? <ol>{leaders.map(result => <li key={`${result.playerId}-${result.puzzleId}`}><span>{leaders.findIndex(item => item.metric === result.metric) + 1}</span><Avatar name={result.playerName} size="sm" /><strong>{result.playerName}</strong><small className={teamInfo[result.team].color}>{teamInfo[result.team].short}</small><b>{game === 'wordle' ? `${result.metric}/6` : formatPuzzleTime(result.metric)}</b></li>)}</ol> : <div className="empty-leaderboard"><Trophy size={22} /><p>No finishes yet. Be the first name on the board.</p></div>}
+    <div><span className="kicker">LIVE LEADERBOARD</span><h3>{game === 'wordle' ? 'Fewest attempts' : 'Fastest solves + DNFs'}</h3></div>
+    {leaders.length ? <ol>{leaders.map(result => { const completed = result.completed !== false; return <li className={!completed ? 'dnf' : ''} key={`${result.playerId}-${result.puzzleId}`}><span>{completed ? finishers.findIndex(item => item.metric === result.metric) + 1 : '—'}</span><Avatar name={result.playerName} size="sm" /><strong>{result.playerName}</strong><small className={teamInfo[result.team].color}>{teamInfo[result.team].short}</small><b>{completed ? (game === 'wordle' ? `${result.metric}/6` : formatPuzzleTime(result.metric)) : 'DNF'}</b></li> })}</ol> : <div className="empty-leaderboard"><Trophy size={22} /><p>No attempts yet. Be the first name on the board.</p></div>}
   </aside>
 }
 
@@ -924,7 +927,11 @@ function ConnectionsRound({ puzzle, onComplete, results }) {
     } else {
       const nextMistakes = mistakes + 1
       setMistakes(nextMistakes)
-      if (nextMistakes >= 4) setLost(true)
+      if (nextMistakes >= 4) {
+        setLost(true)
+        const metric = Math.max(1, Math.ceil((Date.now() - startedAt) / 1000))
+        await onComplete(metric, false)
+      }
     }
     setSelected([])
   }
@@ -943,7 +950,7 @@ function ConnectionsRound({ puzzle, onComplete, results }) {
 function ConnectionsGame({ onComplete, results }) {
   const [roundIndex, setRoundIndex] = useState(0)
   const puzzle = connectionsRounds[roundIndex]
-  return <><PuzzleRoundPicker rounds={connectionsRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><ConnectionsRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={metric => onComplete(puzzle.id, metric)} /></>
+  return <><PuzzleRoundPicker rounds={connectionsRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><ConnectionsRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={(metric, completed = true) => onComplete(puzzle.id, metric, completed)} /></>
 }
 
 const validWordleGuesses = new Set([...validWordleWords.map(word => word.toUpperCase()), ...wordleRounds.map(round => round.answer)])
@@ -1057,15 +1064,15 @@ function LegacyPlayroom({ changeScore, mode = 'grid', navigate }) {
 function Playroom({ mode = 'connections', navigate, players, guestPlayerIdentity, puzzleResults, submitPuzzleResult }) {
   const [gameMode, setGameMode] = useState(mode === 'wordle' ? 'wordle' : 'connections')
   const player = players.find(item => item.id === guestPlayerIdentity?.id && item.name.toLocaleLowerCase() === guestPlayerIdentity.name.toLocaleLowerCase())
-  const complete = (game, puzzleId, metric) => submitPuzzleResult(player.id, game, puzzleId, metric)
+  const complete = (game, puzzleId, metric, completed = true) => submitPuzzleResult(player.id, game, puzzleId, metric, completed)
   return <main>
     <button className="back-link" onClick={() => navigate(`/games/${gameMode}`)}><ArrowRight size={15} /> Game guide</button>
     <section className="page-intro play-intro"><span className="eyebrow">GROUP SESSION · PERSONAL RUN</span><h1>The puzzle arcade</h1><p>Everyone gets the same challenge. Finish on your own device and watch the leaderboard update live.</p></section>
     <div className="game-selector two-games">
-      <button aria-pressed={gameMode === 'connections'} className={gameMode === 'connections' ? 'active' : ''} onClick={() => setGameMode('connections')}><span>▦</span><div><strong>Connections</strong><small>Four groups · 10 min</small></div></button>
       <button aria-pressed={gameMode === 'wordle'} className={gameMode === 'wordle' ? 'active' : ''} onClick={() => setGameMode('wordle')}><span>▣</span><div><strong>Wordle</strong><small>Five letters · 10 min</small></div></button>
+      <button aria-pressed={gameMode === 'connections'} className={gameMode === 'connections' ? 'active' : ''} onClick={() => setGameMode('connections')}><span>▦</span><div><strong>Connections</strong><small>Four groups · 10 min</small></div></button>
     </div>
-    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('connections', puzzleId, metric)} /> : <WordleGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('wordle', puzzleId, metric)} />}</section>}
+    {!player ? <section className="puzzle-join-gate"><Users size={24} /><div><strong>Join before you play</strong><p>Add your name and team so your result has somewhere to land.</p></div><button onClick={() => navigate('/')}>Join game night <ArrowRight size={14} /></button></section> : <section className="game-stage"><div className="puzzle-player-strip"><Avatar name={player.name} size="sm" /><span>Playing as <strong>{player.name}</strong></span><small>{teamInfo[player.team].name}</small></div>{gameMode === 'connections' ? <ConnectionsGame results={puzzleResults} onComplete={(puzzleId, metric, completed) => complete('connections', puzzleId, metric, completed)} /> : <WordleGame results={puzzleResults} onComplete={(puzzleId, metric) => complete('wordle', puzzleId, metric)} />}</section>}
     <section className="fair-play-note"><CircleHelp size={20} /><div><strong>One honest run at a time</strong><p>Play quietly on your own device. Replays are allowed, and the board keeps only your best completed result.</p></div></section>
   </main>
 }
@@ -1188,12 +1195,14 @@ function LocalApp() {
     rememberPlayerIdentity(guestStorageKey, identity)
     return id
   }
-  const submitPuzzleResult = async (playerId, game, puzzleId, metric) => {
+  const submitPuzzleResult = async (playerId, game, puzzleId, metric, completed = true) => {
     const player = players.find(item => item.id === playerId)
     if (!player) throw new Error('Join the game night before submitting a result')
     setPuzzleResults(previous => {
       const existing = previous.find(result => result.playerId === playerId && result.game === game && result.puzzleId === puzzleId)
-      const value = { playerId, playerName: player.name, team: player.team, game, puzzleId, metric: existing ? Math.min(existing.metric, metric) : metric }
+      const existingCompleted = existing?.completed !== false
+      const keepExistingFinish = existing && existingCompleted && !completed
+      const value = { playerId, playerName: player.name, team: player.team, game, puzzleId, metric: keepExistingFinish ? existing.metric : existing && existingCompleted === completed && completed ? Math.min(existing.metric, metric) : metric, completed: keepExistingFinish ? true : completed }
       return existing ? previous.map(result => result === existing ? value : result) : [...previous, value]
     })
   }
@@ -1284,10 +1293,10 @@ function RealtimeApp() {
       throw error
     }
   }
-  const submitPuzzleResult = async (playerId, game, puzzleId, metric) => {
+  const submitPuzzleResult = async (playerId, game, puzzleId, metric, completed = true) => {
     setSyncError('')
     try {
-      return await submitPuzzleResultMutation({ eventKey, playerId, game, puzzleId, metric })
+      return await submitPuzzleResultMutation({ eventKey, playerId, game, puzzleId, metric, completed })
     } catch (error) {
       setSyncError(error.message || 'Could not save the puzzle result')
       throw error

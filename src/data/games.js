@@ -2,13 +2,13 @@ const game = (details) => details
 
 export const games = [
   game({
-    slug: 'geoguessr', name: 'GeoGuessr', icon: '◎', category: 'Party', format: 'Shared-screen geography', players: '2 teams · 10–14', duration: '35–45 min', difficulty: 'Easy', status: 'Full-group feature', color: 'cyan', externalUrl: 'https://www.geoguessr.com/party',
-    summary: 'Explore a mystery Street View location, spot the clues, and place the closest team guess.',
-    why: 'Everyone can contribute immediately: some people scan signs, others read the landscape, and one captain locks the team guess.',
-    setup: ['The host opens a GeoGuessr Party and chooses a world map.', 'Blinky and Inky each choose one captain device for their final guess.', 'Choose 3–5 locations and keep each location to roughly 60–90 seconds.'],
-    rules: ['Both teams explore the same mystery location.', 'Call out road signs, language, road markings, architecture, and landscape clues.', 'Each team captain places one final marker before time expires.', 'Reveal both guesses, celebrate the closest read, and record the displayed scores.'],
-    scoring: 'Add each team’s GeoGuessr score across every location. The higher total earns 15 house points; the runner-up earns 5.',
-    hostTip: 'A GeoGuessr PRO host can create a Party and share its link or code; guests can join without making accounts.',
+    slug: 'geoguessr', name: 'GeoGuessr', icon: '◎', category: 'Party', format: 'Individual geography', players: 'Everyone', duration: '30 min', difficulty: 'Easy', status: 'Group-session leaderboard', color: 'cyan', externalUrl: 'https://www.geoguessr.com/party',
+    summary: 'Explore mystery Street View locations, spot the clues, and compete for three individual five-round podiums.',
+    why: 'Everyone plays simultaneously on their own device, so all fourteen guests stay active while each result remains individual.',
+    setup: ['The host opens a GeoGuessr Party and chooses a world map.', 'Every player joins the same lobby on their own device.', 'Prepare three separate games with five rounds in each game.'],
+    rules: ['Every player explores the same mystery location independently.', 'Scan road signs, language, road markings, architecture, and landscape clues.', 'Place one final marker before the timer expires.', 'After five rounds, record the podium and start a fresh five-round game.'],
+    scoring: 'Score each of the three games separately. Award 5–3–1 individual points to first, second, and third after every five-round game.',
+    hostTip: 'Use one short timer for every location so all three five-round games fit inside the 30-minute block.',
   }),
   game({
     slug: 'wavelength', name: 'Wavelength', icon: '〰', category: 'Party', format: 'Team party', players: '8–14', duration: '20 min', difficulty: 'Easy', status: 'Opening game', color: 'yellow',
@@ -156,6 +156,6 @@ export const games = [
   }),
 ]
 
-export const tonightSlugs = ['geoguessr', 'wordle', 'connections', 'hot-streak', 'flip-7', 'mario-tennis-gc', 'jenga', 'blokus', 'magical-athlete', 'yahtzee', 'scout']
+export const tonightSlugs = ['geoguessr', 'wordle', 'connections', 'mario-tennis-gc', 'jenga', 'blokus', 'flip-7', 'magical-athlete', 'secret-hitler']
 export const partySlugs = ['geoguessr', 'hot-streak', 'wavelength', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections', 'scout']
 export const getGame = slug => games.find(item => item.slug === slug)

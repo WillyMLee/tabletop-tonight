@@ -30,7 +30,7 @@ export const list = query({
 })
 
 export const submit = mutation({
-  args: { eventKey: v.string(), playerId: v.number(), game, puzzleId: v.string(), metric: v.number() },
+  args: { eventKey: v.string(), playerId: v.number(), game, puzzleId: v.string(), metric: v.number(), completed: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
     const eventKey = cleanEventKey(args.eventKey)
     const puzzleId = cleanPuzzleId(args.puzzleId)
@@ -41,13 +41,17 @@ export const submit = mutation({
     const night = await getNight(ctx, eventKey)
     const player = night.players.find(item => item.id === args.playerId && item.checkedIn)
     if (!player) throw new Error('Join the game night before submitting a result')
+    const completed = args.completed !== false
     const existing = await ctx.db.query('puzzleResults')
       .withIndex('by_event_key_and_game_and_puzzle_id_and_player_id', q => q.eq('eventKey', eventKey).eq('game', args.game).eq('puzzleId', puzzleId).eq('playerId', args.playerId))
       .unique()
+    const existingCompleted = existing?.completed !== false
+    const keepExistingFinish = existing && existingCompleted && !completed
     const value = {
       playerName: player.name,
       team: player.team,
-      metric: existing ? Math.min(existing.metric, args.metric) : args.metric,
+      metric: keepExistingFinish ? existing.metric : existing && existingCompleted === completed && completed ? Math.min(existing.metric, args.metric) : args.metric,
+      completed: keepExistingFinish ? true : completed,
       updatedAt: Date.now(),
     }
     if (existing) {

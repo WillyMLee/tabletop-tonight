@@ -107,6 +107,7 @@ export default defineSchema({
     game: v.union(v.literal('wordle'), v.literal('connections')),
     puzzleId: v.string(),
     metric: v.number(),
+    completed: v.optional(v.boolean()),
     updatedAt: v.number(),
   })
     .index('by_event_key', ['eventKey'])
