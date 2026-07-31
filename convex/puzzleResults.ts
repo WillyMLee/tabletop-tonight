@@ -30,7 +30,7 @@ export const list = query({
 })
 
 export const submit = mutation({
-  args: { eventKey: v.string(), playerId: v.number(), game, puzzleId: v.string(), metric: v.number(), completed: v.optional(v.boolean()) },
+  args: { eventKey: v.string(), playerId: v.number(), claimToken: v.string(), game, puzzleId: v.string(), metric: v.number(), completed: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
     const eventKey = cleanEventKey(args.eventKey)
     const puzzleId = cleanPuzzleId(args.puzzleId)
@@ -39,7 +39,7 @@ export const submit = mutation({
       throw new Error('Invalid puzzle result')
     }
     const night = await getNight(ctx, eventKey)
-    const player = night.players.find(item => item.id === args.playerId && item.checkedIn)
+    const player = night.players.find(item => item.id === args.playerId && item.checkedIn && item.claimToken === args.claimToken)
     if (!player) throw new Error('Join the game night before submitting a result')
     const completed = args.completed !== false
     const existing = await ctx.db.query('puzzleResults')

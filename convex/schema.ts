@@ -9,6 +9,7 @@ const player = v.object({
   team: teamSlug,
   points: v.number(),
   checkedIn: v.boolean(),
+  claimToken: v.optional(v.string()),
 })
 
 export default defineSchema({

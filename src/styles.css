@@ -1199,6 +1199,173 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .game-selector.two-games { grid-template-columns: 1fr 1fr; }
 }
 
+/* Dedicated game guides */
+.guide-page-link { width: 100%; border: 1px solid #2c43cb; background: #101641; border-radius: 7px; color: white; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 13px; padding: 10px 12px; text-align: left; }
+.guide-page-link span, .guide-page-link strong, .guide-page-link small { display: block; }
+.guide-page-link strong { color: var(--yellow); font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 11px; }
+.guide-page-link small { color: #98a6d5; font-size: 9px; margin-top: 3px; }
+.guide-page-link svg { color: var(--yellow); flex: 0 0 auto; }
+.guide-page-link.compact { margin: 0; width: auto; min-width: 205px; }
+.station-guide-links { display: grid; gap: 7px; margin-top: 13px; }
+.station-guide-links > button { width: 100%; border: 1px solid #263ba9; background: #101541; border-radius: 7px; color: white; display: grid; grid-template-columns: 31px minmax(0,1fr) 16px; align-items: center; gap: 9px; padding: 9px 10px; text-align: left; }
+.station-guide-links > button > span { font-size: 20px; text-align: center; }
+.station-guide-links strong, .station-guide-links small { display: block; }
+.station-guide-links strong { font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 11px; }
+.station-guide-links small { color: #99a5d1; font-size: 8px; margin-top: 2px; }
+.station-guide-links svg { color: var(--yellow); }
+.detail-play-map { background: #090b29; border-color: #1f329f; margin: 0 0 18px; padding: 23px; }
+.detail-play-map-heading, .controller-map-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 17px; }
+.detail-play-map-heading h2, .controller-map-heading h2 { color: white; font-size: 24px; margin: 4px 0 0; }
+.detail-play-map-heading > p, .controller-map-heading > p { color: #9da9d7; font-size: 10px; line-height: 1.5; margin: 0; max-width: 430px; }
+.detail-play-map .how-diagram { min-height: 240px; }
+.secret-hitler-diagram { display: grid; place-items: center; align-content: center; gap: 16px; }
+.secret-hitler-diagram > div { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 7px; }
+.secret-hitler-diagram span { background: #171d53; border: 1px solid #324dde; border-radius: 5px; color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: 9px; font-weight: 700; padding: 10px; }
+.secret-hitler-diagram i { color: var(--yellow); font-style: normal; }
+.turn-flow-diagram { display: grid; grid-template-columns: repeat(4,1fr); align-items: stretch; gap: 8px; }
+.turn-flow-diagram > span { background: #171d53; border: 1px solid #2b42c3; border-radius: 6px; display: grid; align-content: start; gap: 8px; padding: 11px; }
+.turn-flow-diagram b { width: 24px; height: 24px; background: var(--yellow); border-radius: 50%; color: #08091a; display: grid; place-items: center; font-size: 10px; }
+.turn-flow-diagram small { line-height: 1.45; }
+
+/* Mario Strikers controller map */
+.controller-map-card { background: #080a27; border: 1px solid #2448ff; border-radius: 12px; margin-bottom: 18px; padding: 23px; }
+.controller-map-layout { display: grid; grid-template-columns: minmax(330px,.9fr) minmax(0,1.25fr); align-items: center; gap: 24px; }
+.gamecube-controller { isolation: isolate; width: min(390px,100%); min-height: 255px; background: #aaa2bd; border: 5px solid #d2ccdf; border-radius: 44% 44% 36% 36% / 34% 34% 48% 48%; box-shadow: inset 0 -14px 0 rgba(59,51,78,.2), 0 14px 30px rgba(0,0,0,.25); margin: 0 auto; position: relative; }
+.gamecube-controller::before, .gamecube-controller::after { content: ''; width: 105px; height: 126px; background: #aaa2bd; border: 5px solid #d2ccdf; border-top: 0; border-radius: 0 0 52% 52%; bottom: -45px; position: absolute; z-index: -1; }
+.gamecube-controller::before { left: 15px; transform: rotate(15deg); }
+.gamecube-controller::after { right: 15px; transform: rotate(-15deg); }
+.gc-shoulder { min-width: 72px; background: #686079; border: 3px solid #ddd8e8; border-radius: 12px 12px 5px 5px; color: white; font: 700 11px 'Chakra Petch','Manrope',sans-serif; padding: 7px; position: absolute; text-align: center; top: -15px; }
+.gc-l { left: 28px; }
+.gc-r { right: 28px; }
+.gc-z { background: #7149ae; border: 2px solid #d3c1f2; border-radius: 9px; color: white; font: 700 9px 'Chakra Petch','Manrope',sans-serif; padding: 5px 13px; position: absolute; right: 38px; top: 23px; }
+.gc-stick { border-radius: 50%; display: grid; place-items: center; color: #171422; font: 800 8px 'Chakra Petch','Manrope',sans-serif; position: absolute; }
+.main-stick { width: 73px; height: 73px; background: #6b6478; border: 8px solid #847d90; color: white; left: 48px; top: 58px; }
+.c-stick { width: 55px; height: 55px; background: #e6c950; border: 7px solid #c0a635; right: 71px; bottom: 37px; }
+.gc-dpad { width: 49px; height: 49px; color: #4b4657; display: grid; place-items: center; font-size: 43px; font-weight: 900; left: 78px; bottom: 35px; position: absolute; }
+.gc-start { background: #7b7488; border: 2px solid #d4cfe0; border-radius: 50%; color: white; font: 700 6px 'Chakra Petch','Manrope',sans-serif; display: grid; place-items: center; width: 33px; height: 33px; left: 50%; top: 53%; position: absolute; transform: translate(-50%,-50%); }
+.gc-button { border-radius: 50%; display: grid; place-items: center; color: white; font: 800 11px 'Chakra Petch','Manrope',sans-serif; position: absolute; }
+.gc-a { width: 59px; height: 59px; background: #30a868; border: 5px solid #52c787; right: 66px; top: 70px; }
+.gc-b { width: 34px; height: 34px; background: #c8433d; border: 4px solid #e26660; right: 130px; top: 118px; }
+.gc-x, .gc-y { width: 44px; height: 24px; background: #85808f; border: 3px solid #d8d3df; border-radius: 50%; }
+.gc-x { right: 27px; top: 64px; transform: rotate(55deg); }
+.gc-y { right: 124px; top: 58px; transform: rotate(-45deg); }
+.controller-legend { border: 1px solid #233794; border-radius: 8px; overflow: hidden; }
+.controller-legend > div { display: grid; grid-template-columns: 74px 1fr 1fr; }
+.controller-legend > div + div { border-top: 1px solid #1b2c80; }
+.controller-legend strong, .controller-legend b, .controller-legend span { padding: 8px 9px; }
+.controller-legend strong { background: #182058; color: var(--yellow); font: 700 8px 'Chakra Petch','Manrope',sans-serif; text-transform: uppercase; }
+.controller-legend b { color: var(--yellow); font: 800 9px 'Chakra Petch','Manrope',sans-serif; }
+.controller-legend span { color: #bac3e3; font-size: 9px; line-height: 1.3; }
+.controller-legend span + span, .controller-legend strong + strong { border-left: 1px solid #1b2c80; }
+.controller-quick-tip { background: #13194a; border-left: 4px solid var(--yellow); color: #b8c2e4; font-size: 10px; line-height: 1.5; margin-top: 18px; padding: 10px 12px; }
+.controller-quick-tip strong { color: var(--yellow); }
+
+/* Preset roster claim flow */
+.guest-join form { grid-template-columns: minmax(230px,1fr) minmax(190px,.75fr); }
+.roster-name-select select { width: 100%; min-height: 48px; background: #070923; border: 1px solid #3550ff; border-radius: 6px; color: white; padding: 11px 12px; }
+.roster-name-select select option:disabled { color: #7c86aa; }
+.selected-roster-team { min-height: 48px; background: #0c1035; border: 1px solid #2943d5; border-radius: 6px; display: flex; align-items: center; gap: 9px; padding: 7px 10px; }
+.selected-roster-team .team-ghost { width: 26px; height: 28px; gap: 3px; padding-top: 10px; }
+.selected-roster-team .team-ghost i { width: 4px; height: 6px; }
+.selected-roster-team .team-ghost.coral { background: #ff3b6b; }
+.selected-roster-team .team-ghost.lime { background: #21ddeb; }
+.selected-roster-team small, .selected-roster-team strong { display: block; }
+.selected-roster-team small { color: #8797d4; font-size: 7px; }
+.selected-roster-team strong { color: white; font-family: 'Chakra Petch','Manrope',sans-serif; font-size: 10px; margin-top: 2px; }
+.ghost-player.is-available { opacity: .58; }
+.ghost-player.is-available .avatar { filter: grayscale(1); }
+.ghost-player.is-available small { color: #8c96bc; }
+.ghost-player.is-claimed small { color: var(--yellow); }
+.player-pass > .team-pill { justify-self: end; }
+
+/* Exact Jenga and circuit assignments */
+.jenga-match-block { background: #080a27; border: 1px solid #2448ff; border-radius: 12px; margin-bottom: 12px; padding: 18px; }
+.circuit-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.circuit-section-heading h2 { color: white; font-family: 'Chakra Petch','Manrope',sans-serif; font-size: 22px; margin: 3px 0 4px; }
+.circuit-section-heading p { color: #9ca8d5; font-size: 10px; margin: 0; }
+.jenga-match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.jenga-match-grid article { background: #101541; border: 1px solid #20348f; border-radius: 7px; display: grid; grid-template-columns: 24px 1fr 24px 1fr; align-items: center; gap: 8px; padding: 9px; }
+.jenga-match-grid article > span { width: 22px; height: 22px; background: var(--yellow); border-radius: 50%; color: #08091a; display: grid; place-items: center; font: 800 9px 'Chakra Petch','Manrope',sans-serif; }
+.jenga-match-grid strong, .jenga-match-grid small { display: block; }
+.jenga-match-grid strong { color: white; font-size: 10px; }
+.jenga-match-grid small { color: #8fa0da; font-size: 7px; margin-top: 2px; }
+.jenga-match-grid b { color: #6878b5; font-size: 8px; text-align: center; }
+.circuit-reset-note { background: #111747; border-left: 4px solid var(--yellow); color: var(--yellow); display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 11px 13px; }
+.circuit-reset-note strong { color: white; font-size: 11px; }
+.circuit-reset-note p { color: #9ca8d5; font-size: 9px; margin: 2px 0 0; }
+.circuit-switch-note { color: #aab5dc; font-size: 9px; }
+.exact-station-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.exact-player-list { display: grid; gap: 6px; }
+.exact-player-list > div { background: #0f133e; border: 1px solid #1c2d91; border-left: 3px solid #ff3b6b; border-radius: 6px; display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px; }
+.exact-player-list > div.willy-player { border-left-color: #21ddeb; }
+.exact-player-list strong, .exact-player-list small { display: block; }
+.exact-player-list strong { color: white; font-size: 10px; overflow-wrap: anywhere; }
+.exact-player-list small { color: #8fa0da; font-size: 7px; }
+.exact-player-list i { color: #7e8cc3; font-size: 7px; font-style: normal; }
+.station-score > p { color: #8f9bc9; font-size: 8px; line-height: 1.4; margin: 7px 0 0; }
+
+/* Host run sheet */
+.host-plan-link { margin-top: 16px; }
+.host-plan-page { max-width: 1180px; }
+.host-plan-section { background: #080a27; border: 1px solid #2448ff; border-radius: 12px; margin-top: 14px; padding: 20px; }
+.host-plan-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 15px; }
+.host-plan-heading > span { width: 34px; height: 34px; background: var(--yellow); border-radius: 50%; color: #08091a; display: grid; place-items: center; font: 800 10px 'Chakra Petch','Manrope',sans-serif; }
+.host-plan-heading small { color: #21ddeb; font-size: 8px; font-weight: 700; }
+.host-plan-heading h2 { color: white; font-family: 'Chakra Petch','Manrope',sans-serif; font-size: 21px; margin: 2px 0 0; }
+.cash-plan-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+.cash-plan-grid article { background: #101541; border: 1px solid #233794; border-radius: 8px; padding: 14px; }
+.cash-plan-grid small, .cash-plan-grid strong { display: block; }
+.cash-plan-grid small { color: #21ddeb; font-size: 8px; }
+.cash-plan-grid strong { color: var(--yellow); font: 700 21px 'Chakra Petch','Manrope',sans-serif; margin: 5px 0; }
+.cash-plan-grid p { color: #aab4d8; font-size: 9px; line-height: 1.6; margin: 0; }
+.envelope-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.envelope-groups details { background: #0e123b; border: 1px solid #213799; border-radius: 7px; padding: 10px; }
+.envelope-groups summary { color: white; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; font: 700 10px 'Chakra Petch','Manrope',sans-serif; }
+.envelope-groups summary small { color: var(--yellow); font-size: 8px; }
+.envelope-groups ol { color: #aeb9df; font-size: 9px; line-height: 1.5; margin: 10px 0 0; padding-left: 22px; }
+.host-timeline { display: grid; }
+.host-timeline article { border-top: 1px solid #1c2d91; display: grid; grid-template-columns: 120px 1fr; gap: 15px; padding: 11px 0; }
+.host-timeline time { color: var(--yellow); font: 700 10px 'Chakra Petch','Manrope',sans-serif; }
+.host-timeline strong { color: white; font-size: 11px; }
+.host-timeline p { color: #98a5d1; font-size: 9px; line-height: 1.45; margin: 3px 0 0; }
+.point-rules-table { border: 1px solid #213799; border-radius: 8px; overflow: hidden; }
+.point-rules-table > div { display: grid; grid-template-columns: 1fr 110px 110px; }
+.point-rules-table > div + div { border-top: 1px solid #1c2d91; }
+.point-rules-table strong, .point-rules-table span, .point-rules-table b { padding: 11px 12px; }
+.point-rules-table strong { background: #151c59; color: var(--yellow); font: 700 9px 'Chakra Petch','Manrope',sans-serif; }
+.point-rules-table span { color: #bac4e4; font-size: 10px; }
+.point-rules-table b { color: white; font: 800 13px 'Chakra Petch','Manrope',sans-serif; text-align: center; }
+.point-rules-table b + b, .point-rules-table strong + strong { border-left: 1px solid #1c2d91; }
+.host-rule-note { background: #111747; border-left: 4px solid var(--yellow); color: var(--yellow); display: flex; align-items: start; gap: 9px; margin-top: 10px; padding: 11px; }
+.host-rule-note p { color: #aab4d8; font-size: 9px; line-height: 1.5; margin: 0; }
+.host-shortcuts > div:last-child { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.host-shortcuts button { background: #101541; border: 1px solid #2943d5; border-radius: 7px; color: var(--yellow); display: grid; grid-template-columns: 24px 1fr 16px; align-items: center; gap: 8px; padding: 11px; text-align: left; }
+.host-shortcuts strong, .host-shortcuts small { display: block; }
+.host-shortcuts strong { color: white; font-size: 10px; }
+.host-shortcuts small { color: #8f9dce; font-size: 8px; margin-top: 2px; }
+
+@media (max-width: 900px) {
+  .controller-map-layout { grid-template-columns: 1fr; gap: 64px; }
+  .exact-station-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  .detail-play-map, .controller-map-card { padding: 16px 13px; }
+  .detail-play-map-heading, .controller-map-heading, .circuit-section-heading { align-items: start; flex-direction: column; gap: 7px; }
+  .detail-play-map .how-diagram { min-height: 190px; }
+  .gamecube-controller { min-height: 225px; transform: scale(.9); }
+  .controller-legend > div { grid-template-columns: 63px 1fr 1fr; }
+  .controller-legend strong, .controller-legend b, .controller-legend span { padding: 7px 6px; }
+  .turn-flow-diagram { grid-template-columns: 1fr 1fr; }
+  .guest-join form { grid-template-columns: 1fr; }
+  .selected-roster-team { min-height: 46px; }
+  .guide-page-link.compact { width: 100%; }
+  .jenga-match-grid, .cash-plan-grid, .envelope-groups, .host-shortcuts > div:last-child { grid-template-columns: 1fr; }
+  .circuit-switch-note { display: none; }
+  .host-timeline article { grid-template-columns: 90px 1fr; }
+  .point-rules-table > div { grid-template-columns: minmax(0,1fr) 70px 60px; }
+}
+
 /* Simplified guest flow: Start, Group Games, Circuit, Scores */
 .ghost-player-list .ghost-player { border: 1px solid #1c2d91; background: #090b29; color: white; border-radius: 6px; padding: 9px; display: flex; align-items: center; gap: 9px; min-width: 0; }
 .ghost-player-list .ghost-player span { min-width: 0; }
@@ -1349,16 +1516,21 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .connections-how-diagram .blue { background: #2448ff; }
 .connections-how-diagram .purple { background: #a65cff; }
 
-.tennis-diagram { background: #17725a; border-color: #30e3b0; min-height: 150px; }
-.tennis-diagram::before { content: ''; position: absolute; inset: 13px; border: 2px solid rgba(255,255,255,.8); background: linear-gradient(90deg,transparent 49.5%,rgba(255,255,255,.7) 49.5%,rgba(255,255,255,.7) 50.5%,transparent 50.5%); }
-.tennis-diagram::after { content: ''; position: absolute; left: 13px; right: 13px; top: 50%; border-top: 2px solid rgba(255,255,255,.7); }
-.court-net { position: absolute; top: 13px; bottom: 13px; left: 50%; border-left: 3px dashed white; z-index: 1; }
-.player-dot { width: 25px; height: 25px; border: 2px solid white; border-radius: 50%; display: grid; place-items: center; color: #070815; font-size: 8px; font-style: normal; font-weight: 800; position: absolute; z-index: 2; }
-.player-dot.pink { background: #ff3b6b; left: 18%; }
-.player-dot.cyan { background: #21ddeb; right: 18%; }
-.player-dot.front { top: 28%; }
-.player-dot.back { bottom: 20%; }
-.tennis-diagram small { background: rgba(5,6,24,.8); bottom: 5px; left: 50%; padding: 3px 5px; position: absolute; transform: translateX(-50%); white-space: nowrap; z-index: 3; }
+.strikers-diagram { background: #17725a; border-color: #30e3b0; min-height: 150px; overflow: hidden; }
+.strikers-diagram::before { content: ''; position: absolute; inset: 13px 20px; border: 2px solid rgba(255,255,255,.8); background: linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,.75) 49.5%, rgba(255,255,255,.75) 50.5%, transparent 50.5%); }
+.strikers-diagram::after { content: ''; width: 38px; height: 38px; border: 2px solid rgba(255,255,255,.75); border-radius: 50%; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); }
+.strikers-goal { width: 14px; height: 47px; border: 2px solid white; position: absolute; top: 50%; transform: translateY(-50%); z-index: 1; }
+.strikers-goal.left { border-left: 0; left: 6px; }
+.strikers-goal.right { border-right: 0; right: 6px; }
+.strikers-player { width: 27px; height: 27px; border: 2px solid white; border-radius: 50%; display: grid; place-items: center; color: #070815; font-size: 8px; font-style: normal; font-weight: 800; position: absolute; z-index: 2; }
+.strikers-player.pink { background: #ff3b6b; }
+.strikers-player.cyan { background: #21ddeb; }
+.strikers-player.pink.forward { left: 36%; top: 25%; }
+.strikers-player.pink.support { left: 22%; bottom: 22%; }
+.strikers-player.cyan.forward { right: 36%; bottom: 25%; }
+.strikers-player.cyan.support { right: 22%; top: 22%; }
+.strikers-ball { display: grid; place-items: center; font-size: 17px; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 3; }
+.strikers-diagram small { background: rgba(5,6,24,.85); bottom: 5px; left: 50%; padding: 3px 6px; position: absolute; transform: translateX(-50%); white-space: nowrap; z-index: 4; }
 
 .jenga-diagram { display: grid; place-items: center; padding-bottom: 23px; }
 .jenga-diagram > div { width: 104px; display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; transform: perspective(200px) rotateX(-4deg); }

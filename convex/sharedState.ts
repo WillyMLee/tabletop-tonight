@@ -1,13 +1,12 @@
 import { mutation, query, type MutationCtx } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
 import { v } from 'convex/values'
+import { initialRoster } from './eventConfig'
 
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
 const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
-const pods = ['A', 'B', 'C', 'D'] as const
-
-const defaultPlayers: Doc<'sharedGameNights'>['players'] = []
+const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
 
@@ -43,7 +42,9 @@ export const get = query({
   args: { eventKey: v.string() },
   handler: async (ctx, { eventKey }) => {
     const key = cleanEventKey(eventKey)
-    return await ctx.db.query('sharedGameNights').withIndex('by_event_key', q => q.eq('eventKey', key)).unique()
+    const state = await ctx.db.query('sharedGameNights').withIndex('by_event_key', q => q.eq('eventKey', key)).unique()
+    if (!state) return null
+    return { ...state, players: state.players.map(({ claimToken: _claimToken, ...player }) => player) }
   },
 })
 
@@ -124,6 +125,8 @@ export const adjustIndividualPhaseScore = mutation({
 export const setPlayerTeam = mutation({
   args: { eventKey: v.string(), playerId: v.number(), team: teamSlug },
   handler: async (ctx, { eventKey, playerId, team }) => {
+    const rosterPlayer = initialRoster.find(player => player.id === playerId)
+    if (!rosterPlayer || rosterPlayer.team !== team) throw new Error('Teams are locked for this event')
     const state = await getState(ctx, eventKey)
     const players = state.players.map(player => player.id === playerId ? { ...player, team } : player)
     await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
@@ -154,7 +157,7 @@ export const recordCircuitResult = mutation({
     if (!Number.isInteger(phase) || phase < 0 || phase > 9 || !/^[a-z0-9-]{2,64}$/.test(slug)) throw new Error('Invalid circuit result')
     const state = await getState(ctx, eventKey)
     const key = `${phase}:${slug}`
-    const allocation = (value?: 'meeple' | 'mayhem' | 'split') => value === 'meeple' ? { meeple: 10, mayhem: 0 } : value === 'mayhem' ? { meeple: 0, mayhem: 10 } : value === 'split' ? { meeple: 5, mayhem: 5 } : { meeple: 0, mayhem: 0 }
+    const allocation = (value?: 'meeple' | 'mayhem' | 'split') => value === 'meeple' ? { meeple: 2, mayhem: 0 } : value === 'mayhem' ? { meeple: 0, mayhem: 2 } : value === 'split' ? { meeple: 1, mayhem: 1 } : { meeple: 0, mayhem: 0 }
     const before = allocation(state.circuitResults[key])
     const after = allocation(result)
     const delta = { meeple: after.meeple - before.meeple, mayhem: after.mayhem - before.mayhem }
@@ -185,34 +188,34 @@ export const addPlayer = mutation({
   handler: async (ctx, { eventKey, name }) => {
     const cleanName = name.trim().replace(/\s+/g, ' ').slice(0, 40)
     if (!cleanName) throw new Error('Player name is required')
-    const state = await getState(ctx, eventKey)
-    if (state.players.length >= 30) throw new Error('Player limit reached')
-    const team = state.players.filter(player => player.team === 'meeple').length <= state.players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
-    const id = Math.max(0, ...state.players.map(player => player.id)) + 1
-    await ctx.db.patch(state._id, { players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }], podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % pods.length] }, updatedAt: Date.now() })
+    throw new Error(`${cleanName} is not on the locked event roster`)
   },
 })
 
 export const joinPlayer = mutation({
-  args: { eventKey: v.string(), name: v.string(), team: teamSlug },
-  handler: async (ctx, { eventKey, name, team }) => {
-    const cleanName = name.trim().replace(/\s+/g, ' ').slice(0, 40)
-    if (!cleanName) throw new Error('Your name is required')
+  args: { eventKey: v.string(), playerId: v.number(), claimToken: v.string() },
+  handler: async (ctx, { eventKey, playerId, claimToken }) => {
+    if (!Number.isInteger(playerId) || playerId < 1) throw new Error('Choose your name from the roster')
+    if (!/^[a-zA-Z0-9-]{16,128}$/.test(claimToken)) throw new Error('Invalid player claim')
     const state = await getState(ctx, eventKey)
-    const existing = state.players.find(player => player.name.toLocaleLowerCase() === cleanName.toLocaleLowerCase())
-    if (existing) {
-      const players = state.players.map(player => player.id === existing.id ? { ...player, name: cleanName, team, checkedIn: true } : player)
-      await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
-      return existing.id
-    }
-    if (state.players.length >= 30) throw new Error('The game-night roster is full')
-    const id = Math.max(0, ...state.players.map(player => player.id)) + 1
-    await ctx.db.patch(state._id, {
-      players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }],
-      podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % pods.length] },
-      updatedAt: Date.now(),
+    const existing = state.players.find(player => player.id === playerId)
+    if (!existing) throw new Error('That player is not on this game-night roster')
+    if (existing.checkedIn && existing.claimToken !== claimToken) throw new Error(`${existing.name} is already claimed on another device`)
+    const players = state.players.map(player => player.id === existing.id ? { ...player, checkedIn: true, claimToken } : player)
+    await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
+    return existing.id
+  },
+})
+
+export const releasePlayer = mutation({
+  args: { eventKey: v.string(), playerId: v.number() },
+  handler: async (ctx, { eventKey, playerId }) => {
+    const state = await getState(ctx, eventKey)
+    const players = state.players.map(player => {
+      if (player.id !== playerId) return player
+      return { id: player.id, name: player.name, team: player.team, points: player.points, checkedIn: false }
     })
-    return id
+    await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
   },
 })
 
@@ -220,7 +223,9 @@ export const toggleCheckIn = mutation({
   args: { eventKey: v.string(), playerId: v.number() },
   handler: async (ctx, { eventKey, playerId }) => {
     const state = await getState(ctx, eventKey)
-    const players = state.players.map(player => player.id === playerId ? { ...player, checkedIn: !player.checkedIn } : player)
+    const target = state.players.find(player => player.id === playerId)
+    if (!target?.checkedIn) throw new Error('Players check in by claiming their roster name')
+    const players = state.players.map(player => player.id === playerId ? { id: player.id, name: player.name, team: player.team, points: player.points, checkedIn: false } : player)
     await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
   },
 })
@@ -229,15 +234,18 @@ export const removePlayer = mutation({
   args: { eventKey: v.string(), playerId: v.number() },
   handler: async (ctx, { eventKey, playerId }) => {
     const state = await getState(ctx, eventKey)
-    const podAssignments = { ...state.podAssignments }
-    delete podAssignments[String(playerId)]
-    await ctx.db.patch(state._id, { players: state.players.filter(player => player.id !== playerId), podAssignments, updatedAt: Date.now() })
+    const players = state.players.map(player => player.id === playerId ? { id: player.id, name: player.name, team: player.team, points: player.points, checkedIn: false } : player)
+    await ctx.db.patch(state._id, { players, updatedAt: Date.now() })
   },
 })
 
 export const setTeamAssignments = mutation({
   args: { eventKey: v.string(), assignments: v.array(v.object({ playerId: v.number(), team: teamSlug })) },
   handler: async (ctx, { eventKey, assignments }) => {
+    for (const assignment of assignments) {
+      const rosterPlayer = initialRoster.find(player => player.id === assignment.playerId)
+      if (!rosterPlayer || rosterPlayer.team !== assignment.team) throw new Error('Teams are locked for this event')
+    }
     const state = await getState(ctx, eventKey)
     const byId = new Map(assignments.map(assignment => [assignment.playerId, assignment.team]))
     const players = state.players.map(player => ({ ...player, team: byId.get(player.id) ?? player.team }))

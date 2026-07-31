@@ -7,7 +7,7 @@ export const games = [
     why: 'Everyone plays simultaneously on their own device, so all fourteen guests stay active while each result remains individual.',
     setup: ['The host opens a GeoGuessr Party and chooses a world map.', 'Every player joins the same lobby on their own device.', 'Prepare three separate games with five rounds in each game.'],
     rules: ['Every player explores the same mystery location independently.', 'Scan road signs, language, road markings, architecture, and landscape clues.', 'Place one final marker before the timer expires.', 'After five rounds, record the podium and start a fresh five-round game.'],
-    scoring: 'Score each of the three games separately. Award 5–3–1 individual points to first, second, and third after every five-round game.',
+    scoring: 'Score each of the three games separately. Each five-location game winner earns 3 individual points and 3 points for their team.',
     hostTip: 'Use one short timer for every location so all three five-round games fit inside the 30-minute block.',
   }),
   game({
@@ -25,7 +25,7 @@ export const games = [
     why: 'Exactly four players, almost no downtime, and a result that is easy to score.',
     setup: ['Each player takes all pieces of one color.', 'Put teammates on opposite colors.', 'Start every color from its matching board corner.'],
     rules: ['Your first piece covers your corner.', 'Later pieces touch your color corner-to-corner.', 'Your own pieces may never share an edge.', 'When nobody can play, fewest remaining squares wins.'],
-    scoring: 'Award individual points 5–3–2–1 by finish and add them to each house team.',
+    scoring: 'The table winner earns 2 individual points and 2 points for their team.',
     hostTip: 'Use a 20-minute timer; finish the current turn and count remaining squares.',
   }),
   game({
@@ -34,7 +34,7 @@ export const games = [
     why: 'It flexes to different pod sizes and gives the room a dramatic spectator moment.',
     setup: ['Build 18 alternating layers of three blocks.', 'Seat players in alternating team order.', 'Choose the first player randomly.'],
     rules: ['Use one hand to remove one block from below the highest completed layer.', 'Place it on top at a right angle.', 'You may test blocks but must restore anything you move.', 'The player who drops the tower loses for their team.'],
-    scoring: 'The winning team earns 10 points. The last clean pull earns 3 individual points.',
+    scoring: 'Each 1v1 winner earns 1 individual point and 1 point for their team.',
     hostTip: 'Film the tower in slow motion for an instant end-of-night replay.',
   }),
   game({
@@ -43,17 +43,8 @@ export const games = [
     why: 'Two-versus-two maps perfectly to the team competition and keeps four controllers active.',
     setup: ['Connect and test four GameCube controllers.', 'Choose Grudge Match and two-player teams.', 'Use a short match length and a familiar arena.'],
     rules: ['Pass and shoot to create openings.', 'Use tackles and items to win possession.', 'Charge a Super Strike only when protected by your teammate.', 'Most goals when time expires wins.'],
-    scoring: 'Winning pair earns 5 individual points each and 10 points for their house team.',
+    scoring: 'The winning side earns 2 individual points for the table winner and 2 points for that player’s team.',
     hostTip: 'Run a quick controls demo before the timer starts; the original GameCube game supports four players.',
-  }),
-  game({
-    slug: 'mario-tennis-gc', name: 'Mario Power Tennis', icon: '🎾', category: 'GameCube', format: 'Arcade sports', players: '1–4', duration: '20 min', difficulty: 'Easy', status: 'Circuit game · GC', color: 'pink',
-    summary: 'A fast doubles match with Mario characters, gimmick courts, and Power Shots.',
-    why: 'Doubles gives each team two active players and provides a gentler counterpoint to Strikers.',
-    setup: ['Connect four controllers.', 'Choose doubles exhibition mode.', 'Use one short set and a standard court for new players.'],
-    rules: ['Move into position and use normal or power shots to return the ball.', 'Work front-and-back court with your teammate.', 'A missed return awards the opposing pair a point.', 'Win the short set or lead when the station timer ends.'],
-    scoring: 'Winning pair earns 5 individual points each and 10 points for their house team.',
-    hostTip: 'Use standard courts first; gimmick courts are better for rematches.',
   }),
   game({
     slug: 'yahtzee', name: 'Yahtzee Relay', icon: '⚄', category: 'Tabletop', format: 'Dice challenge', players: '2–6', duration: '20 min', difficulty: 'Easy', status: 'Circuit game', color: 'yellow',
@@ -79,7 +70,7 @@ export const games = [
     why: 'It handles the complete guest list, teaches quickly, and gives non-hobby gamers real decisions.',
     setup: ['Shuffle the number, modifier, and action cards.', 'Choose a dealer.', 'Deal one face-up card to every player.'],
     rules: ['On your turn choose Hit to receive a card or Stay to bank the round.', 'A repeated number makes you bust for zero.', 'Modifier and action cards resolve immediately.', 'Seven different number cards ends the round and awards the Flip 7 bonus.'],
-    scoring: 'Play to 200 normally, or run three rounds and award 10–6–3 game-night points to the top three.',
+    scoring: 'The table winner earns 2 individual points and 2 points for their team.',
     hostTip: 'This is the most flexible physical party game in the lineup—keep it ready when attendance changes.',
   }),
   game({
@@ -142,7 +133,7 @@ export const games = [
     why: 'Every guest plays on their own device and the app ranks the room by fewest attempts.',
     setup: ['Every player joins the roster first.', 'Open Wordle on each device.', 'The same puzzle and result board load for the whole room.'],
     rules: ['Submit a valid five-letter guess.', 'A green tile is correct and in position.', 'A yellow tile appears elsewhere in the answer.', 'A dark tile is not in the answer; solve within six guesses.'],
-    scoring: 'Fewest attempts ranks first; ties share the same place. The leaderboard updates live across devices.',
+    scoring: 'Fewest attempts wins each word. The winner earns 3 individual points and 3 points for their team; the leaderboard updates live.',
     hostTip: 'Ask everyone to play silently until the eight-minute timer ends so late solvers do not hear the answer.',
   }),
   game({
@@ -151,11 +142,11 @@ export const games = [
     why: 'Every player gets the same grid while the app automatically times and ranks successful solves.',
     setup: ['Every player joins the roster first.', 'Open Connections on each device when the host says go.', 'The timer starts when the puzzle loads.'],
     rules: ['Select four words with a common link.', 'Submit to test the group.', 'Correct groups lock into place.', 'Find all four groups before using four mistakes.'],
-    scoring: 'Fastest successful solve ranks first; the leaderboard updates live across devices.',
+    scoring: 'Fastest successful solve wins each round. The winner earns 3 individual points and 3 points for their team.',
     hostTip: 'Keep the room quiet until time is called. Replace the starter groups in src/data/puzzles.js with the final word dump.',
   }),
 ]
 
-export const tonightSlugs = ['geoguessr', 'wordle', 'connections', 'mario-tennis-gc', 'jenga', 'blokus', 'flip-7', 'magical-athlete', 'secret-hitler']
+export const tonightSlugs = ['geoguessr', 'wordle', 'connections', 'jenga', 'mario-strikers-gc', 'blokus', 'flip-7']
 export const partySlugs = ['geoguessr', 'hot-streak', 'wavelength', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections', 'scout']
 export const getGame = slug => games.find(item => item.slug === slug)

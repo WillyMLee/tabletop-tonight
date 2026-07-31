@@ -4,7 +4,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/WillyMLee/tabletop-tonight/ci.yml?style=for-the-badge&label=checks)](https://github.com/WillyMLee/tabletop-tonight/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-21DDEB?style=for-the-badge)](LICENSE)
 
-A mobile-first, arcade-inspired game-night hub for shared check-in, live scoring, party puzzles, and four-station rotations. Built for a 10–14 person night, but designed so another host can fork it and make it their own.
+A mobile-first, arcade-inspired game-night hub for preset teams, live scoring, party puzzles, head-to-head matches, and exact circuit assignments. Built for a 14-person night, but designed so another host can fork it and make it their own.
 
 **[Open the live app →](https://tabletop-tonight.willymlee.workers.dev/)**
 
@@ -12,9 +12,9 @@ A mobile-first, arcade-inspired game-night hub for shared check-in, live scoring
 
 Game nights usually split information across a group chat, a notes app, handwritten scores, and one person repeatedly explaining where everyone should go. Tabletop Tonight turns that into four focused views:
 
-- **Start** — join with only a name, choose a ghost team, and manage the roster.
+- **Start** — claim one pre-listed roster name, see the locked teams, and release mistaken claims.
 - **Group Games** — run GeoGuessr, Wordle, and Connections in a clear order.
-- **Circuit** — keep four pods moving through four physical stations with live assignments and scoring.
+- **Circuit** — run seven Jenga matches, then show exact Blokus, Mario Strikers, and Flip 7 assignments for four rounds.
 - **Scores** — separate the team championship from individual standings.
 
 The interface uses progressive disclosure: guests see the next action first, while visual rules and scoring details stay collapsed until needed.
@@ -22,9 +22,9 @@ The interface uses progressive disclosure: guests see the next action first, whi
 ## Highlights
 
 - Real-time multi-device updates through Convex subscriptions
-- No-password guest check-in with reclaimable names
-- Two-step player removal to prevent accidental roster changes
-- Four synchronized circuit rotations with movable pod assignments
+- No-password guest check-in with atomic, one-device-per-name claims
+- Two-step claim release to recover from a wrong name or changed device
+- Four balanced circuit rounds with exact player assignments
 - Atomic team, circuit, and individual score updates
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
@@ -38,7 +38,7 @@ The interface uses progressive disclosure: guests see the next action first, whi
 | Layer | Technology | Role |
 | --- | --- | --- |
 | UI | React 19 + Vite | Responsive single-page application |
-| Realtime backend | Convex | Shared roster, scores, pods, circuit results, and puzzle leaderboards |
+| Realtime backend | Convex | Shared roster claims, scores, circuit results, and puzzle leaderboards |
 | Hosting | Cloudflare Workers | Global static asset delivery and SPA routing |
 | Icons | Lucide React | Accessible interface icons |
 | Validation | TypeScript + production build scripts | Backend type checks and deploy verification |
@@ -77,6 +77,7 @@ The key is an invite capability, not authentication. Anyone with the deployed ap
 
 - Edit the game catalog and rule text in [`src/data/games.js`](src/data/games.js).
 - Replace the Wordle word pool and Connections boards in [`src/data/puzzles.js`](src/data/puzzles.js). Five no-repeat Wordles are deterministically shuffled from the pool using `VITE_GAME_NIGHT_KEY`, so every guest sees the same stable rounds.
+- Replace the roster, Jenga pairings, circuit assignments, timeline, scoring rules, and envelope labels in [`convex/eventConfig.ts`](convex/eventConfig.ts).
 - Update the group lineup, stations, and rotations near the top of [`src/App.jsx`](src/App.jsx).
 - Adjust the Pac-Man-inspired theme in [`src/styles.css`](src/styles.css).
 - Change the Worker name and compatibility date in [`wrangler.jsonc`](wrangler.jsonc).
@@ -115,7 +116,7 @@ This deploys the Convex functions, builds the frontend with the production Conve
 
 ## Architecture notes
 
-The current party-sized implementation keeps one bounded shared-night document for low-latency subscriptions and atomic score updates. Puzzle results use a separate indexed table because they grow independently. Convex production insights report the live deployment as healthy; larger multi-event products should move roster and scoring entities into dedicated tables with host authentication.
+The current party-sized implementation keeps one bounded shared-night document for low-latency subscriptions and atomic score updates. A private device claim is stored in Convex but removed from public roster responses; that same claim is required for puzzle submissions. Puzzle results use a separate indexed table because they grow independently. Larger multi-event products should move roster and scoring entities into dedicated tables with authenticated host roles.
 
 ## Project status
 
