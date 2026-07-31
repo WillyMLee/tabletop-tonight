@@ -22,6 +22,7 @@
     "verify:live": "node scripts/verify-live-sync.mjs",
     "verify:join": "node scripts/verify-guest-join.mjs",
     "verify:winners": "node scripts/verify-winner-scoring.mjs",
+    "verify:willy-reset": "node scripts/verify-willy-reset.mjs",
     "verify:puzzle-scoring": "node scripts/verify-puzzle-scoring.mjs",
     "verify:puzzles": "node scripts/verify-puzzle-data.mjs",
     "reset:live": "node scripts/reset-game-night.mjs",

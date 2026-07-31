@@ -1818,3 +1818,40 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .puzzle-leaderboard li > small { grid-column: 3; grid-row: 2; justify-self: start; }
   .puzzle-leaderboard li > b { grid-column: 4; grid-row: 1 / 3; align-self: center; white-space: nowrap; }
 }
+
+/* Final leaderboard rhythm and Willy's scoped group-game controls */
+.standings-list { display: grid; gap: 8px; margin-top: 12px; }
+.standings-list > div { min-height: 58px; border: 1px solid #1d2f97; border-radius: 9px; gap: 12px; padding: 11px 13px; }
+.standings-list > div.podium-row { margin: 0; }
+.puzzle-leaderboard ol { display: grid; gap: 5px; padding: 7px 11px 11px; }
+.puzzle-leaderboard li { min-height: 46px; border: 1px solid #17246e; border-radius: 7px; gap: 9px; padding: 8px 9px; }
+.puzzle-leaderboard li:last-child { border-bottom: 1px solid #17246e; }
+
+.willy-group-admin { background: linear-gradient(110deg,#111747,#090c30); border: 1px solid #21ddeb; border-radius: 12px; display: grid; grid-template-columns: 42px minmax(0,1fr) auto; align-items: center; gap: 13px; margin: 14px 0; padding: 14px 16px; box-shadow: 0 0 24px rgba(33,221,235,.08); }
+.willy-admin-icon { width: 40px; height: 40px; background: #21ddeb; border-radius: 50%; color: #07112d; display: grid; place-items: center; }
+.willy-group-admin > div > strong, .willy-group-admin > div > small { display: block; }
+.willy-group-admin > div > strong { color: white; font: 700 13px 'Chakra Petch','Manrope',sans-serif; margin: 2px 0; }
+.willy-group-admin > div > small { color: #a7b3d9; font-size: 9px; line-height: 1.45; }
+.willy-group-admin > button { background: transparent; border: 1px solid #21ddeb; border-radius: 6px; color: #7ff4fa; display: inline-flex; align-items: center; gap: 6px; font: 700 9px 'Chakra Petch','Manrope',sans-serif; padding: 10px 12px; }
+.willy-reset-confirm { background: #080a27; border: 1px solid #ff7898; border-radius: 8px; padding: 9px; }
+.willy-reset-confirm > strong { color: white; display: block; font-size: 9px; margin-bottom: 7px; }
+.willy-reset-confirm > span { display: flex; gap: 5px; }
+.willy-reset-confirm button { background: #171c50; border: 1px solid #3348a7; border-radius: 5px; color: white; font-size: 8px; padding: 6px 8px; }
+.willy-reset-confirm button.confirm { background: #ff3b6b; border-color: #ff3b6b; color: white; }
+.willy-reset-confirm button:disabled { opacity: .55; }
+.willy-group-admin > em { grid-column: 2 / -1; color: #54f0cf; font-size: 8px; font-style: normal; }
+.willy-group-admin > em.error { color: #ff7898; }
+
+@media (max-width: 700px) {
+  .standings-list { gap: 6px; }
+  .standings-list > div { grid-template-columns: 25px 34px minmax(0,1fr) auto; gap: 7px; padding: 10px 8px; }
+  .standings-list > div.podium-1 { padding: 12px 8px; }
+  .puzzle-leaderboard ol { gap: 4px; padding: 6px 7px 8px; }
+  .puzzle-leaderboard li { gap: 3px 7px; padding: 8px 7px; }
+  .willy-group-admin { grid-template-columns: 38px minmax(0,1fr); padding: 13px; }
+  .willy-admin-icon { width: 36px; height: 36px; }
+  .willy-group-admin > button, .willy-reset-confirm { grid-column: 1 / -1; justify-content: center; width: 100%; }
+  .willy-reset-confirm > span { justify-content: stretch; }
+  .willy-reset-confirm button { flex: 1; }
+  .willy-group-admin > em { grid-column: 1 / -1; }
+}

@@ -146,6 +146,7 @@ const groupGameLineup = [
 ]
 
 const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2, 'magical-athlete': 2, 'table-choice': 2 }
+const groupGameScoreSlugs = new Set(['geoguessr', 'wordle', 'connections', 'jenga'])
 const groupWinnerRounds = {
   geoguessr: Array.from({ length: 3 }, (_, index) => ({ key: `geoguessr:${index + 1}`, label: `Game ${index + 1}` })),
 }
@@ -690,8 +691,22 @@ function AutoPuzzleResults({ game, results }) {
   </div>
 }
 
-function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleResults }) {
+function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleResults, guestPlayerIdentity, resetGroupGameScores }) {
+  const [resetState, setResetState] = useState('idle')
+  const [confirmingReset, setConfirmingReset] = useState(false)
   const rosterByName = new Map(players.map(player => [player.name, player]))
+  const willy = players.find(player => player.name === 'Willy')
+  const isWilly = Boolean(willy?.checkedIn && guestPlayerIdentity?.id === willy.id && guestPlayerIdentity?.name === willy.name)
+  const confirmGroupReset = async () => {
+    setResetState('working')
+    try {
+      await resetGroupGameScores()
+      setConfirmingReset(false)
+      setResetState('done')
+    } catch {
+      setResetState('error')
+    }
+  }
   return (
     <main className="phase-page group-games-page">
       <section className="phase-page-hero">
@@ -700,6 +715,14 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
         <p>Three personal challenges followed by seven fast Jenga matchups. Start at the top and move on when the host calls time.</p>
         <div className="phase-summary"><span><strong>4</strong> games</span><span><strong>100</strong> minutes</span><span><strong>18</strong> winners</span></div>
       </section>
+
+      {isWilly && <section className="willy-group-admin" aria-label="Willy group-game controls">
+        <span className="willy-admin-icon"><ShieldCheck size={20} /></span>
+        <div><span className="kicker">WILLY ADMIN</span><strong>Group-game score control</strong><small>Clears GeoGuessr, Wordle, Connections, and Jenga results only. Circuit scores and player check-ins stay intact.</small></div>
+        {!confirmingReset ? <button type="button" onClick={() => { setConfirmingReset(true); setResetState('idle') }}><RotateCcw size={15} /> Reset group scores</button> : <div className="willy-reset-confirm"><strong>Clear all group results?</strong><span><button type="button" onClick={() => setConfirmingReset(false)}>Cancel</button><button type="button" className="confirm" disabled={resetState === 'working'} onClick={confirmGroupReset}>{resetState === 'working' ? 'Resetting…' : 'Yes, reset'}</button></span></div>}
+        {resetState === 'done' && <em role="status">Group-game scores cleared.</em>}
+        {resetState === 'error' && <em className="error" role="alert">Reset failed. Check the live-sync message above.</em>}
+      </section>}
 
       <section className="simple-game-flow" aria-label="Group game order">
         {groupGameLineup.map(item => {
@@ -1586,6 +1609,28 @@ function LocalApp() {
       mayhem: Math.max(0, previous.mayhem + (nextPlayer?.team === 'mayhem' ? points : 0) - (previousPlayer?.team === 'mayhem' ? points : 0)),
     }))
   }
+  const resetGroupGameScores = async () => {
+    const willy = players.find(player => player.name === 'Willy')
+    if (!willy?.checkedIn || guestPlayerIdentity?.id !== willy.id || guestPlayerIdentity?.name !== willy.name) throw new Error('Only the claimed Willy profile can reset group-game scores')
+    const nextWinners = { ...gameWinners }
+    const removedByPlayer = new Map()
+    const removedByTeam = { meeple: 0, mayhem: 0 }
+    for (const [winnerKey, winnerId] of Object.entries(gameWinners)) {
+      const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
+      if (!groupGameScoreSlugs.has(slug)) continue
+      const winner = players.find(player => player.id === winnerId)
+      const points = gamePointValues[slug] || 0
+      if (winner && points) {
+        removedByPlayer.set(winner.id, (removedByPlayer.get(winner.id) || 0) + points)
+        removedByTeam[winner.team] += points
+      }
+      delete nextWinners[winnerKey]
+    }
+    setGameWinners(nextWinners)
+    setPuzzleResults([])
+    setPlayers(previous => previous.map(player => ({ ...player, points: Math.max(0, player.points - (removedByPlayer.get(player.id) || 0)) })))
+    setScores(previous => ({ meeple: Math.max(0, previous.meeple - removedByTeam.meeple), mayhem: Math.max(0, previous.mayhem - removedByTeam.mayhem) }))
+  }
   const checkedIn = useMemo(() => players.filter(p => p.checkedIn).length, [players])
   const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setCircuitGameChoices({}); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
   const addPlayer = name => {
@@ -1632,7 +1677,7 @@ function LocalApp() {
     recordGameWinner(puzzleWinnerKey(game, puzzleId), winner?.playerId)
   }
 
-  return <GameNightShell syncMode="local" hostAccess={{ status: 'unavailable', unlock: () => {} }} state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode="local" hostAccess={{ status: 'unavailable', unlock: () => {} }} state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetGroupGameScores, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
@@ -1676,6 +1721,7 @@ function RealtimeApp() {
     if (current) store.setQuery(api.sharedState.get, { eventKey: args.eventKey }, { ...current, circuitGameChoices: { ...(current.circuitGameChoices || {}), [String(args.round)]: args.choice } })
   })
   const recordGameWinnerMutation = useMutation(api.sharedState.recordGameWinner)
+  const resetGroupGameScoresMutation = useMutation(api.sharedState.resetGroupGameScores)
   const addPlayerMutation = useMutation(api.sharedState.addPlayer)
   const joinPlayerMutation = useMutation(api.sharedState.joinPlayer)
   const toggleCheckInMutation = useMutation(api.sharedState.toggleCheckIn)
@@ -1715,6 +1761,16 @@ function RealtimeApp() {
   const recordCircuitResult = (phase, slug, result) => commit(recordCircuitResultMutation({ eventKey, phase, slug, result: result || undefined }))
   const setCircuitGameChoice = (round, choice) => commit(setCircuitGameChoiceMutation({ eventKey, round, choice }))
   const recordGameWinner = (winnerKey, playerId) => commit(recordGameWinnerMutation({ eventKey, winnerKey, playerId }))
+  const resetGroupGameScores = async () => {
+    setSyncError('')
+    try {
+      if (guestPlayerIdentity?.name !== 'Willy' || !guestPlayerIdentity.claimToken) throw new Error('Claim the Willy profile before resetting group-game scores')
+      return await resetGroupGameScoresMutation({ eventKey, playerId: guestPlayerIdentity.id, claimToken: guestPlayerIdentity.claimToken })
+    } catch (error) {
+      setSyncError(error.message || 'Could not reset group-game scores')
+      throw error
+    }
+  }
   const addPlayer = name => commit(addPlayerMutation({ eventKey, name }))
   const joinPlayer = async playerId => {
     setSyncError('')
@@ -1762,13 +1818,13 @@ function RealtimeApp() {
   }
   const hostAccess = { status: !hostPin ? 'locked' : hostVerified === undefined ? 'checking' : hostVerified ? 'unlocked' : 'denied', unlock: unlockHost }
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} hostAccess={hostAccess} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} hostAccess={hostAccess} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetGroupGameScores, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAccess, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
   const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices = {}, gameWinners = {}, dinnerOrder, puzzleResults } = state
-  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
+  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetGroupGameScores, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
   const gameSlug = path.startsWith('/games/') ? decodeURIComponent(path.slice('/games/'.length)) : null
   const playMode = path.startsWith('/play/') ? path.slice('/play/'.length) : null
 
@@ -1781,7 +1837,7 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAc
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
-      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults }} />}
+      {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults, guestPlayerIdentity, resetGroupGameScores }} />}
       {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} isHost={hostAccess.status === 'unlocked'} />}

@@ -18,6 +18,7 @@ const gamePointValues: Record<string, number> = {
   'magical-athlete': 2,
   'table-choice': 2,
 }
+const groupGameSlugs = new Set(['geoguessr', 'wordle', 'connections', 'jenga'])
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
@@ -239,6 +240,48 @@ export const recordGameWinner = mutation({
       updatedAt: Date.now(),
     })
     return null
+  },
+})
+
+export const resetGroupGameScores = mutation({
+  args: { eventKey: v.string(), playerId: v.number(), claimToken: v.string() },
+  handler: async (ctx, { eventKey, playerId, claimToken }) => {
+    if (!Number.isInteger(playerId) || playerId < 1 || !/^[a-zA-Z0-9-]{16,128}$/.test(claimToken)) throw new Error('Invalid player claim')
+    const state = await getState(ctx, eventKey)
+    const willy = state.players.find(player => player.id === playerId && player.name === 'Willy')
+    if (!willy?.checkedIn || willy.claimToken !== claimToken) throw new Error('Only the claimed Willy profile can reset group-game scores')
+
+    const gameWinners = { ...(state.gameWinners ?? {}) }
+    const removedByPlayer = new Map<number, number>()
+    const removedByTeam = { meeple: 0, mayhem: 0 }
+    let clearedRounds = 0
+
+    for (const [winnerKey, winnerId] of Object.entries(gameWinners)) {
+      const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
+      if (!groupGameSlugs.has(slug)) continue
+      const winner = state.players.find(player => player.id === winnerId)
+      const points = gamePointValues[slug] ?? 0
+      if (winner && points) {
+        removedByPlayer.set(winner.id, (removedByPlayer.get(winner.id) ?? 0) + points)
+        removedByTeam[winner.team] += points
+      }
+      delete gameWinners[winnerKey]
+      clearedRounds += 1
+    }
+
+    const puzzleResults = await ctx.db.query('puzzleResults').withIndex('by_event_key', q => q.eq('eventKey', state.eventKey)).take(200)
+    for (const result of puzzleResults) await ctx.db.delete('puzzleResults', result._id)
+
+    await ctx.db.patch(state._id, {
+      gameWinners,
+      players: state.players.map(player => ({ ...player, points: clampPoints(player.points - (removedByPlayer.get(player.id) ?? 0)) })),
+      scores: {
+        meeple: clampPoints(state.scores.meeple - removedByTeam.meeple),
+        mayhem: clampPoints(state.scores.mayhem - removedByTeam.mayhem),
+      },
+      updatedAt: Date.now(),
+    })
+    return { clearedRounds, clearedPuzzleResults: puzzleResults.length }
   },
 })
 

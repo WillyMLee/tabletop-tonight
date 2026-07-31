@@ -27,6 +27,7 @@ The interface uses progressive disclosure: guests see the next action first, whi
 - Four balanced circuit rounds with exact player assignments
 - Atomic manual scoring for hosted games plus automatic Wordle and Connections leader scoring
 - Server-validated, session-only host mode that keeps Jessa's run sheet and manual score controls off guest screens
+- Claim-protected Willy control for resetting group-game results without disturbing circuit scores or check-ins
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
 - Responsive, diagram-based game guides for every scheduled activity, including Flip 7 special-card rules
@@ -100,6 +101,7 @@ npm run verify:puzzles  # validates all puzzle content
 npm run check           # Convex TypeScript + production frontend build
 npm run verify:join     # optional live guest-flow check
 npm run verify:winners  # verifies atomic player + team winner scoring
+npm run verify:willy-reset # verifies Willy-only group score reset authorization
 npm run verify:live -- https://your-deployment.convex.cloud
 ```
 

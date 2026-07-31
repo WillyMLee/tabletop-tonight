@@ -33,7 +33,7 @@ export const list = query({
   args: { eventKey: v.string() },
   handler: async (ctx, { eventKey }) => {
     const key = cleanEventKey(eventKey)
-    return await ctx.db.query('puzzleResults').withIndex('by_event_key', q => q.eq('eventKey', key)).take(100)
+    return await ctx.db.query('puzzleResults').withIndex('by_event_key', q => q.eq('eventKey', key)).take(200)
   },
 })
 
