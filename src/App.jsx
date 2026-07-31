@@ -765,8 +765,8 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
   )
 }
 
-function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }) {
-  const selectedRound = currentEvent >= 4 && currentEvent <= 7 ? currentEvent - 4 : 0
+function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }) {
+  const [selectedRound, setSelectedRound] = useState(0)
   const round = circuitRounds[selectedRound]
   const rosterByName = new Map(players.map(player => [player.name, player]))
 
@@ -780,7 +780,7 @@ function Circuit({ currentEvent, setCurrentEvent, players, gameWinners, recordGa
       </section>
 
       <nav className="circuit-round-picker" aria-label="Circuit rounds">
-        {circuitRounds.map((item, index) => <button className={selectedRound === index ? 'active' : ''} aria-current={selectedRound === index ? 'step' : undefined} onClick={() => setCurrentEvent(index + 4)} key={item.label}><span>{index + 1}</span><strong>{item.label}</strong><small>{item.time}</small></button>)}
+        {circuitRounds.map((item, index) => <button className={selectedRound === index ? 'active' : ''} aria-current={selectedRound === index ? 'step' : undefined} onClick={() => setSelectedRound(index)} key={item.label}><span>{index + 1}</span><strong>{item.label}</strong><small>{item.time}</small></button>)}
       </nav>
 
       <section className="circuit-now-bar">
@@ -1840,7 +1840,7 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAc
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
       {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults, guestPlayerIdentity, resetPuzzleRound }} />}
-      {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
+      {path === '/circuit' && <Circuit {...{ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} isHost={hostAccess.status === 'unlocked'} />}
       {path === '/host' && (hostAccess.status === 'unlocked' ? <HostPlan navigate={navigate} /> : <HostGate hostAccess={hostAccess} navigate={navigate} />)}

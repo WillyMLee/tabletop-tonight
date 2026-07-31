@@ -1131,8 +1131,12 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .puzzle-round-picker > div:last-child { justify-content: flex-start; }
   .puzzle-round-picker button { min-width: 78px; }
   .game-selector.two-games button:last-child { display: flex; }
-  .wordle-keyboard button { min-width: 25px; height: 39px; padding: 0 3px; }
-  .wordle-keyboard button.wide { min-width: 44px; }
+  .game-stage { padding: 12px 8px; }
+  .puzzle-with-board { padding: 12px 8px; }
+  .wordle-keyboard { width: 100%; }
+  .wordle-keyboard > div { gap: 3px; }
+  .wordle-keyboard button { flex: 1 1 0; min-width: 0; height: 44px; padding: 0 2px; }
+  .wordle-keyboard button.wide { flex: 1.8 1 0; min-width: 0; }
   .guest-join { gap: 19px; padding: 19px 15px; }
   .guest-join-copy { align-items: flex-start; }
   .join-ghost { width: 50px; height: 52px; padding-top: 18px; }
@@ -1572,8 +1576,8 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .flow-number { font-size: 15px; padding-top: 10px; }
   .flow-copy h2 { font-size: 19px; }
   .flow-action { grid-column: 1 / -1; width: 100%; }
-  .circuit-round-picker { display: flex; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
-  .circuit-round-picker button { flex: 0 0 142px; scroll-snap-align: start; }
+  .circuit-round-picker { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .circuit-round-picker button { min-height: 58px; }
   .simple-station-grid { grid-template-columns: 1fr; }
   .circuit-now-bar { align-items: stretch; flex-direction: column; }
   .circuit-now-bar button { justify-content: center; }
@@ -1796,15 +1800,52 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .podium-3 .podium-label { color: #e09a6c; }
 
 @media (max-width: 700px) {
-  .roster-picker-popover { width: calc(100vw - 58px); }
-  .roster-picker-groups { grid-template-columns: 1fr; max-height: 360px; }
-  .winner-picker-popover { left: 0; transform: none; transform-origin: top left; }
+  .roster-picker-popover {
+    width: auto;
+    max-height: calc(100dvh - 106px);
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    top: auto;
+    position: fixed;
+    transform-origin: bottom center;
+  }
+  .roster-picker-groups { grid-template-columns: 1fr; max-height: min(55dvh,430px); }
+  .roster-picker-groups section > div:last-child > button { min-height: 46px; padding: 8px; }
+  .winner-picker-popover {
+    width: auto;
+    max-height: calc(100dvh - 112px);
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    left: 12px;
+    right: 12px;
+    top: auto;
+    position: fixed;
+    transform: none;
+    transform-origin: bottom center;
+    z-index: 120;
+  }
+  .winner-picker-popover > div { max-height: min(48dvh,360px); }
+  .winner-picker-popover > div > button { min-height: 48px; padding: 8px 10px; }
+  .winner-picker-popover .clear-winner { min-height: 42px; }
+  .winner-picker-trigger { min-height: 58px; }
   @keyframes winner-menu-in { from { opacity: 0; transform: translateY(-7px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .standings-list > div.podium-1 { grid-template-columns: 42px 38px minmax(0,1fr) auto; padding: 12px 7px; }
   .rank-1 { width: 39px; height: 39px; }
   .host-gate-card { padding: 25px 17px; }
   .host-gate-card form { grid-template-columns: 1fr; }
   .host-gate-card form button { justify-content: center; }
+}
+
+@media (max-width: 390px) {
+  .circuit-round-picker { gap: 6px; }
+  .circuit-round-picker button { grid-template-columns: 25px minmax(0,1fr); column-gap: 6px; padding: 8px; }
+  .circuit-round-picker button > span { width: 25px; height: 25px; }
+  .circuit-round-picker strong { font-size: 10px; }
+  .circuit-round-picker small { font-size: 8px; }
+  .simple-station-card { padding: 14px 12px; }
+  .simple-station-card > header { grid-template-columns: 38px minmax(0,1fr) auto; gap: 8px; }
+  .station-icon { width: 36px; height: 36px; }
+  .pod-badge { font-size: 8px; padding: 6px 5px; }
 }
 
 @media (max-width: 520px) {
