@@ -14,8 +14,9 @@ if (!eventKey) throw new Error('VITE_GAME_NIGHT_KEY is missing from .env.local')
 const client = new ConvexHttpClient(deploymentUrl)
 await client.mutation(api.sharedState.reset, { eventKey })
 const state = await client.query(api.sharedState.get, { eventKey })
+const puzzleResults = await client.query(api.puzzleResults.list, { eventKey })
 
-if (!state || state.scores.meeple !== 0 || state.scores.mayhem !== 0 || state.players.length !== 0) {
+if (!state || state.scores.meeple !== 0 || state.scores.mayhem !== 0 || state.players.length !== 0 || puzzleResults.length !== 0) {
   throw new Error('Game-night reset could not be verified')
 }
 

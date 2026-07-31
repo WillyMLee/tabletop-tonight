@@ -10,6 +10,7 @@
 
 import type * as events from "../events.js";
 import type * as games from "../games.js";
+import type * as puzzleResults from "../puzzleResults.js";
 import type * as scores from "../scores.js";
 import type * as sharedState from "../sharedState.js";
 
@@ -22,6 +23,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   events: typeof events;
   games: typeof games;
+  puzzleResults: typeof puzzleResults;
   scores: typeof scores;
   sharedState: typeof sharedState;
 }>;

@@ -93,9 +93,23 @@ export default defineSchema({
     currentEvent: v.number(),
     phaseScores: v.record(v.string(), teamScores),
     individualPhaseScores: v.record(v.string(), v.record(v.string(), v.number())),
-    podAssignments: v.record(v.string(), v.union(v.literal('A'), v.literal('B'), v.literal('C'))),
+    podAssignments: v.record(v.string(), v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))),
     circuitResults: v.record(v.string(), v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))),
     dinnerOrder: v.string(),
     updatedAt: v.number(),
   }).index('by_event_key', ['eventKey']),
+
+  puzzleResults: defineTable({
+    eventKey: v.string(),
+    playerId: v.number(),
+    playerName: v.string(),
+    team: teamSlug,
+    game: v.union(v.literal('wordle'), v.literal('connections')),
+    puzzleId: v.string(),
+    metric: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_event_key', ['eventKey'])
+    .index('by_event_key_and_game_and_puzzle_id', ['eventKey', 'game', 'puzzleId'])
+    .index('by_event_key_and_game_and_puzzle_id_and_player_id', ['eventKey', 'game', 'puzzleId', 'playerId']),
 })

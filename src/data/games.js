@@ -92,6 +92,15 @@ export const games = [
     hostTip: 'Keep this to one 4–6-player pod. For fourteen guests, Hot Streak is the better full-room racing game.',
   }),
   game({
+    slug: 'scout', name: 'SCOUT', icon: '🎪', category: 'Tabletop', format: 'Climbing card game', players: '2–5', duration: '20 min', difficulty: 'Easy', status: 'Circuit swap', color: 'cyan',
+    summary: 'Play stronger sets and runs without rearranging your hand, or scout one card from the current show.',
+    why: 'It fits a 3–4-player dinner-table pod, teaches quickly, and finishes comfortably inside a 25-minute circuit.',
+    setup: ['Deal every player a full hand and do not let anyone rearrange it.', 'Each player chooses which side of their hand is upright.', 'Give the start-player and Scout & Show tokens to the first player.'],
+    rules: ['Play a matching set or consecutive run stronger than the current show.', 'Instead of playing, scout one end card from the current show into your hand.', 'Use Scout & Show once per round to do both actions.', 'The round ends when someone empties their hand or every opponent scouts the same show.'],
+    scoring: 'Highest round score earns 10 team points; second place earns 3 individual points.',
+    hostTip: 'Use this as the Dinner Table #2 fallback when Magical Athlete feels too long or the pod wants cards instead of dice.',
+  }),
+  game({
     slug: 'secret-hitler', name: 'Secret Hitler', icon: '◉', category: 'Party', format: 'Social deduction', players: '5–10', duration: '45 min', difficulty: 'Medium', status: 'Party split', color: 'pink',
     summary: 'Elect governments, pass hidden policies, and identify the secret fascist team.',
     why: 'It creates a talkative social table for 5–8 guests while the other table runs Magical Athlete.',
@@ -128,25 +137,25 @@ export const games = [
     hostTip: 'With 13–14 guests, play as two large house teams and keep turns to one minute.',
   }),
   game({
-    slug: 'wordle', name: 'Wordle', icon: '▣', category: 'In-app', format: 'Word puzzle', players: '2 teams', duration: '10 min', difficulty: 'Medium', status: 'Full-room puzzle', color: 'cyan', playable: 'wordle',
-    summary: 'Use colored feedback to discover a five-letter word in six guesses.',
-    why: 'One projected puzzle lets the entire room collaborate between longer games.',
-    setup: ['Put the app on the largest screen.', 'Choose one captain per team.', 'Alternate which team submits each guess.'],
+    slug: 'wordle', name: 'Wordle', icon: '▣', category: 'In-app', format: 'Individual word race', players: 'Everyone', duration: '8 min', difficulty: 'Medium', status: 'Group-session leaderboard', color: 'cyan', playable: 'wordle',
+    summary: 'Use colored feedback to discover the same five-letter word as everyone else in six guesses.',
+    why: 'Every guest plays on their own device and the app ranks the room by fewest attempts.',
+    setup: ['Every player joins the roster first.', 'Open Wordle on each device.', 'The same puzzle and result board load for the whole room.'],
     rules: ['Submit a valid five-letter guess.', 'A green tile is correct and in position.', 'A yellow tile appears elsewhere in the answer.', 'A dark tile is not in the answer; solve within six guesses.'],
-    scoring: 'The team that submits the solving guess earns 10 points.',
-    hostTip: 'Let both teams discuss openly, but alternate the final submitting captain.',
+    scoring: 'Fewest attempts ranks first; ties share the same place. The leaderboard updates live across devices.',
+    hostTip: 'Ask everyone to play silently until the eight-minute timer ends so late solvers do not hear the answer.',
   }),
   game({
-    slug: 'connections', name: 'Connections', icon: '▦', category: 'In-app', format: 'Grouping puzzle', players: '2 teams', duration: '10 min', difficulty: 'Medium', status: 'Full-room puzzle', color: 'yellow', playable: 'connections',
+    slug: 'connections', name: 'Connections', icon: '▦', category: 'In-app', format: 'Individual grouping race', players: 'Everyone', duration: '10 min', difficulty: 'Medium', status: 'Group-session leaderboard', color: 'yellow', playable: 'connections',
     summary: 'Sort sixteen words into four hidden groups of four.',
-    why: 'It is already implemented for a shared screen and gives both teams a fast collaborative reset.',
-    setup: ['Put the app on a shared screen.', 'Choose one captain per team.', 'Alternate control after every incorrect guess.'],
+    why: 'Every player gets the same grid while the app automatically times and ranks successful solves.',
+    setup: ['Every player joins the roster first.', 'Open Connections on each device when the host says go.', 'The timer starts when the puzzle loads.'],
     rules: ['Select four words with a common link.', 'Submit to test the group.', 'Correct groups lock into place.', 'Find all four groups before using four mistakes.'],
-    scoring: 'The team that solves the final group earns 10 points.',
-    hostTip: 'Only the active captain touches the screen, but everyone can pitch theories.',
+    scoring: 'Fastest successful solve ranks first; the leaderboard updates live across devices.',
+    hostTip: 'Keep the room quiet until time is called. Replace the starter groups in src/data/puzzles.js with the final word dump.',
   }),
 ]
 
-export const tonightSlugs = ['geoguessr', 'hot-streak', 'wavelength', 'blokus', 'jenga', 'mario-strikers-gc', 'mario-tennis-gc', 'yahtzee', 'magical-athlete', 'flip-7']
-export const partySlugs = ['geoguessr', 'hot-streak', 'wavelength', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections']
+export const tonightSlugs = ['geoguessr', 'wordle', 'connections', 'hot-streak', 'flip-7', 'mario-tennis-gc', 'jenga', 'blokus', 'magical-athlete', 'yahtzee', 'scout']
+export const partySlugs = ['geoguessr', 'hot-streak', 'wavelength', 'herd-mentality', 'magical-athlete', 'flip-7', 'secret-hitler', 'codenames', 'monikers-family', 'wordle', 'connections', 'scout']
 export const getGame = slug => games.find(item => item.slug === slug)

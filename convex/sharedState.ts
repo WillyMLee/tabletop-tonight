@@ -3,9 +3,9 @@ import type { Doc } from './_generated/dataModel'
 import { v } from 'convex/values'
 
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
-const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'))
+const pod = v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))
 const circuitResult = v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))
-const pods = ['A', 'B', 'C'] as const
+const pods = ['A', 'B', 'C', 'D'] as const
 
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = []
 
@@ -189,7 +189,7 @@ export const addPlayer = mutation({
     if (state.players.length >= 30) throw new Error('Player limit reached')
     const team = state.players.filter(player => player.team === 'meeple').length <= state.players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...state.players.map(player => player.id)) + 1
-    await ctx.db.patch(state._id, { players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }], podAssignments: { ...state.podAssignments, [String(id)]: pods[id % 3] }, updatedAt: Date.now() })
+    await ctx.db.patch(state._id, { players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }], podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % pods.length] }, updatedAt: Date.now() })
   },
 })
 
@@ -209,7 +209,7 @@ export const joinPlayer = mutation({
     const id = Math.max(0, ...state.players.map(player => player.id)) + 1
     await ctx.db.patch(state._id, {
       players: [...state.players, { id, name: cleanName, team, points: 0, checkedIn: true }],
-      podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % 3] },
+      podAssignments: { ...state.podAssignments, [String(id)]: pods[(id - 1) % pods.length] },
       updatedAt: Date.now(),
     })
     return id
@@ -250,6 +250,8 @@ export const reset = mutation({
   handler: async (ctx, { eventKey }) => {
     const state = await getState(ctx, eventKey)
     const fresh = initialState(state.eventKey)
+    const puzzleResults = await ctx.db.query('puzzleResults').withIndex('by_event_key', q => q.eq('eventKey', state.eventKey)).take(100)
+    for (const result of puzzleResults) await ctx.db.delete('puzzleResults', result._id)
     await ctx.db.patch(state._id, fresh)
   },
 })

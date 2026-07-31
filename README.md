@@ -7,11 +7,12 @@ A mobile-first, Pac-Man-inspired game-night planner and live scoreboard for a 10
 - Live two-team scorekeeping and an individual leaderboard
 - No-account guest check-in: enter a name, choose a ghost team, and join the shared roster
 - A ten-phase run of show from check-in through the optional Secret Hitler finale
-- Full-group GeoGuessr instructions for 3–5 shared rounds
+- A five-game group session: GeoGuessr, Wordle, Connections, Hot Streak, and Flip 7
+- Live individual leaderboards for Wordle attempts and Connections completion time
 - Three configurable circuit rounds with random, player-choice, and rival-choice assignments
-- Three-pod assignments that can be randomized or changed player by player
-- A 16-game library with setup, how-to-play, scoring, and host guidance
-- Shared-screen Wordle and Connections games that award team points
+- Four named stations—Couch, Island, Dinner Table #1, and Dinner Table #2—with assignments that can be randomized or changed player by player
+- A 17-game library with setup, how-to-play, scoring, and host guidance
+- Individual in-app Wordle and Connections challenges with synced results
 - Editable attendance, team moves, check-in controls, and team shuffling
 - Responsive desktop and phone layouts with persistent mobile navigation
 - Cloudflare Workers Static Assets configuration, SPA fallback, caching, and security headers
@@ -34,6 +35,8 @@ Run `npm run check` before publishing to type-check the Convex backend and build
 When `VITE_CONVEX_URL` is configured, every screen subscribes to one shared game-night document in Convex. Score changes and circuit results update atomically, and common score controls use optimistic updates for immediate local feedback. Convex then pushes the committed state to every connected device.
 
 Without `VITE_CONVEX_URL`, the app intentionally falls back to browser-local persistence so frontend development is not blocked. The header identifies the active mode as `LIVE SYNC`, `CONNECTING`, or local device storage.
+
+The starter Wordle answer and Connections grid live in `src/data/puzzles.js`. Change the puzzle IDs when replacing either challenge so each new puzzle gets a fresh leaderboard.
 
 `VITE_GAME_NIGHT_KEY` selects the shared event. Treat it as an invite-link capability: use a long, unique value and share the deployed URL only with guests. This party build intentionally has no account flow: guests with the link can join by name, select a team, and update the night. Add identity-based host roles before using the same model for public or sensitive events.
 
