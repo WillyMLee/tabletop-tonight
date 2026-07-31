@@ -76,8 +76,8 @@ Create a private host code in each Convex deployment. Keep this value out of
 client-side `VITE_*` variables and out of source control:
 
 ```bash
-npx convex env set JESSA_ADMIN_PIN "choose-a-long-private-code"
-npx convex env set --prod JESSA_ADMIN_PIN "choose-a-long-private-code"
+npx convex env set JESSA_ADMIN_PIN "choose-a-private-code"
+npx convex env set --prod JESSA_ADMIN_PIN "choose-a-private-code"
 ```
 
 The key is an invite capability, not authentication. Anyone with the deployed app and event key can change the shared night. Use a long, unique value and see [SECURITY.md](SECURITY.md) before adapting this for sensitive or public events.
