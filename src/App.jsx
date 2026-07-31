@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useConvexConnectionState, useMutation, useQuery } from 'convex/react'
-import { all as validWordleWords } from '../node_modules/wordle-words/index.mjs'
 import { api } from '../convex/_generated/api.js'
 import {
   ArrowRight,
@@ -438,20 +437,31 @@ function GuestJoin({ players, playerIdentity, joinPlayer, changePlayerTeam }) {
   </section>
 }
 
-function Tonight({ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }) {
+function Tonight({ players, guestPlayerIdentity, joinPlayer, changePlayerTeam, removePlayer }) {
   const activePlayers = players.filter(player => player.checkedIn)
+  const [managingPlayers, setManagingPlayers] = useState(false)
+  const [confirmingPlayer, setConfirmingPlayer] = useState(null)
+  const removeFromRoster = playerId => {
+    if (confirmingPlayer !== playerId) {
+      setConfirmingPlayer(playerId)
+      return
+    }
+    removePlayer(playerId)
+    setConfirmingPlayer(null)
+  }
   return (
     <main className="live-hub">
       <GuestJoin players={players} playerIdentity={guestPlayerIdentity} joinPlayer={joinPlayer} changePlayerTeam={changePlayerTeam} />
       <section className="pac-section teams-zone">
-        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h1>Choose your team</h1><p>{activePlayers.length} {activePlayers.length === 1 ? 'player is' : 'players are'} checked in. Pick pink or cyan above; you can switch anytime.</p></div></div>
+        <div className="pac-section-head"><div><span className="kicker">GHOST ROSTER</span><h1>Choose your team</h1><p>{activePlayers.length} {activePlayers.length === 1 ? 'player is' : 'players are'} checked in. Pick pink or cyan above; you can switch anytime.</p></div><button className={`pixel-button ${managingPlayers ? 'active' : ''}`} aria-pressed={managingPlayers} onClick={() => { setManagingPlayers(value => !value); setConfirmingPlayer(null) }}>{managingPlayers ? 'DONE' : 'MANAGE PLAYERS'}</button></div>
+        {managingPlayers && <div className="roster-manage-note"><CircleHelp size={17} /><span><strong>Remove a player</strong> Tap Remove once to select them, then tap Confirm.</span></div>}
         <div className="ghost-team-grid">
           {Object.keys(teamInfo).map(team => {
             const info = teamInfo[team]
             const members = activePlayers.filter(player => player.team === team)
             return <article className={`ghost-team-card ${info.color}`} key={team}>
               <header><span className="team-ghost"><i /><i /></span><div><small>{team === 'meeple' ? 'PINK TEAM' : 'CYAN TEAM'}</small><h3>{info.name}</h3></div><strong>{members.length}</strong></header>
-              <div className="ghost-player-list">{members.length ? members.map(member => <div className="ghost-player" key={member.id}><Avatar name={member.name} /><span><strong>{member.name}</strong><small>READY</small></span></div>) : <p className="empty-team">No players yet—be the first ghost in.</p>}</div>
+              <div className="ghost-player-list">{members.length ? members.map(member => <div className={`ghost-player ${managingPlayers ? 'is-managing' : ''}`} key={member.id}><Avatar name={member.name} /><span><strong>{member.name}</strong><small>READY</small></span>{managingPlayers && <button className={`remove-player-button ${confirmingPlayer === member.id ? 'confirming' : ''}`} onClick={() => removeFromRoster(member.id)} aria-label={`${confirmingPlayer === member.id ? 'Confirm removal of' : 'Remove'} ${member.name}`}>{confirmingPlayer === member.id ? 'CONFIRM' : 'REMOVE'}</button>}</div>) : <p className="empty-team">No players yet—be the first ghost in.</p>}</div>
             </article>
           })}
         </div>
@@ -1037,7 +1047,13 @@ function ConnectionsGame({ onComplete, results }) {
   return <><PuzzleRoundPicker rounds={connectionsRounds} roundIndex={roundIndex} setRoundIndex={setRoundIndex} /><ConnectionsRound key={puzzle.id} puzzle={puzzle} results={results} onComplete={(metric, completed = true) => onComplete(puzzle.id, metric, completed)} /></>
 }
 
-const validWordleGuesses = new Set([...validWordleWords.map(word => word.toUpperCase()), ...wordleRounds.map(round => round.answer)])
+const wordleAnswers = new Set(wordleRounds.map(round => round.answer))
+let wordleDictionaryPromise
+const isValidWordleGuess = async word => {
+  if (wordleAnswers.has(word)) return true
+  wordleDictionaryPromise ??= import('../node_modules/wordle-words/index.mjs').then(({ all }) => new Set(all.map(entry => entry.toUpperCase())))
+  return (await wordleDictionaryPromise).has(word)
+}
 
 function WordleRound({ puzzle, onComplete, results }) {
   const [entry, setEntry] = useState('')
@@ -1060,7 +1076,7 @@ function WordleRound({ puzzle, onComplete, results }) {
     if (guesses.some(guess => guess.word === word)) { setWordError('You already tried that word.'); return }
     setWordError('')
     setValidating(true)
-    if (!validWordleGuesses.has(word)) { setWordError(`${word} is not in the Wordle word list.`); setValidating(false); return }
+    if (!await isValidWordleGuess(word)) { setWordError(`${word} is not in the Wordle word list.`); setValidating(false); return }
     setValidating(false)
     const solved = word === target
     const nextGuesses = [...guesses, { word, result: grade(word) }]
@@ -1421,12 +1437,12 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, syncMo
         <div className={`header-status ${syncMode === 'realtime' ? 'is-synced' : syncMode === 'connecting' ? 'is-connecting' : ''}`} title={syncMode === 'realtime' ? 'Updates sync live across devices' : syncMode === 'connecting' ? 'Reconnecting to live sync' : 'Stored on this device'}><span className="live-dot" /><strong>{checkedIn}</strong> checked in {syncMode !== 'local' && <small>{syncMode === 'realtime' ? 'LIVE SYNC' : 'CONNECTING'}</small>}</div>
       </header>
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
-      {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
+      {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam, removePlayer }} />}
       {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames navigate={navigate} />}
       {path === '/circuit' && <Circuit {...{ currentEvent, setCurrentEvent, players, podAssignments, circuitResults, movePlayerToPod, randomizePods, recordCircuitResult }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore }} />}
-      {path === '/teams' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam }} />}
+      {path === '/teams' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, changePlayerTeam, removePlayer }} />}
       {playMode && <Playroom {...{ navigate, players, guestPlayerIdentity, puzzleResults, submitPuzzleResult }} mode={playMode} />}
       <footer><Logo /><p>Made for snacks, friendly rivalries, and questionable strategy.</p><span>Game night, organized.</span></footer>
       <div className="mobile-nav"><Nav path={path} navigate={navigate} /></div>

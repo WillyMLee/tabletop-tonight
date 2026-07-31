@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tabletop Tonight arcade icon">
+  <rect width="512" height="512" rx="104" fill="#03030f"/>
+  <circle cx="256" cy="256" r="184" fill="#ffe600"/>
+  <path d="M256 256 432 152a184 184 0 0 1 0 208Z" fill="#03030f"/>
+  <circle cx="276" cy="142" r="20" fill="#03030f"/>
+</svg>

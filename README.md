@@ -1,75 +1,126 @@
 # Tabletop Tonight
 
-A mobile-first, Pac-Man-inspired game-night planner and live scoreboard for a 10–14 person party.
+[![Live demo](https://img.shields.io/badge/demo-live-FFE600?style=for-the-badge&logo=cloudflare&logoColor=111111)](https://tabletop-tonight.willymlee.workers.dev/)
+[![CI](https://img.shields.io/github/actions/workflow/status/WillyMLee/tabletop-tonight/ci.yml?style=for-the-badge&label=checks)](https://github.com/WillyMLee/tabletop-tonight/actions)
+[![License: MIT](https://img.shields.io/badge/license-MIT-21DDEB?style=for-the-badge)](LICENSE)
 
-## What is included
+A mobile-first, arcade-inspired game-night hub for shared check-in, live scoring, party puzzles, and four-station rotations. Built for a 10–14 person night, but designed so another host can fork it and make it their own.
 
-- Live two-team scorekeeping and an individual leaderboard
-- No-account guest check-in: enter a name, choose a ghost team, and join the shared roster
-- A ten-phase run of show from check-in through the optional Secret Hitler finale
-- A five-game group session: GeoGuessr, Wordle, Connections, Hot Streak, and Flip 7
-- Live individual leaderboards for Wordle attempts and Connections completion time
-- Three configurable circuit rounds with random, player-choice, and rival-choice assignments
-- Four named stations—Couch, Island, Dinner Table #1, and Dinner Table #2—with assignments that can be randomized or changed player by player
-- A 17-game library with setup, how-to-play, scoring, and host guidance
-- Individual in-app Wordle and Connections challenges with synced results
-- Editable attendance, team moves, check-in controls, and team shuffling
-- Responsive desktop and phone layouts with persistent mobile navigation
-- Cloudflare Workers Static Assets configuration, SPA fallback, caching, and security headers
-- Convex subscriptions and atomic mutations for synchronized scores, teams, phases, pods, and dinner notes
-- Optimistic score updates for instant feedback on the device making the change
+**[Open the live app →](https://tabletop-tonight.willymlee.workers.dev/)**
 
-## Run locally
+## Why this project exists
 
-```powershell
+Game nights usually split information across a group chat, a notes app, handwritten scores, and one person repeatedly explaining where everyone should go. Tabletop Tonight turns that into four focused views:
+
+- **Start** — join with only a name, choose a ghost team, and manage the roster.
+- **Group Games** — run GeoGuessr, Wordle, and Connections in a clear order.
+- **Circuit** — keep four pods moving through four physical stations with live assignments and scoring.
+- **Scores** — separate the team championship from individual standings.
+
+The interface uses progressive disclosure: guests see the next action first, while visual rules and scoring details stay collapsed until needed.
+
+## Highlights
+
+- Real-time multi-device updates through Convex subscriptions
+- No-password guest check-in with reclaimable names
+- Two-step player removal to prevent accidental roster changes
+- Four synchronized circuit rotations with movable pod assignments
+- Atomic team, circuit, and individual score updates
+- Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
+- Three original New York-themed Connections rounds with live solve-time leaderboards
+- Responsive, diagram-based game guides for every scheduled activity
+- Optimistic score updates for immediate feedback
+- Cloudflare Workers Static Assets deployment with SPA fallback and security headers
+- Browser-local fallback when Convex is not configured
+
+## Tech stack
+
+| Layer | Technology | Role |
+| --- | --- | --- |
+| UI | React 19 + Vite | Responsive single-page application |
+| Realtime backend | Convex | Shared roster, scores, pods, circuit results, and puzzle leaderboards |
+| Hosting | Cloudflare Workers | Global static asset delivery and SPA routing |
+| Icons | Lucide React | Accessible interface icons |
+| Validation | TypeScript + production build scripts | Backend type checks and deploy verification |
+
+## Quick start
+
+Requirements: Node.js 20+ and npm.
+
+```bash
+git clone https://github.com/WillyMLee/tabletop-tonight.git
+cd tabletop-tonight
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-Open the local URL printed by Vite. Use `npm run build` to create the production bundle in `dist`.
+Without a `VITE_CONVEX_URL`, the app runs in local-only mode and stores state in the browser. That makes visual customization possible before creating any cloud resources.
 
-Run `npm run check` before publishing to type-check the Convex backend and build the frontend together.
+## Add live sync
 
-## Data model
+Create or connect a Convex project:
 
-When `VITE_CONVEX_URL` is configured, every screen subscribes to one shared game-night document in Convex. Score changes and circuit results update atomically, and common score controls use optimistic updates for immediate local feedback. Convex then pushes the committed state to every connected device.
-
-Without `VITE_CONVEX_URL`, the app intentionally falls back to browser-local persistence so frontend development is not blocked. The header identifies the active mode as `LIVE SYNC`, `CONNECTING`, or local device storage.
-
-The starter Wordle answer and Connections grid live in `src/data/puzzles.js`. Change the puzzle IDs when replacing either challenge so each new puzzle gets a fresh leaderboard.
-
-`VITE_GAME_NIGHT_KEY` selects the shared event. Treat it as an invite-link capability: use a long, unique value and share the deployed URL only with guests. This party build intentionally has no account flow: guests with the link can join by name, select a team, and update the night. Add identity-based host roles before using the same model for public or sensitive events.
-
-## Recommended hosting: Cloudflare Workers
-
-Cloudflare is the best fit for this version: the site is a Vite SPA, the checked-in `wrangler.jsonc` already provides route fallback, and static-asset requests are free and unlimited. Convex provides the live transactional state while Cloudflare serves the application shell and assets.
-
-### GitHub-connected deployment
-
-1. Create a GitHub repository and push this project to it.
-2. In Cloudflare, open **Workers & Pages**, choose **Create application**, then **Import a repository**.
-3. Authorize the GitHub account, select the repository, and keep the Worker name as `tabletop-tonight` so it matches `wrangler.jsonc`.
-4. Use `npm run build` as the build command and `npx wrangler deploy` as the deploy command.
-5. Deploy to the generated `workers.dev` address. Add a custom domain later if desired.
-
-Cloudflare will build and deploy again whenever the production branch is pushed. A local one-off deployment is also available after Wrangler authentication:
-
-```powershell
-npm run deploy
+```bash
+npm run convex:dev
 ```
 
-## Convex production step
+Convex writes the deployment values to `.env.local`. Set a unique event key as well:
 
-Create or select a project with `npm run convex:dev`. Use a unique `VITE_GAME_NIGHT_KEY` locally and in the Cloudflare build environment. For production, build through Convex so `VITE_CONVEX_URL` points at the production deployment:
-
-```powershell
-npx convex deploy --cmd "npm run build"
+```dotenv
+VITE_GAME_NIGHT_KEY=my-private-game-night-2026
 ```
 
-To deploy both the Convex backend and the resulting frontend from an authenticated workstation:
+The key is an invite capability, not authentication. Anyone with the deployed app and event key can change the shared night. Use a long, unique value and see [SECURITY.md](SECURITY.md) before adapting this for sensitive or public events.
 
-```powershell
+## Customize your night
+
+- Edit the game catalog and rule text in [`src/data/games.js`](src/data/games.js).
+- Replace Wordle answers and Connections boards in [`src/data/puzzles.js`](src/data/puzzles.js).
+- Update the group lineup, stations, and rotations near the top of [`src/App.jsx`](src/App.jsx).
+- Adjust the Pac-Man-inspired theme in [`src/styles.css`](src/styles.css).
+- Change the Worker name and compatibility date in [`wrangler.jsonc`](wrangler.jsonc).
+
+Keep puzzle IDs stable after guests begin playing; changing an ID intentionally creates a fresh leaderboard.
+
+## Quality checks
+
+```bash
+npm run verify:puzzles  # validates all puzzle content
+npm run check           # Convex TypeScript + production frontend build
+npm run verify:join     # optional live guest-flow check
+npm run verify:live -- https://your-deployment.convex.cloud
+```
+
+GitHub Actions runs the deterministic checks on every push and pull request.
+
+## Deploy
+
+### Convex + Cloudflare from the command line
+
+Authenticate both CLIs, then run:
+
+```bash
 npm run deploy:live
 ```
 
-Never commit `.env.local` or a Convex deploy key. The public `VITE_CONVEX_URL` is a deployment address, while authorization must still be enforced by the backend functions.
+This deploys the Convex functions, builds the frontend with the production Convex URL, and publishes the static app through Wrangler.
+
+### Git-connected Cloudflare deployment
+
+1. Fork this repository and connect it in **Cloudflare Workers & Pages**.
+2. Use `npm run build` as the build command.
+3. Add `VITE_CONVEX_URL` and `VITE_GAME_NIGHT_KEY` as build variables.
+4. Deploy with `npx wrangler deploy`.
+
+## Architecture notes
+
+The current party-sized implementation keeps one bounded shared-night document for low-latency subscriptions and atomic score updates. Puzzle results use a separate indexed table because they grow independently. Convex production insights report the live deployment as healthy; larger multi-event products should move roster and scoring entities into dedicated tables with host authentication.
+
+## Project status
+
+This repository is both a working event app and a portfolio project by [William Lee](https://github.com/WillyMLee). Contributions, adaptations, and ideas are welcome—see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE) — use it, remix it, and host your own game night.

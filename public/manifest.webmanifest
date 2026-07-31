@@ -1,10 +1,17 @@
 {
   "name": "Tabletop Tonight",
   "short_name": "Tabletop",
-  "description": "Plan teams, run the itinerary, and keep score at game night.",
+  "description": "Run teams, circuits, party puzzles, and live scoring at game night.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#03030f",
   "theme_color": "#03030f",
-  "icons": []
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

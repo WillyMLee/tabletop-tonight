@@ -1,12 +1,24 @@
 {
   "name": "tabletop-tonight",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "A realtime, mobile-first game-night hub built with React, Convex, and Cloudflare Workers.",
+  "homepage": "https://tabletop-tonight.willymlee.workers.dev/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WillyMLee/tabletop-tonight.git"
+  },
+  "license": "MIT",
+  "keywords": ["game-night", "react", "convex", "cloudflare-workers", "realtime"],
+  "engines": {
+    "node": ">=20"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc -p convex --noEmit",
     "check": "npm run typecheck && npm run build",
+    "verify": "npm run verify:puzzles && npm run check",
     "verify:live": "node scripts/verify-live-sync.mjs",
     "verify:join": "node scripts/verify-guest-join.mjs",
     "verify:puzzles": "node scripts/verify-puzzle-data.mjs",
