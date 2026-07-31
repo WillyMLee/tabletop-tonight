@@ -76,7 +76,7 @@ The key is an invite capability, not authentication. Anyone with the deployed ap
 ## Customize your night
 
 - Edit the game catalog and rule text in [`src/data/games.js`](src/data/games.js).
-- Replace Wordle answers and Connections boards in [`src/data/puzzles.js`](src/data/puzzles.js).
+- Replace the Wordle word pool and Connections boards in [`src/data/puzzles.js`](src/data/puzzles.js). Five no-repeat Wordles are deterministically shuffled from the pool using `VITE_GAME_NIGHT_KEY`, so every guest sees the same stable rounds.
 - Update the group lineup, stations, and rotations near the top of [`src/App.jsx`](src/App.jsx).
 - Adjust the Pac-Man-inspired theme in [`src/styles.css`](src/styles.css).
 - Change the Worker name and compatibility date in [`wrangler.jsonc`](wrangler.jsonc).

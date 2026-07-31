@@ -1,12 +1,42 @@
-// Replace these placeholder Wordles with the host's final word list. Keep each
-// ID stable once guests begin playing so its leaderboard remains intact.
-export const wordleRounds = [
-  { id: 'wordle-night-1', label: 'Round 1', answer: 'GHOST' },
-  { id: 'wordle-night-2', label: 'Round 2', answer: 'CRANE' },
-  { id: 'wordle-night-3', label: 'Round 3', answer: 'PLANT' },
-  { id: 'wordle-night-4', label: 'Round 4', answer: 'SHORE' },
-  { id: 'wordle-night-5', label: 'Round 5', answer: 'BLEND' },
-]
+// The event key seeds a stable shuffle: every guest gets the same five rounds,
+// the answers do not change on refresh, and no word repeats during the event.
+export const wordleWordPool = ['XENON', 'SNACK', 'SMILE', 'SWEAT', 'TREAT', 'TULIP', 'PROOF', 'CHECK', 'ALIEN', 'GHOST']
+
+const hashSeed = value => {
+  let hash = 2166136261
+  for (const character of value) {
+    hash ^= character.charCodeAt(0)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
+
+const seededRandom = seed => () => {
+  seed += 0x6D2B79F5
+  let value = seed
+  value = Math.imul(value ^ value >>> 15, value | 1)
+  value ^= value + Math.imul(value ^ value >>> 7, value | 61)
+  return ((value ^ value >>> 14) >>> 0) / 4294967296
+}
+
+export const shuffleWordleWords = seed => {
+  const words = [...wordleWordPool]
+  const random = seededRandom(hashSeed(seed))
+  for (let index = words.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(random() * (index + 1))
+    const current = words[index]
+    words[index] = words[target]
+    words[target] = current
+  }
+  return words
+}
+
+const wordleSeed = import.meta.env?.VITE_GAME_NIGHT_KEY || 'tabletop-tonight'
+export const wordleRounds = shuffleWordleWords(`wordle:${wordleSeed}`).slice(0, 5).map((answer, index) => ({
+  id: `wordle-pool-v1-${index + 1}`,
+  label: `Round ${index + 1}`,
+  answer,
+}))
 
 // Original New York-inspired boards for this game night. The display order is
 // deliberately mixed so groups are not adjacent when a round begins.
