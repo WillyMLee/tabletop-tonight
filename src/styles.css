@@ -1208,6 +1208,7 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .empty-team { grid-column: 1 / -1; color: #8797ca; font-size: 11px; line-height: 1.5; margin: 5px; }
 
 .phase-page { max-width: 1060px; }
+.scoreboard-grid.single-panel { grid-template-columns: minmax(0, 1fr); }
 .phase-page-hero { background: linear-gradient(135deg, #0b0e31 0%, #111851 100%); border: 2px solid #2448ff; border-radius: 16px; box-shadow: 0 0 28px rgba(36,72,255,.18); padding: 29px 31px; margin-bottom: 20px; }
 .phase-page-hero h1 { color: white; font-family: 'Chakra Petch', 'Manrope', sans-serif; font-size: clamp(34px, 6vw, 58px); line-height: 1; margin: 9px 0 11px; text-transform: uppercase; }
 .phase-page-hero > p { color: #b5bfdf; font-size: 14px; line-height: 1.55; margin: 0; max-width: 720px; }

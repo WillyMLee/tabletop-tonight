@@ -888,7 +888,7 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore }) {
       </section>
       <TeamScores scores={scores} onChange={changeScore} />
 
-      <section className="scoreboard-grid">
+      <section className="scoreboard-grid single-panel">
         <div className="card standings">
           <div className="section-heading"><div><span className="kicker">INDIVIDUAL POINTS</span><h2>Player leaderboard</h2></div><span className="muted-chip">Top 8</span></div>
           <div className="standings-list">
@@ -901,18 +901,6 @@ function Scoreboard({ scores, changeScore, players, changePlayerScore }) {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="card prizes">
-          <div className="section-heading"><div><span className="kicker">END-OF-NIGHT</span><h2>Prize cabinet</h2></div><PartyPopper /></div>
-          {[
-            ['🏆', 'Team Champions', 'Highest combined score', 'The big prize'],
-            ['👑', 'Game Night MVP', 'Most individual points', 'First pick'],
-            ['🔥', 'Comeback Kid', 'Best turnaround', 'Host’s choice'],
-            ['🌀', 'Chaos Agent', 'Funniest moment', 'Group vote'],
-            ['🤝', 'Golden Ghost', 'Best sport', 'Group vote'],
-          ].map(([icon, title, detail, badge]) => <div className="prize-row" key={title}><span>{icon}</span><div><strong>{title}</strong><small>{detail}</small></div><em>{badge}</em></div>)}
-          <div className="prize-tip"><Lightbulb size={17} /><p><strong>Prize idea:</strong> winning team gets first pick from a $25 snack-and-silly-trophy table.</p></div>
         </div>
       </section>
     </main>
