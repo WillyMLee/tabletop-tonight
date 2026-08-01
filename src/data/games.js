@@ -30,8 +30,8 @@ export const games = [
   }),
   game({
     slug: 'jenga', name: 'Jenga', icon: '▥', category: 'Tabletop', format: '1v1 dexterity', players: '2', duration: '4 min / match', difficulty: 'Easy', status: 'Group game', color: 'pink',
-    summary: 'Seven fast cross-team matches: pull, place, and keep the tower standing.',
-    why: 'Seven fixed head-to-head matches give every player one fast, dramatic turn.',
+    summary: 'Six fast cross-team matches: pull, place, and keep the tower standing.',
+    why: 'Six fixed head-to-head matches give every player one fast, dramatic turn.',
     setup: ['Build 18 alternating layers of three blocks.', 'Call the next Team Jessa vs. Team Willy matchup.', 'Start a four-minute timer.'],
     rules: ['Use one hand to remove one block from below the highest completed layer.', 'Place it on top at a right angle.', 'You may test blocks but must restore anything you move.', 'A fallen tower loses; at four minutes, the tallest stable tower wins.'],
     scoring: 'Each 1v1 winner earns 1 individual point and 1 point for their team.',
@@ -98,7 +98,7 @@ export const games = [
     setup: ['Use the board matching the player count.', 'Deal secret role and party-membership cards.', 'Seat randomly and select the first President.'],
     rules: ['The President nominates a Chancellor and everyone votes.', 'An elected government secretly chooses and enacts one policy.', 'Track liberal and fascist policies and resolve unlocked powers.', 'Liberals win through five liberal policies or Hitler’s removal; fascists win through six fascist policies or electing Hitler after three fascist policies.'],
     scoring: 'Every member of the winning side earns 5 individual points; cap the house-team award at 10.',
-    hostTip: 'The official game supports 5–10, so use it as one half of the party split—not for all 14 guests.',
+    hostTip: 'The official game supports 5–10, so use it as one half of the party split—not for all 12 guests.',
   }),
   game({
     slug: 'herd-mentality', name: 'Herd Mentality', icon: '♉', category: 'Party', format: 'Opinion matching', players: '4–20', duration: '20 min', difficulty: 'Easy', status: 'Recommended intro', color: 'pink',
@@ -125,7 +125,7 @@ export const games = [
     setup: ['Split into the two house teams.', 'Choose a shared deck of cards for the session.', 'Set a one-minute turn timer.'],
     rules: ['Round one allows any spoken clues except the answer.', 'Round two allows only one word.', 'Round three uses charades only.', 'Teams alternate timed turns and keep every card they guess.'],
     scoring: 'Count captured cards across all three rounds. Winning house team earns 10 points; top clue giver earns 3 individual points.',
-    hostTip: 'With 13–14 guests, play as two large house teams and keep turns to one minute.',
+    hostTip: 'With 12 guests, play as two large house teams and keep turns to one minute.',
   }),
   game({
     slug: 'wordle', name: 'Wordle', icon: '▣', category: 'In-app', format: 'Individual word race', players: 'Everyone', duration: '8 min', difficulty: 'Medium', status: 'Group-session leaderboard', color: 'cyan', playable: 'wordle',

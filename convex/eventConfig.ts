@@ -2,12 +2,11 @@ export const eventDetails = {
   title: 'Game Night',
   date: 'Saturday, August 1, 2026',
   host: 'Jessa',
-  playerCount: 14,
+  playerCount: 12,
 }
 
 export const initialRoster = [
   { id: 1, name: 'Don Robert', team: 'meeple' as const },
-  { id: 2, name: 'Jessa', team: 'meeple' as const },
   { id: 3, name: 'Julie', team: 'meeple' as const },
   { id: 4, name: 'Thomas', team: 'meeple' as const },
   { id: 5, name: 'Valeria', team: 'meeple' as const },
@@ -16,7 +15,6 @@ export const initialRoster = [
   { id: 8, name: 'Willy', team: 'mayhem' as const },
   { id: 9, name: 'Brendan', team: 'mayhem' as const },
   { id: 10, name: 'Joanna', team: 'mayhem' as const },
-  { id: 11, name: 'Omar', team: 'mayhem' as const },
   { id: 12, name: 'Andrew', team: 'mayhem' as const },
   { id: 13, name: 'Young', team: 'mayhem' as const },
   { id: 14, name: 'Janice', team: 'mayhem' as const },
@@ -24,11 +22,10 @@ export const initialRoster = [
 
 export const jengaMatches = [
   ['Don Robert', 'Willy'],
-  ['Jessa', 'Brendan'],
   ['Julie', 'Joanna'],
   ['Thomas', 'Young'],
   ['Valeria', 'Andrew'],
-  ['Annhien', 'Omar'],
+  ['Annhien', 'Brendan'],
   ['Rebekah', 'Janice'],
 ]
 
@@ -36,28 +33,28 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Jessa', 'Willy', 'Brendan'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Joanna', 'Janice'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Thomas', 'Annhien', 'Omar', 'Andrew'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Thomas', 'Willy', 'Brendan'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Andrew', 'Joanna'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Annhien', 'Janice'] },
       { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Rebekah', 'Young'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Thomas', 'Joanna', 'Young'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Jessa', 'Omar', 'Andrew'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Valeria', 'Rebekah', 'Willy', 'Janice'] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Annhien', 'Brendan'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Young'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Annhien', 'Rebekah', 'Willy', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Andrew', 'Joanna'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Valeria', 'Brendan'] },
     ],
   },
   {
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Valeria', 'Annhien', 'Omar', 'Janice'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Thomas', 'Rebekah', 'Willy', 'Brendan'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Jessa', 'Joanna', 'Young'] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Julie', 'Andrew'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Annhien', 'Rebekah', 'Andrew', 'Joanna'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Brendan'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Julie', 'Valeria', 'Willy', 'Young'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Thomas', 'Janice'] },
     ],
   },
   {
@@ -75,23 +72,21 @@ export const circuitFourLockedAssignments = {} as const
 
 // Maximum-diversity starting lineup. Teams can still adjust these selections in the app.
 export const circuitFourSuggestedAssignments = {
-  'Don Robert': 'A',
-  Jessa: 'C',
+  'Don Robert': 'D',
   Julie: 'C',
-  Thomas: 'D',
-  Valeria: 'B',
+  Thomas: 'B',
+  Valeria: 'A',
   Annhien: 'B',
-  Rebekah: 'A',
-  Willy: 'B',
+  Rebekah: 'C',
+  Willy: 'D',
   Brendan: 'C',
-  Joanna: 'A',
-  Omar: 'C',
-  Andrew: 'A',
+  Joanna: 'C',
+  Andrew: 'B',
   Young: 'B',
-  Janice: 'D',
+  Janice: 'A',
 } as const
 
-export const circuitFourTeamCapacities = { A: 2, B: 2, C: 2, D: 1 } as const
+export const circuitFourTeamCapacities = { A: 1, B: 2, C: 2, D: 1 } as const
 
 export const eventTimeline = [
   { time: '6:00–6:15', activity: 'Arrival and setup', detail: 'Claim your pre-listed name, find your team, and get settled.' },
@@ -99,7 +94,7 @@ export const eventTimeline = [
   { time: '6:20–6:45', activity: 'GeoGuessr', detail: 'Three five-location rounds; one envelope after each round.' },
   { time: '6:45–7:10', activity: 'Wordle', detail: 'Five words; one envelope after each word.' },
   { time: '7:10–7:30', activity: 'Connections', detail: 'Three fastest-solve rounds; one envelope after each round.' },
-  { time: '7:30–8:00', activity: 'Jenga head-to-head', detail: 'Seven cross-team matches with a four-minute hard stop.' },
+  { time: '7:30–8:00', activity: 'Jenga head-to-head', detail: 'Six cross-team matches with a four-minute hard stop.' },
   { time: '8:00–9:35', activity: 'Main circuit', detail: 'Four 20-minute rounds with a five-minute switch after rounds 1–3.' },
   { time: '9:35–9:45', activity: 'Final scoring', detail: 'Add points and run one sudden-death tie-breaker only if needed.' },
   { time: '9:45–9:50', activity: 'Final prizes', detail: 'Award the individual champion and every winning-team member.' },
@@ -113,7 +108,7 @@ export const pointRules = [
 ]
 
 export const envelopeGroups = [
-  { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`)] },
+  { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...jengaMatches.map((_, index) => `Jenga — Match ${index + 1} Winner`)] },
   { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2', 'Jenga'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
-  { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 7 }, (_, index) => `Winning Team Member ${index + 1}`)] },
+  { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 6 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]

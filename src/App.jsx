@@ -518,7 +518,7 @@ function Tonight({ players, guestPlayerIdentity, joinPlayer, releasePlayer }) {
     <main className="live-hub">
       <GuestJoin players={players} playerIdentity={guestPlayerIdentity} joinPlayer={joinPlayer} />
       <section className="pac-section teams-zone">
-        <div className="pac-section-head"><div><span className="kicker">PRESET TEAMS · {eventDetails.date.toUpperCase()}</span><h1>Teams are locked in</h1><p>{activePlayers.length} of {players.length} players have claimed their name. Jessa is playing and also keeping score for the night.</p></div><button className={`pixel-button ${managingPlayers ? 'active' : ''}`} aria-pressed={managingPlayers} onClick={() => { setManagingPlayers(value => !value); setConfirmingPlayer(null) }}>{managingPlayers ? 'DONE' : 'MANAGE CLAIMS'}</button></div>
+        <div className="pac-section-head"><div><span className="kicker">PRESET TEAMS · {eventDetails.date.toUpperCase()}</span><h1>Teams are locked in</h1><p>{activePlayers.length} of {players.length} players have claimed their name. Jessa is hosting and keeping score, not playing.</p></div><button className={`pixel-button ${managingPlayers ? 'active' : ''}`} aria-pressed={managingPlayers} onClick={() => { setManagingPlayers(value => !value); setConfirmingPlayer(null) }}>{managingPlayers ? 'DONE' : 'MANAGE CLAIMS'}</button></div>
         {managingPlayers && <div className="roster-manage-note"><CircleHelp size={17} /><span><strong>Release a claimed name</strong> Use this only if someone chose the wrong person or changed devices.</span></div>}
         <div className="ghost-team-grid">
           {Object.keys(teamInfo).map(team => {
@@ -717,7 +717,7 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
       <section className="phase-page-hero">
         <span className="eyebrow">6:20–8:00 PM · EVERYONE PLAYS</span>
         <h1>Group Games</h1>
-        <p>Three personal challenges followed by seven fast Jenga matchups. Start at the top and move on when the host calls time.</p>
+        <p>Three personal challenges followed by six fast Jenga matchups. Start at the top and move on when the host calls time.</p>
         <div className="phase-summary"><span><strong>4</strong> games</span><span><strong>100</strong> minutes</span><span><strong>18</strong> winners</span></div>
       </section>
 
@@ -745,12 +745,12 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
               <small>{item.duration} · {item.location}</small>
               <h2>{game.name}</h2>
               <p>{item.note}</p>
-              <div className="flow-score"><Trophy size={15} /><span>{isJenga ? 'Seven match winners · 1 individual + 1 team point each.' : item.slug === 'wordle' ? 'Five word winners · 3 individual + 3 team points each.' : 'Three round winners · 3 individual + 3 team points each.'}</span></div>
+              <div className="flow-score"><Trophy size={15} /><span>{isJenga ? 'Six match winners · 1 individual + 1 team point each.' : item.slug === 'wordle' ? 'Five word winners · 3 individual + 3 team points each.' : 'Three round winners · 3 individual + 3 team points each.'}</span></div>
               <GameHowTo game={game} navigate={navigate} />
               {!isJenga && !isAutoScored && <div className="game-winner-panel"><div><span className="kicker">HOST RECORDS GEOGUESSR</span><strong>Winner selector</strong><small>Pick each game winner after GeoGuessr finishes.</small></div><div className="winner-selector-grid">{groupWinnerRounds[item.slug].map(round => <WinnerSelector label={round.label} winnerKey={round.key} options={players} winnerId={gameWinners[round.key]} recordGameWinner={recordGameWinner} key={round.key} />)}</div></div>}
               {isAutoScored && <AutoPuzzleResults game={item.slug} results={puzzleResults} />}
               {isJenga && <section className="jenga-match-block group-jenga-block">
-                <div className="circuit-section-heading"><div><span className="kicker">7:30–8:00 PM · ISLAND</span><h2>Seven 1v1 matchups</h2><p>Each match gets four minutes. A fallen tower loses; at the buzzer, tallest stable tower wins.</p></div></div>
+                <div className="circuit-section-heading"><div><span className="kicker">7:30–8:00 PM · ISLAND</span><h2>Six 1v1 matchups</h2><p>Each match gets four minutes. A fallen tower loses; at the buzzer, tallest stable tower wins.</p></div></div>
                 <div className="jenga-match-grid">{jengaMatches.map(([jessaName, willyName], index) => {
                   const options = [rosterByName.get(jessaName), rosterByName.get(willyName)].filter(Boolean)
                   const winnerKey = `jenga:${index + 1}`
@@ -782,7 +782,7 @@ function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }
     <div className="champion-draft-grid">{Object.keys(teamInfo).map(team => {
       const members = players.filter(player => player.team === team)
       return <section className={`champion-team-card ${teamInfo[team].color}`} key={team}>
-        <div className="champion-team-head"><span className={`team-ghost ${teamInfo[team].color}`}><i /><i /></span><div><small>{assignedCount(team)} OF 7 PLACED</small><strong>{teamInfo[team].name}</strong></div></div>
+        <div className="champion-team-head"><span className={`team-ghost ${teamInfo[team].color}`}><i /><i /></span><div><small>{assignedCount(team)} OF {members.length} PLACED</small><strong>{teamInfo[team].name}</strong></div></div>
         <div className="champion-player-list">{members.map(player => {
           const pod = assignments[String(player.id)] || ''
           const lockedPod = circuitFourLockedAssignments[player.name]
@@ -1154,7 +1154,7 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
       <section className="page-intro">
         <span className="eyebrow">THE GAME PLAN</span>
         <h1>A full night, <em>zero benchwarmers.</em></h1>
-        <p>The core schedule keeps all 14 players active. With 10–14 guests, use 3–4 people at each of the four stations.</p>
+        <p>The core schedule keeps all 12 players active. Each round uses two four-player stations and two head-to-head stations.</p>
       </section>
 
       <section className="schedule-layout">
@@ -1287,7 +1287,7 @@ function HostPlan({ navigate }) {
 
     <section className="host-plan-section cash-plan-section">
       <div className="host-plan-heading"><span>01</span><div><small>BEFORE GUESTS ARRIVE</small><h2>Cash and envelopes</h2></div></div>
-      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$74</strong><p>34 one-dollar bills<br />8 five-dollar bills</p></article><article><small>PREPARE</small><strong>42</strong><p>34 red envelopes with $1<br />8 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
+      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$68</strong><p>33 one-dollar bills<br />7 five-dollar bills</p></article><article><small>PREPARE</small><strong>40</strong><p>33 red envelopes with $1<br />7 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
       <div className="envelope-groups">{envelopeGroups.map(group => <details key={group.title}><summary><span>{group.title}</span><small>{group.labels.length} labels · {group.amount}</small></summary><ol>{group.labels.map(label => <li key={label}>{label}</li>)}</ol></details>)}</div>
     </section>
 

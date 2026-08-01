@@ -4,7 +4,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/WillyMLee/tabletop-tonight/ci.yml?style=for-the-badge&label=checks)](https://github.com/WillyMLee/tabletop-tonight/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-21DDEB?style=for-the-badge)](LICENSE)
 
-A mobile-first, arcade-inspired game-night hub for preset teams, live scoring, party puzzles, head-to-head matches, and exact circuit assignments. Built for a 14-person night, but designed so another host can fork it and make it their own.
+A mobile-first, arcade-inspired game-night hub for preset teams, live scoring, party puzzles, head-to-head matches, and exact circuit assignments. Built for a 12-person night, but designed so another host can fork it and make it their own.
 
 **[Open the live app →](https://tabletop-tonight.willymlee.workers.dev/)**
 
@@ -13,7 +13,7 @@ A mobile-first, arcade-inspired game-night hub for preset teams, live scoring, p
 Game nights usually split information across a group chat, a notes app, handwritten scores, and one person repeatedly explaining where everyone should go. Tabletop Tonight turns that into four focused views:
 
 - **Start** — claim one pre-listed roster name, see the locked teams, and release mistaken claims.
-- **Group Games** — run GeoGuessr, Wordle, Connections, and seven four-minute Jenga matches in a clear order.
+- **Group Games** — run GeoGuessr, Wordle, Connections, and six four-minute Jenga matches in a clear order.
 - **Circuit** — show exact Blokus and Mario Strikers assignments plus a live Flip 7 / Magical Athlete choice for four rounds.
 - **Scores** — separate the team championship from individual standings.
 
