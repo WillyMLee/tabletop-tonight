@@ -36,25 +36,25 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Omar', 'Andrew'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Joanna', 'Omar'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Thomas', 'Willy', 'Young'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Annhien', 'Rebekah', 'Brendan', 'Joanna', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Annhien', 'Rebekah', 'Brendan', 'Andrew', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Thomas', 'Joanna', 'Janice'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Annhien', 'Rebekah', 'Omar', 'Andrew'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Julie', 'Valeria', 'Willy', 'Brendan', 'Young'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Annhien', 'Young', 'Janice'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Rebekah', 'Omar', 'Andrew'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Valeria', 'Willy', 'Brendan', 'Joanna'] },
     ],
   },
   {
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Annhien', 'Rebekah', 'Brendan', 'Young'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Joanna', 'Janice'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Melissa', 'Thomas', 'Willy', 'Omar', 'Andrew'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Rebekah', 'Brendan', 'Andrew'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Valeria', 'Annhien', 'Joanna', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Melissa', 'Julie', 'Willy', 'Omar', 'Young'] },
     ],
   },
   {
