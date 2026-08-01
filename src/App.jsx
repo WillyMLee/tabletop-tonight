@@ -143,7 +143,7 @@ const groupGameLineup = [
   { order: 1, slug: 'geoguessr', duration: '25 min', location: 'Everyone’s phone', note: 'Play 3 separate games of 5 locations. Each round winner receives 3 individual and 3 team points.' },
   { order: 2, slug: 'wordle', duration: '25 min', location: 'Everyone’s phone', note: 'Play all 5 words. Fewest attempts wins each word and earns 3 individual and 3 team points.' },
   { order: 3, slug: 'connections', duration: '20 min', location: 'Everyone’s phone', note: 'Play 3 rounds. Fastest successful solve earns 3 individual and 3 team points.' },
-  { order: 4, slug: 'jenga', duration: '30 min', location: 'Island', note: 'Run all 7 fixed cross-team matches. Each match has a four-minute hard stop and awards 1 individual + 1 team point.' },
+  { order: 4, slug: 'jenga', duration: '30 min', location: 'Island', note: 'Run all 6 fixed cross-team matches. Each match has a four-minute hard stop and awards 1 individual + 1 team point.' },
 ]
 
 const gamePointValues = { geoguessr: 3, wordle: 3, connections: 3, jenga: 1, blokus: 2, 'mario-strikers-gc': 2, 'flip-7': 2, 'magical-athlete': 2, 'table-choice': 2 }
@@ -718,7 +718,7 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
         <span className="eyebrow">6:20–8:00 PM · EVERYONE PLAYS</span>
         <h1>Group Games</h1>
         <p>Three personal challenges followed by six fast Jenga matchups. Start at the top and move on when the host calls time.</p>
-        <div className="phase-summary"><span><strong>4</strong> games</span><span><strong>100</strong> minutes</span><span><strong>18</strong> winners</span></div>
+        <div className="phase-summary"><span><strong>4</strong> games</span><span><strong>100</strong> minutes</span><span><strong>17</strong> winners</span></div>
       </section>
 
       {isWilly && <section className="willy-group-admin" aria-label="Willy group-game controls">
