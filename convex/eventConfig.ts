@@ -36,17 +36,17 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Joanna', 'Omar'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Omar', 'Janice'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Thomas', 'Willy', 'Young'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Annhien', 'Rebekah', 'Brendan', 'Andrew', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Annhien', 'Rebekah', 'Brendan', 'Joanna', 'Andrew'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Annhien', 'Young', 'Janice'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Annhien', 'Joanna', 'Young'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Rebekah', 'Omar', 'Andrew'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Valeria', 'Willy', 'Brendan', 'Joanna'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Valeria', 'Willy', 'Brendan', 'Janice'] },
     ],
   },
   {
