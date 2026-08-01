@@ -36,12 +36,12 @@ import {
 } from 'lucide-react'
 import { games, getGame, tonightSlugs } from './data/games.js'
 import { activeConnections, connectionWords, connectionsRounds, wordleRounds } from './data/puzzles.js'
-import { circuitFourLockedAssignments, circuitFourTeamCapacities, circuitRounds, envelopeGroups, eventDetails, eventTimeline, initialRoster, jengaMatches, pointRules } from '../convex/eventConfig'
+import { circuitFourLockedAssignments, circuitFourSuggestedAssignments, circuitFourTeamCapacities, circuitRounds, envelopeGroups, eventDetails, eventTimeline, initialRoster, jengaMatches, pointRules } from '../convex/eventConfig'
 
 const defaultPlayers = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments = {}
-const defaultCircuitFourAssignments = Object.fromEntries(initialRoster.filter(player => circuitFourLockedAssignments[player.name]).map(player => [String(player.id), circuitFourLockedAssignments[player.name]]))
+const defaultCircuitFourAssignments = Object.fromEntries(initialRoster.filter(player => circuitFourSuggestedAssignments[player.name]).map(player => [String(player.id), circuitFourSuggestedAssignments[player.name]]))
 
 const storedPlayerIdentity = storageKey => {
   if (typeof window === 'undefined') return null
@@ -778,7 +778,7 @@ function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }
   const podCount = (team, pod) => players.filter(player => player.team === team && assignments[String(player.id)] === pod).length
 
   return <section className="champion-draft">
-    <header><div><span className="kicker">CIRCUIT 4 · TEAM CHOICE</span><h2>Draft your championship lineup</h2><p>Everyone already played three different circuit games. Each team now chooses two Strikers, two Blokus, two Flip 7/Magical Athlete, and one Jenga champion for the final round.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
+    <header><div><span className="kicker">CIRCUIT 4 · OPTIMIZED TEAM CHOICE</span><h2>Review your championship lineup</h2><p>The maximum-diversity lineup is prefilled: rounds 1–3 give everyone a new game, and eight players complete all four. Teams may still adjust the final selections.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
     <div className="champion-draft-grid">{Object.keys(teamInfo).map(team => {
       const members = players.filter(player => player.team === team)
       return <section className={`champion-team-card ${teamInfo[team].color}`} key={team}>
@@ -814,7 +814,7 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
       <section className="phase-page-hero circuit-hero">
         <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Rounds 1–3 use all four stations, so every player gets three different games with no forced repeats. Round 4 is a team-selected championship lineup.</p>
+        <p>Rounds 1–3 give every player a different game and maximize new opponents. Round 4 starts with an optimized lineup that teams can adjust.</p>
         <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>{round.stations.length}</strong> stations now</span><span><strong>20</strong> min each</span></div>
       </section>
 

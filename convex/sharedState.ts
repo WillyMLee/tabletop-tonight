@@ -1,7 +1,7 @@
 import { mutation, query, type MutationCtx } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
 import { v } from 'convex/values'
-import { circuitFourLockedAssignments, circuitFourTeamCapacities, initialRoster } from './eventConfig'
+import { circuitFourLockedAssignments, circuitFourSuggestedAssignments, circuitFourTeamCapacities, initialRoster } from './eventConfig'
 
 const teamSlug = v.union(v.literal('meeple'), v.literal('mayhem'))
 const puzzleGame = v.union(v.literal('wordle'), v.literal('connections'))
@@ -22,11 +22,13 @@ const gamePointValues: Record<string, number> = {
 const defaultPlayers: Doc<'sharedGameNights'>['players'] = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments: Doc<'sharedGameNights'>['podAssignments'] = {}
-const lockedCircuitFourAssignments: Record<string, 'A' | 'B' | 'C' | 'D'> = Object.fromEntries(
+const circuitFourAssignmentsById = (assignments: Record<string, 'A' | 'B' | 'C' | 'D'>): Record<string, 'A' | 'B' | 'C' | 'D'> => Object.fromEntries(
   initialRoster
-    .filter(player => player.name in circuitFourLockedAssignments)
-    .map(player => [String(player.id), circuitFourLockedAssignments[player.name as keyof typeof circuitFourLockedAssignments]]),
+    .filter(player => player.name in assignments)
+    .map(player => [String(player.id), assignments[player.name]]),
 )
+const suggestedCircuitFourAssignments = circuitFourAssignmentsById(circuitFourSuggestedAssignments)
+const lockedCircuitFourAssignments = circuitFourAssignmentsById(circuitFourLockedAssignments)
 
 const initialState = (eventKey: string) => ({
   eventKey,
@@ -38,7 +40,7 @@ const initialState = (eventKey: string) => ({
   podAssignments: defaultPodAssignments,
   circuitResults: {},
   circuitGameChoices: {},
-  circuitFourAssignments: lockedCircuitFourAssignments,
+  circuitFourAssignments: suggestedCircuitFourAssignments,
   gameWinners: {},
   dinnerOrder: '',
   updatedAt: Date.now(),
@@ -219,7 +221,7 @@ export const setCircuitFourAssignment = mutation({
     const lockedPod = lockedCircuitFourAssignments[String(playerId)]
     if (lockedPod && lockedPod !== pod) throw new Error(`${player.name} is locked into the game they still need to rotate through`)
 
-    const assignments = { ...lockedCircuitFourAssignments, ...(state.circuitFourAssignments ?? {}) }
+    const assignments = { ...(state.circuitFourAssignments ?? suggestedCircuitFourAssignments), ...lockedCircuitFourAssignments }
     if (pod) assignments[String(playerId)] = pod
     else delete assignments[String(playerId)]
     const teamCount = pod ? state.players.filter(item => item.team === player.team && assignments[String(item.id)] === pod).length : 0
