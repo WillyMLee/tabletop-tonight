@@ -60,7 +60,7 @@ export const circuitRounds = [
   {
     label: 'Circuit 4', time: '9:15–9:35 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', pod: 'A' as const, capacity: 4, players: [] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', pod: 'A' as const, capacity: 2, players: [] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', pod: 'B' as const, capacity: 4, players: [] },
       { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', pod: 'C' as const, capacity: 4, players: [] },
       { slug: 'jenga', name: 'Jenga', location: 'Island', pod: 'D' as const, capacity: 2, players: [] },
