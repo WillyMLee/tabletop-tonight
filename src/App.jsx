@@ -518,7 +518,7 @@ function Tonight({ players, guestPlayerIdentity, joinPlayer, releasePlayer }) {
     <main className="live-hub">
       <GuestJoin players={players} playerIdentity={guestPlayerIdentity} joinPlayer={joinPlayer} />
       <section className="pac-section teams-zone">
-        <div className="pac-section-head"><div><span className="kicker">PRESET TEAMS · {eventDetails.date.toUpperCase()}</span><h1>Teams are locked in</h1><p>{activePlayers.length} of {players.length} players have claimed their name. Jessa is the host and scorekeeper, not a player.</p></div><button className={`pixel-button ${managingPlayers ? 'active' : ''}`} aria-pressed={managingPlayers} onClick={() => { setManagingPlayers(value => !value); setConfirmingPlayer(null) }}>{managingPlayers ? 'DONE' : 'MANAGE CLAIMS'}</button></div>
+        <div className="pac-section-head"><div><span className="kicker">PRESET TEAMS · {eventDetails.date.toUpperCase()}</span><h1>Teams are locked in</h1><p>{activePlayers.length} of {players.length} players have claimed their name. Jessa is playing and also keeping score for the night.</p></div><button className={`pixel-button ${managingPlayers ? 'active' : ''}`} aria-pressed={managingPlayers} onClick={() => { setManagingPlayers(value => !value); setConfirmingPlayer(null) }}>{managingPlayers ? 'DONE' : 'MANAGE CLAIMS'}</button></div>
         {managingPlayers && <div className="roster-manage-note"><CircleHelp size={17} /><span><strong>Release a claimed name</strong> Use this only if someone chose the wrong person or changed devices.</span></div>}
         <div className="ghost-team-grid">
           {Object.keys(teamInfo).map(team => {

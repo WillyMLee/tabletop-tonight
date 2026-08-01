@@ -7,7 +7,7 @@ export const eventDetails = {
 
 export const initialRoster = [
   { id: 1, name: 'Don Robert', team: 'meeple' as const },
-  { id: 2, name: 'Melissa', team: 'meeple' as const },
+  { id: 2, name: 'Jessa', team: 'meeple' as const },
   { id: 3, name: 'Julie', team: 'meeple' as const },
   { id: 4, name: 'Thomas', team: 'meeple' as const },
   { id: 5, name: 'Valeria', team: 'meeple' as const },
@@ -24,7 +24,7 @@ export const initialRoster = [
 
 export const jengaMatches = [
   ['Don Robert', 'Willy'],
-  ['Melissa', 'Brendan'],
+  ['Jessa', 'Brendan'],
   ['Julie', 'Joanna'],
   ['Thomas', 'Young'],
   ['Valeria', 'Andrew'],
@@ -36,7 +36,7 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Rebekah', 'Brendan', 'Joanna'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Jessa', 'Rebekah', 'Brendan', 'Joanna'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Omar', 'Andrew'] },
       { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Willy', 'Young'] },
       { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Annhien', 'Janice'] },
@@ -47,7 +47,7 @@ export const circuitRounds = [
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Annhien', 'Andrew', 'Young'] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Thomas', 'Rebekah', 'Willy', 'Brendan'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Julie', 'Omar', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Jessa', 'Julie', 'Omar', 'Janice'] },
       { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Valeria', 'Joanna'] },
     ],
   },
@@ -55,7 +55,7 @@ export const circuitRounds = [
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
       { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Valeria', 'Willy', 'Omar'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Melissa', 'Young', 'Janice'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Jessa', 'Young', 'Janice'] },
       { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Annhien', 'Rebekah', 'Joanna', 'Andrew'] },
       { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Julie', 'Brendan'] },
     ],
