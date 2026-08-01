@@ -1301,6 +1301,7 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .circuit-reset-note p { color: #9ca8d5; font-size: 9px; margin: 2px 0 0; }
 .circuit-switch-note { color: #aab5dc; font-size: 9px; }
 .exact-station-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.exact-station-grid.is-champion-round { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .exact-player-list { display: grid; gap: 6px; }
 .exact-player-list > div { background: #0f133e; border: 1px solid #1c2d91; border-left: 3px solid #ff3b6b; border-radius: 6px; display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px; }
 .exact-player-list > div.willy-player { border-left-color: #21ddeb; }
@@ -1366,7 +1367,7 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 
 @media (max-width: 900px) {
   .controller-map-layout { grid-template-columns: 1fr; gap: 64px; }
-  .exact-station-grid { grid-template-columns: 1fr; }
+  .exact-station-grid, .exact-station-grid.is-champion-round { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 700px) {
@@ -1542,6 +1543,41 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .circuit-now-bar em { color: var(--yellow); font-size: 10px; font-style: normal; margin-left: 6px; }
 .circuit-now-bar button { background: #17266f; border: 1px solid #3550ff; border-radius: 5px; color: var(--yellow); display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; padding: 8px 10px; }
 
+.champion-draft { background: linear-gradient(145deg,#080a27,#111747); border: 2px solid var(--yellow); border-radius: 14px; box-shadow: 0 0 26px rgba(255,231,0,.1); margin-bottom: 14px; padding: 18px; }
+.champion-draft > header { position: static; height: auto; background: transparent; border: 0; display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 0 0 14px; }
+.champion-draft h2 { color: white; font-family: 'Chakra Petch','Manrope',sans-serif; font-size: 23px; margin: 3px 0 5px; }
+.champion-draft header p { color: #aeb8dc; font-size: 10px; line-height: 1.5; margin: 0; max-width: 720px; }
+.draft-sync { background: #0d153e; border: 1px solid #21ddeb; border-radius: 999px; color: #b9f8fb; display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; font: 700 8px 'Chakra Petch','Manrope',sans-serif; padding: 7px 10px; text-transform: uppercase; }
+.champion-draft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.champion-team-card { background: #090c30; border: 1px solid #ff3b6b; border-radius: 10px; overflow: hidden; }
+.champion-team-card.lime { border-color: #21ddeb; }
+.champion-team-head { background: linear-gradient(90deg,rgba(255,59,107,.18),transparent); display: flex; align-items: center; gap: 10px; padding: 11px 12px; }
+.champion-team-card.lime .champion-team-head { background: linear-gradient(90deg,rgba(33,221,235,.17),transparent); }
+.champion-team-head .team-ghost { width: 28px; height: 30px; gap: 3px; padding-top: 10px; }
+.champion-team-card.lime .team-ghost { background: #21ddeb; }
+.champion-team-head small, .champion-team-head strong { display: block; }
+.champion-team-head small { color: #8f9dcc; font-size: 7px; }
+.champion-team-head strong { color: white; font: 700 12px 'Chakra Petch','Manrope',sans-serif; margin-top: 2px; }
+.champion-player-list { display: grid; gap: 5px; padding: 8px; }
+.champion-player-list > label { background: #101541; border: 1px solid #243992; border-radius: 7px; display: grid; grid-template-columns: 29px minmax(0,1fr) minmax(128px,.72fr); align-items: center; gap: 8px; padding: 7px; }
+.champion-player-list > label.coverage-lock { background: linear-gradient(90deg,rgba(255,231,0,.11),#101541 45%); border-color: #857b16; }
+.champion-player-list label > span strong, .champion-player-list label > span small { display: block; }
+.champion-player-list label > span strong { color: white; font-size: 10px; }
+.champion-player-list label > span small { color: #8e9ccb; font-size: 6px; line-height: 1.3; margin-top: 2px; }
+.champion-player-list .coverage-lock label > span small, .champion-player-list .coverage-lock > span small { color: var(--yellow); }
+.champion-player-list select { width: 100%; min-width: 0; min-height: 38px; appearance: none; background: #070923 linear-gradient(45deg,transparent 50%,var(--yellow) 50%) calc(100% - 13px) 16px/5px 5px no-repeat; border: 1px solid #3550ff; border-radius: 6px; color: white; font: 700 8px 'Chakra Petch','Manrope',sans-serif; padding: 8px 24px 8px 8px; }
+.champion-player-list select:focus { border-color: var(--yellow); outline: 2px solid rgba(255,231,0,.12); }
+.champion-player-list select:disabled { background-color: #17183b; border-color: #827b27; color: var(--yellow); opacity: 1; }
+.draft-capacity-strip { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; margin-top: 10px; }
+.draft-capacity-strip > span { background: #0b0f36; border: 1px solid #263caa; border-radius: 7px; display: grid; grid-template-columns: 25px minmax(0,1fr); align-items: center; column-gap: 7px; padding: 8px; }
+.draft-capacity-strip b { grid-row: 1 / 3; color: var(--yellow); font-size: 18px; text-align: center; }
+.draft-capacity-strip strong { color: white; font-size: 8px; overflow-wrap: anywhere; }
+.draft-capacity-strip small { color: #8796c8; font-size: 7px; }
+.pod-badge.needs-draft { background: #ff7898; }
+.exact-player-list > div.open-champion-slot { border: 1px dashed #5467c5; border-left: 3px solid #6c7bd0; color: #91a0d4; grid-template-columns: 30px 1fr auto; }
+.open-champion-slot > span { width: 25px; height: 25px; border: 1px dashed #6c7bd0; border-radius: 50%; display: grid; place-items: center; font-size: 15px; }
+.open-champion-slot > strong { color: #aeb8dc; }
+
 .simple-station-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .simple-station-card { background: #080a27; border: 1px solid #2448ff; border-radius: 11px; overflow: hidden; padding: 16px; }
 .simple-station-card > header { position: static; height: auto; background: transparent; border: 0; display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 10px; padding: 0 0 13px; }
@@ -1581,6 +1617,10 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
   .simple-station-grid { grid-template-columns: 1fr; }
   .circuit-now-bar { align-items: stretch; flex-direction: column; }
   .circuit-now-bar button { justify-content: center; }
+  .champion-draft { padding: 14px 11px; }
+  .champion-draft > header { align-items: start; flex-direction: column; gap: 9px; }
+  .champion-draft-grid { grid-template-columns: 1fr; }
+  .draft-capacity-strip { grid-template-columns: 1fr 1fr; }
 }
 
 /* Clear score hierarchy */
@@ -1743,6 +1783,7 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .station-score > .winner-selector { display: block; }
 .winner-selector.is-open { border-color: var(--yellow); z-index: 70; }
 .winner-picker-trigger { width: 100%; min-height: 54px; background: transparent; border: 0; border-radius: 7px; color: white; display: grid; grid-template-columns: 17px minmax(0,1fr) 15px; align-items: center; gap: 7px; padding: 8px; text-align: left; }
+.winner-picker-trigger:disabled { cursor: not-allowed; opacity: .58; }
 .winner-picker-trigger > svg:first-child { color: var(--yellow); }
 .winner-picker-trigger > svg:last-child { color: #8fa0da; transition: transform .2s ease; }
 .winner-selector.is-open .winner-picker-trigger > svg:last-child { color: var(--yellow); transform: rotate(180deg); }

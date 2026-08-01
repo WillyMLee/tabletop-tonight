@@ -97,6 +97,7 @@ export default defineSchema({
     podAssignments: v.record(v.string(), v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D'))),
     circuitResults: v.record(v.string(), v.union(v.literal('meeple'), v.literal('mayhem'), v.literal('split'))),
     circuitGameChoices: v.optional(v.record(v.string(), v.union(v.literal('flip-7'), v.literal('magical-athlete')))),
+    circuitFourAssignments: v.optional(v.record(v.string(), v.union(v.literal('A'), v.literal('B'), v.literal('C'), v.literal('D')))),
     gameWinners: v.optional(v.record(v.string(), v.number())),
     dinnerOrder: v.string(),
     updatedAt: v.number(),

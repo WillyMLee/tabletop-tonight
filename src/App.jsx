@@ -36,11 +36,12 @@ import {
 } from 'lucide-react'
 import { games, getGame, tonightSlugs } from './data/games.js'
 import { activeConnections, connectionWords, connectionsRounds, wordleRounds } from './data/puzzles.js'
-import { circuitRounds, envelopeGroups, eventDetails, eventTimeline, initialRoster, jengaMatches, pointRules } from '../convex/eventConfig'
+import { circuitFourLockedAssignments, circuitFourTeamCapacities, circuitRounds, envelopeGroups, eventDetails, eventTimeline, initialRoster, jengaMatches, pointRules } from '../convex/eventConfig'
 
 const defaultPlayers = initialRoster.map(player => ({ ...player, points: 0, checkedIn: false }))
 
 const defaultPodAssignments = {}
+const defaultCircuitFourAssignments = Object.fromEntries(initialRoster.filter(player => circuitFourLockedAssignments[player.name]).map(player => [String(player.id), circuitFourLockedAssignments[player.name]]))
 
 const storedPlayerIdentity = storageKey => {
   if (typeof window === 'undefined') return null
@@ -583,7 +584,7 @@ function GameHowTo({ game, navigate }) {
   return <button className="guide-page-link" onClick={() => navigate(`/games/${game.slug}`)}><span><strong>How to play</strong><small>Open the full rules and visual play map</small></span><ArrowRight size={15} /></button>
 }
 
-function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner }) {
+function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner, disabled = false }) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
   const triggerRef = useRef(null)
@@ -614,9 +615,9 @@ function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner 
   }
 
   return <div className={`winner-selector ${open ? 'is-open' : ''} ${winner ? `has-winner ${teamInfo[winner.team].color}` : ''}`} ref={rootRef}>
-    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" onClick={() => setOpen(current => !current)}>
+    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" disabled={disabled} onClick={() => setOpen(current => !current)}>
       <Trophy size={15} />
-      <span><small>{label}</small><strong>{winner ? winner.name : 'Choose winner'}</strong>{winner && <em>{teamInfo[winner.team].name}</em>}</span>
+      <span><small>{label}</small><strong>{disabled ? 'Fill the draft first' : winner ? winner.name : 'Choose winner'}</strong>{winner && <em>{teamInfo[winner.team].name}</em>}</span>
       <ChevronDown size={15} />
     </button>
     {open && <div className="winner-picker-popover" role="listbox" aria-label={`${label} winner`}>
@@ -631,7 +632,7 @@ function WinnerSelector({ label, winnerKey, options, winnerId, recordGameWinner 
   </div>
 }
 
-function TeamWinnerSelector({ label, result, recordResult }) {
+function TeamWinnerSelector({ label, result, recordResult, disabled = false }) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef(null)
   const triggerRef = useRef(null)
@@ -662,9 +663,9 @@ function TeamWinnerSelector({ label, result, recordResult }) {
   }
 
   return <div className={`winner-selector team-winner-selector ${open ? 'is-open' : ''} ${winner ? `has-winner ${winner.color}` : ''}`} ref={rootRef}>
-    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" onClick={() => setOpen(current => !current)}>
+    <button className="winner-picker-trigger" type="button" ref={triggerRef} aria-expanded={open} aria-haspopup="listbox" disabled={disabled} onClick={() => setOpen(current => !current)}>
       <Trophy size={15} />
-      <span><small>{label}</small><strong>{winner ? winner.name : 'Choose winning team'}</strong>{winner && <em>+2 team points</em>}</span>
+      <span><small>{label}</small><strong>{disabled ? 'Fill the draft first' : winner ? winner.name : 'Choose winning team'}</strong>{winner && <em>+2 team points</em>}</span>
       <ChevronDown size={15} />
     </button>
     {open && <div className="winner-picker-popover team-winner-popover" role="listbox" aria-label={`${label} team winner`}>
@@ -765,18 +766,56 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
   )
 }
 
-function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }) {
+const championPodInfo = {
+  A: { game: 'Mario Strikers', location: 'Couch', icon: '⚽' },
+  B: { game: 'Blokus', location: 'Dinner Table #1', icon: '▦' },
+  C: { game: 'Flip 7 / Magical Athlete', location: 'Dinner Table #2', icon: '⑦' },
+  D: { game: 'Jenga', location: 'Island', icon: '▥' },
+}
+
+function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }) {
+  const assignedCount = team => players.filter(player => player.team === team && assignments[String(player.id)]).length
+  const podCount = (team, pod) => players.filter(player => player.team === team && assignments[String(player.id)] === pod).length
+
+  return <section className="champion-draft">
+    <header><div><span className="kicker">CIRCUIT 4 · TEAM CHOICE</span><h2>Draft your championship lineup</h2><p>Each team fills two Strikers, two Blokus, two Flip 7/Magical Athlete, and one Jenga seat. Four coverage picks are locked so everyone reaches every circuit game.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
+    <div className="champion-draft-grid">{Object.keys(teamInfo).map(team => {
+      const members = players.filter(player => player.team === team)
+      return <section className={`champion-team-card ${teamInfo[team].color}`} key={team}>
+        <div className="champion-team-head"><span className={`team-ghost ${teamInfo[team].color}`}><i /><i /></span><div><small>{assignedCount(team)} OF 7 PLACED</small><strong>{teamInfo[team].name}</strong></div></div>
+        <div className="champion-player-list">{members.map(player => {
+          const pod = assignments[String(player.id)] || ''
+          const lockedPod = circuitFourLockedAssignments[player.name]
+          return <label className={lockedPod ? 'coverage-lock' : ''} key={player.id}>
+            <Avatar name={player.name} team={player.team} size="sm" />
+            <span><strong>{player.name}</strong><small>{lockedPod ? `COVERAGE LOCK · ${championPodInfo[lockedPod].game}` : pod ? championPodInfo[pod].location : 'TEAM PICKS THIS SEAT'}</small></span>
+            <select value={pod} disabled={Boolean(lockedPod)} aria-label={`Circuit 4 game for ${player.name}`} onChange={event => setCircuitFourAssignment(player.id, event.target.value)}>
+              <option value="">{pod ? 'Unassigned' : 'Choose game'}</option>
+              {Object.entries(championPodInfo).map(([optionPod, info]) => <option value={optionPod} disabled={optionPod !== pod && podCount(team, optionPod) >= circuitFourTeamCapacities[optionPod]} key={optionPod}>{info.game}</option>)}
+            </select>
+          </label>
+        })}</div>
+      </section>
+    })}</div>
+    <div className="draft-capacity-strip">{Object.entries(championPodInfo).map(([pod, info]) => <span key={pod}><b>{info.icon}</b><strong>{info.game}</strong><small>{circuitFourTeamCapacities[pod]} per team</small></span>)}</div>
+  </section>
+}
+
+function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, circuitFourAssignments, setCircuitFourAssignment, navigate }) {
   const [selectedRound, setSelectedRound] = useState(0)
   const round = circuitRounds[selectedRound]
   const rosterByName = new Map(players.map(player => [player.name, player]))
+  const isChampionRound = selectedRound === 3
+  const lockedAssignments = Object.fromEntries(players.filter(player => circuitFourLockedAssignments[player.name]).map(player => [String(player.id), circuitFourLockedAssignments[player.name]]))
+  const effectiveChampionAssignments = { ...(circuitFourAssignments || {}), ...lockedAssignments }
 
   return (
     <main className="phase-page circuit-page">
       <section className="phase-page-hero circuit-hero">
         <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Choose a round, send everyone to the listed station, then record the winning player or team. Strikers scores the team only; the tabletop games score both.</p>
-        <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>3</strong> stations</span><span><strong>20</strong> min each</span></div>
+        <p>Rounds 1–3 maximize game coverage and new opponents. Round 4 is a team-selected championship lineup with Jenga added at the Island.</p>
+        <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>{round.stations.length}</strong> stations now</span><span><strong>20</strong> min each</span></div>
       </section>
 
       <nav className="circuit-round-picker" aria-label="Circuit rounds">
@@ -788,23 +827,29 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
         <span className="circuit-switch-note">5-minute switch after this round{selectedRound === 3 ? ': no switch needed' : ''}</span>
       </section>
 
-      <section className="exact-station-grid">
+      {isChampionRound && <CircuitChampionDraft players={players} assignments={effectiveChampionAssignments} setCircuitFourAssignment={setCircuitFourAssignment} />}
+
+      <section className={`exact-station-grid ${isChampionRound ? 'is-champion-round' : ''}`}>
         {round.stations.map(station => {
           const isStrikers = station.slug === 'mario-strikers-gc'
           const isTableChoice = station.slug === 'flip-7'
+          const isJenga = station.slug === 'jenga'
           const activeSlug = isTableChoice ? (circuitGameChoices[String(selectedRound + 1)] || 'flip-7') : station.slug
           const winnerKey = isTableChoice ? `table-choice:circuit-${selectedRound + 1}` : `${activeSlug}:circuit-${selectedRound + 1}`
           const teamResultKey = `${selectedRound + 4}:${activeSlug}`
           const game = getGame(activeSlug)
-          const stationPlayers = station.players.map(name => rosterByName.get(name)).filter(Boolean)
+          const stationNames = isChampionRound ? players.filter(player => effectiveChampionAssignments[String(player.id)] === station.pod).map(player => player.name) : station.players
+          const stationPlayers = stationNames.map(name => rosterByName.get(name)).filter(Boolean)
+          const stationCapacity = station.capacity || stationNames.length
+          const stationReady = !isChampionRound || stationPlayers.length === stationCapacity
           return <article className="simple-station-card" key={`${selectedRound}-${station.location}`}>
-            <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{game.name}</h2></div><span className="pod-badge">{station.players.length} PLAYERS</span></header>
+            <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{game.name}</h2></div><span className={`pod-badge ${stationReady ? '' : 'needs-draft'}`}>{isChampionRound ? `${stationPlayers.length}/${stationCapacity}` : stationPlayers.length} PLAYERS</span></header>
             {isTableChoice && <div className="table-game-switch" role="group" aria-label={`Dinner Table #2 game for ${round.label}`}><span>PLAY THIS ROUND</span><div>{['flip-7', 'magical-athlete'].map(slug => { const option = getGame(slug); return <button type="button" className={activeSlug === slug ? 'active' : ''} aria-pressed={activeSlug === slug} onClick={() => setCircuitGameChoice(selectedRound + 1, slug)} key={slug}><span>{option.icon}</span><strong>{option.name}</strong></button> })}</div></div>}
-            <div className="exact-player-list">{station.players.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} team={player?.team} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}</div>
+            <div className="exact-player-list">{stationNames.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} team={player?.team} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}{isChampionRound && Array.from({ length: Math.max(0, stationCapacity - stationPlayers.length) }, (_, index) => <div className="open-champion-slot" key={`open-${index}`}><span>+</span><strong>Open champion slot</strong><i>DRAFT</i></div>)}</div>
             <div className="station-guide-links"><button onClick={() => navigate(`/games/${activeSlug}`)}><span>{game.icon}</span><div><strong>{game.name} how-to</strong><small>Rules · play map{isStrikers ? ' · controls' : ''}</small></div><ArrowRight size={14} /></button></div>
             {isStrikers
-              ? <div className="station-score team-only-score"><small>TEAM WINNER · +2 TEAM · NO INDIVIDUAL POINTS</small><TeamWinnerSelector label={`${round.label} team winner`} result={circuitResults[teamResultKey]} recordResult={result => recordCircuitResult(selectedRound + 4, activeSlug, result)} /><p>Choose the winning house team. No individual player score changes for Strikers.</p></div>
-              : <div className="station-score"><small>WINNER · +2 INDIVIDUAL · +2 TEAM</small><WinnerSelector label={`${round.label} winner`} winnerKey={winnerKey} options={stationPlayers} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /><p>The player and their team are scored together as soon as you select them.</p></div>}
+              ? <div className="station-score team-only-score"><small>TEAM WINNER · +2 TEAM · NO INDIVIDUAL POINTS</small><TeamWinnerSelector disabled={!stationReady} label={`${round.label} team winner`} result={circuitResults[teamResultKey]} recordResult={result => recordCircuitResult(selectedRound + 4, activeSlug, result)} /><p>Choose the winning house team. No individual player score changes for Strikers.</p></div>
+              : <div className="station-score"><small>WINNER · +{isJenga ? 1 : 2} INDIVIDUAL · +{isJenga ? 1 : 2} TEAM</small><WinnerSelector disabled={!stationReady} label={`${round.label} winner`} winnerKey={winnerKey} options={stationPlayers} winnerId={gameWinners[winnerKey]} recordGameWinner={recordGameWinner} /><p>{isJenga ? 'The champion and their team each earn one point.' : 'The player and their team are scored together as soon as you select them.'}</p></div>}
           </article>
         })}
       </section>
@@ -1237,12 +1282,12 @@ function HostPlan({ navigate }) {
       <span className="eyebrow">HOST / SCOREKEEPER · JESSA</span>
       <h1>Game Night Run Sheet</h1>
       <p>{eventDetails.date} · {eventDetails.playerCount} players · three hours and fifty minutes from arrival to final prizes.</p>
-      <div className="phase-summary"><span><strong>$70</strong> prize cash</span><span><strong>38</strong> envelopes</span><span><strong>2</strong> scoreboards</span></div>
+      <div className="phase-summary"><span><strong>$71</strong> prize cash</span><span><strong>39</strong> envelopes</span><span><strong>2</strong> scoreboards</span></div>
     </section>
 
     <section className="host-plan-section cash-plan-section">
       <div className="host-plan-heading"><span>01</span><div><small>BEFORE GUESTS ARRIVE</small><h2>Cash and envelopes</h2></div></div>
-      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$70</strong><p>30 one-dollar bills<br />8 five-dollar bills</p></article><article><small>PREPARE</small><strong>38</strong><p>30 red envelopes with $1<br />8 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
+      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$71</strong><p>31 one-dollar bills<br />8 five-dollar bills</p></article><article><small>PREPARE</small><strong>39</strong><p>31 red envelopes with $1<br />8 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
       <div className="envelope-groups">{envelopeGroups.map(group => <details key={group.title}><summary><span>{group.title}</span><small>{group.labels.length} labels · {group.amount}</small></summary><ol>{group.labels.map(label => <li key={label}>{label}</li>)}</ol></details>)}</div>
     </section>
 
@@ -1550,6 +1595,7 @@ function LocalApp() {
   const [podAssignments, setPodAssignments] = useStoredState('tabletop-pod-assignments', defaultPodAssignments)
   const [circuitResults, setCircuitResults] = useStoredState('tabletop-v2-circuit-results', {})
   const [circuitGameChoices, setCircuitGameChoices] = useStoredState('tabletop-v1-circuit-game-choices', {})
+  const [circuitFourAssignments, setCircuitFourAssignments] = useStoredState('tabletop-v1-circuit-four-assignments', defaultCircuitFourAssignments)
   const [gameWinners, setGameWinners] = useStoredState('tabletop-v1-game-winners', {})
   const [dinnerOrder, setDinnerOrder] = useStoredState('tabletop-dinner-order', '')
   const [puzzleResults, setPuzzleResults] = useStoredState('tabletop-v1-puzzle-results', [])
@@ -1596,6 +1642,12 @@ function LocalApp() {
     setScores(previous => ({ meeple: Math.max(0, previous.meeple + delta.meeple), mayhem: Math.max(0, previous.mayhem + delta.mayhem) }))
   }
   const setCircuitGameChoice = (round, choice) => setCircuitGameChoices(previous => ({ ...previous, [String(round)]: choice }))
+  const setCircuitFourAssignment = (playerId, pod) => setCircuitFourAssignments(previous => {
+    const next = { ...defaultCircuitFourAssignments, ...previous }
+    if (pod) next[String(playerId)] = pod
+    else delete next[String(playerId)]
+    return next
+  })
   const recordGameWinner = (winnerKey, playerId) => {
     const slug = winnerKey.slice(0, winnerKey.indexOf(':'))
     const points = gamePointValues[slug]
@@ -1634,7 +1686,7 @@ function LocalApp() {
     }
   }
   const checkedIn = useMemo(() => players.filter(p => p.checkedIn).length, [players])
-  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setCircuitGameChoices({}); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
+  const resetDemo = () => { setPlayers(defaultPlayers); setScores({ meeple: 0, mayhem: 0 }); setPhaseScores({}); setIndividualPhaseScores({}); setPodAssignments(defaultPodAssignments); setCircuitResults({}); setCircuitGameChoices({}); setCircuitFourAssignments(defaultCircuitFourAssignments); setGameWinners({}); setDinnerOrder(''); setPuzzleResults([]); setCurrentEvent(0) }
   const addPlayer = name => {
     const team = players.filter(player => player.team === 'meeple').length <= players.filter(player => player.team === 'mayhem').length ? 'meeple' : 'mayhem'
     const id = Math.max(0, ...players.map(player => player.id)) + 1
@@ -1679,7 +1731,7 @@ function LocalApp() {
     recordGameWinner(puzzleWinnerKey(game, puzzleId), winner?.playerId)
   }
 
-  return <GameNightShell syncMode="local" hostAccess={{ status: 'unavailable', unlock: () => {} }} state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode="local" hostAccess={{ status: 'unavailable', unlock: () => {} }} state={{ scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices, circuitFourAssignments, gameWinners, dinnerOrder, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, setCircuitFourAssignment, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function RealtimeApp() {
@@ -1722,6 +1774,15 @@ function RealtimeApp() {
     const current = store.getQuery(api.sharedState.get, { eventKey: args.eventKey })
     if (current) store.setQuery(api.sharedState.get, { eventKey: args.eventKey }, { ...current, circuitGameChoices: { ...(current.circuitGameChoices || {}), [String(args.round)]: args.choice } })
   })
+  const setCircuitFourAssignmentMutation = useMutation(api.sharedState.setCircuitFourAssignment).withOptimisticUpdate((store, args) => {
+    const current = store.getQuery(api.sharedState.get, { eventKey: args.eventKey })
+    if (current) {
+      const assignments = { ...defaultCircuitFourAssignments, ...(current.circuitFourAssignments || {}) }
+      if (args.pod) assignments[String(args.playerId)] = args.pod
+      else delete assignments[String(args.playerId)]
+      store.setQuery(api.sharedState.get, { eventKey: args.eventKey }, { ...current, circuitFourAssignments: assignments })
+    }
+  })
   const recordGameWinnerMutation = useMutation(api.sharedState.recordGameWinner)
   const resetPuzzleRoundMutation = useMutation(api.sharedState.resetPuzzleRound)
   const addPlayerMutation = useMutation(api.sharedState.addPlayer)
@@ -1762,6 +1823,7 @@ function RealtimeApp() {
   }
   const recordCircuitResult = (phase, slug, result) => commit(recordCircuitResultMutation({ eventKey, phase, slug, result: result || undefined }))
   const setCircuitGameChoice = (round, choice) => commit(setCircuitGameChoiceMutation({ eventKey, round, choice }))
+  const setCircuitFourAssignment = (playerId, pod) => commit(setCircuitFourAssignmentMutation({ eventKey, playerId, pod: pod || undefined }))
   const recordGameWinner = (winnerKey, playerId) => commit(recordGameWinnerMutation({ eventKey, winnerKey, playerId }))
   const resetPuzzleRound = async (game, puzzleId) => {
     setSyncError('')
@@ -1820,13 +1882,13 @@ function RealtimeApp() {
   }
   const hostAccess = { status: !hostPin ? 'locked' : hostVerified === undefined ? 'checking' : hostVerified ? 'unlocked' : 'denied', unlock: unlockHost }
 
-  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} hostAccess={hostAccess} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
+  return <GameNightShell syncMode={connectionState.isWebSocketConnected ? 'realtime' : 'connecting'} syncError={syncError} hostAccess={hostAccess} state={{ ...state, circuitGameChoices: state.circuitGameChoices || {}, circuitFourAssignments: state.circuitFourAssignments || defaultCircuitFourAssignments, gameWinners: state.gameWinners || {}, puzzleResults }} actions={{ changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, setCircuitFourAssignment, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo }} checkedIn={checkedIn} guestPlayerIdentity={guestPlayerIdentity} />
 }
 
 function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAccess, syncMode, syncError = '' }) {
   const { path, navigate } = useRouter()
-  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices = {}, gameWinners = {}, dinnerOrder, puzzleResults } = state
-  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
+  const { scores, players, currentEvent, phaseScores, individualPhaseScores, podAssignments, circuitResults, circuitGameChoices = {}, circuitFourAssignments = defaultCircuitFourAssignments, gameWinners = {}, dinnerOrder, puzzleResults } = state
+  const { changeScore, changePlayerScore, setCurrentEvent, setDinnerOrder, changePhaseScore, changeIndividualPhaseScore, changePlayerTeam, movePlayerToPod, randomizePods, recordCircuitResult, setCircuitGameChoice, setCircuitFourAssignment, recordGameWinner, resetPuzzleRound, addPlayer, joinPlayer, submitPuzzleResult, shuffleTeams, toggleCheckIn, movePlayerTeam, removePlayer, releasePlayer, resetDemo } = actions
   const gameSlug = path.startsWith('/games/') ? decodeURIComponent(path.slice('/games/'.length)) : null
   const playMode = path.startsWith('/play/') ? path.slice('/play/'.length) : null
 
@@ -1840,7 +1902,7 @@ function GameNightShell({ state, actions, checkedIn, guestPlayerIdentity, hostAc
       {syncError && <div className="sync-error" role="status">Live sync issue: {syncError}</div>}
       {path === '/' && <Tonight {...{ players, guestPlayerIdentity, joinPlayer, releasePlayer }} />}
       {(path === '/group-games' || path === '/games' || path === '/run-of-show' || path === '/lineup') && <GroupGames {...{ navigate, players, gameWinners, recordGameWinner, puzzleResults, guestPlayerIdentity, resetPuzzleRound }} />}
-      {path === '/circuit' && <Circuit {...{ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, navigate }} />}
+      {path === '/circuit' && <Circuit {...{ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, circuitFourAssignments, setCircuitFourAssignment, navigate }} />}
       {gameSlug && <GameDetail game={getGame(gameSlug)} navigate={navigate} />}
       {path === '/scores' && <Scoreboard {...{ scores, changeScore, players, changePlayerScore, navigate }} isHost={hostAccess.status === 'unlocked'} />}
       {path === '/host' && (hostAccess.status === 'unlocked' ? <HostPlan navigate={navigate} /> : <HostGate hostAccess={hostAccess} navigate={navigate} />)}

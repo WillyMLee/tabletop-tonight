@@ -36,36 +36,46 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Julie', 'Young', 'Janice'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Melissa', 'Annhien', 'Willy', 'Andrew'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Thomas', 'Valeria', 'Rebekah', 'Brendan', 'Joanna', 'Omar'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Melissa', 'Omar', 'Willy'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Thomas', 'Young', 'Brendan'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Valeria', 'Annhien', 'Rebekah', 'Joanna', 'Andrew', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Rebekah', 'Willy', 'Joanna'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Melissa', 'Valeria', 'Brendan', 'Young'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Julie', 'Thomas', 'Annhien', 'Omar', 'Andrew', 'Janice'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Young', 'Joanna'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Rebekah', 'Omar', 'Andrew'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Thomas', 'Annhien', 'Willy', 'Brendan', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Thomas', 'Willy', 'Omar'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Rebekah', 'Brendan', 'Janice'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Valeria', 'Annhien', 'Joanna', 'Andrew', 'Young'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Rebekah', 'Andrew', 'Brendan'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Melissa', 'Valeria', 'Willy', 'Joanna'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Julie', 'Annhien', 'Omar', 'Young', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 4', time: '9:15–9:35 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Valeria', 'Annhien', 'Brendan', 'Andrew'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Thomas', 'Joanna', 'Omar'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Julie', 'Rebekah', 'Willy', 'Young', 'Janice'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', pod: 'A' as const, capacity: 4, players: [] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', pod: 'B' as const, capacity: 4, players: [] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', pod: 'C' as const, capacity: 4, players: [] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', pod: 'D' as const, capacity: 2, players: [] },
     ],
   },
 ]
+
+export const circuitFourLockedAssignments = {
+  Rebekah: 'A',
+  Brendan: 'A',
+  Annhien: 'B',
+  Janice: 'B',
+} as const
+
+export const circuitFourTeamCapacities = { A: 2, B: 2, C: 2, D: 1 } as const
 
 export const eventTimeline = [
   { time: '6:00–6:15', activity: 'Arrival and setup', detail: 'Claim your pre-listed name, find your team, and get settled.' },
@@ -88,6 +98,6 @@ export const pointRules = [
 
 export const envelopeGroups = [
   { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`)] },
-  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
+  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2', ...(index === 3 ? ['Jenga'] : [])].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
   { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 7 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]
