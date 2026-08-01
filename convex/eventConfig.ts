@@ -36,25 +36,28 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Valeria', 'Omar', 'Janice'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Thomas', 'Willy', 'Young'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Annhien', 'Rebekah', 'Brendan', 'Joanna', 'Andrew'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Rebekah', 'Brendan', 'Joanna'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Omar', 'Andrew'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Willy', 'Young'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Annhien', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Melissa', 'Annhien', 'Joanna', 'Young'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Rebekah', 'Omar', 'Andrew'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Valeria', 'Willy', 'Brendan', 'Janice'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Annhien', 'Andrew', 'Young'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Thomas', 'Rebekah', 'Willy', 'Brendan'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Melissa', 'Julie', 'Omar', 'Janice'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Valeria', 'Joanna'] },
     ],
   },
   {
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Rebekah', 'Brendan', 'Andrew'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Valeria', 'Annhien', 'Joanna', 'Janice'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Melissa', 'Julie', 'Willy', 'Omar', 'Young'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Valeria', 'Willy', 'Omar'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Melissa', 'Young', 'Janice'] },
+      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Annhien', 'Rebekah', 'Joanna', 'Andrew'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Julie', 'Brendan'] },
     ],
   },
   {
@@ -68,12 +71,7 @@ export const circuitRounds = [
   },
 ]
 
-export const circuitFourLockedAssignments = {
-  'Don Robert': 'A',
-  Willy: 'A',
-  Melissa: 'B',
-  Brendan: 'B',
-} as const
+export const circuitFourLockedAssignments = {} as const
 
 export const circuitFourTeamCapacities = { A: 2, B: 2, C: 2, D: 1 } as const
 
@@ -98,6 +96,6 @@ export const pointRules = [
 
 export const envelopeGroups = [
   { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...Array.from({ length: 7 }, (_, index) => `Jenga — Match ${index + 1} Winner`)] },
-  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2', ...(index === 3 ? ['Jenga'] : [])].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
+  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2', 'Jenga'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
   { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 7 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]

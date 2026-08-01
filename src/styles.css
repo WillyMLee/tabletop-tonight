@@ -1300,7 +1300,7 @@ footer { background: #03030f; border-top: 1px solid #2448ff; }
 .circuit-reset-note strong { color: white; font-size: 11px; }
 .circuit-reset-note p { color: #9ca8d5; font-size: 9px; margin: 2px 0 0; }
 .circuit-switch-note { color: #aab5dc; font-size: 9px; }
-.exact-station-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.exact-station-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
 .exact-station-grid.is-champion-round { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .exact-player-list { display: grid; gap: 6px; }
 .exact-player-list > div { background: #0f133e; border: 1px solid #1c2d91; border-left: 3px solid #ff3b6b; border-radius: 6px; display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px; }

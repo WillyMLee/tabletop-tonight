@@ -778,7 +778,7 @@ function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }
   const podCount = (team, pod) => players.filter(player => player.team === team && assignments[String(player.id)] === pod).length
 
   return <section className="champion-draft">
-    <header><div><span className="kicker">CIRCUIT 4 · TEAM CHOICE</span><h2>Draft your championship lineup</h2><p>Each team fills two Strikers, two Blokus, two Flip 7/Magical Athlete, and one Jenga seat. Four coverage picks are locked so everyone reaches every circuit game.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
+    <header><div><span className="kicker">CIRCUIT 4 · TEAM CHOICE</span><h2>Draft your championship lineup</h2><p>Everyone already played three different circuit games. Each team now chooses two Strikers, two Blokus, two Flip 7/Magical Athlete, and one Jenga champion for the final round.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
     <div className="champion-draft-grid">{Object.keys(teamInfo).map(team => {
       const members = players.filter(player => player.team === team)
       return <section className={`champion-team-card ${teamInfo[team].color}`} key={team}>
@@ -814,7 +814,7 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
       <section className="phase-page-hero circuit-hero">
         <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Rounds 1–3 maximize game coverage and new opponents. Round 4 is a team-selected championship lineup with Jenga added at the Island.</p>
+        <p>Rounds 1–3 use all four stations, so every player gets three different games with no forced repeats. Round 4 is a team-selected championship lineup.</p>
         <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>{round.stations.length}</strong> stations now</span><span><strong>20</strong> min each</span></div>
       </section>
 
@@ -1282,12 +1282,12 @@ function HostPlan({ navigate }) {
       <span className="eyebrow">HOST / SCOREKEEPER · JESSA</span>
       <h1>Game Night Run Sheet</h1>
       <p>{eventDetails.date} · {eventDetails.playerCount} players · three hours and fifty minutes from arrival to final prizes.</p>
-      <div className="phase-summary"><span><strong>$71</strong> prize cash</span><span><strong>39</strong> envelopes</span><span><strong>2</strong> scoreboards</span></div>
+      <div className="phase-summary"><span><strong>$74</strong> prize cash</span><span><strong>42</strong> envelopes</span><span><strong>2</strong> scoreboards</span></div>
     </section>
 
     <section className="host-plan-section cash-plan-section">
       <div className="host-plan-heading"><span>01</span><div><small>BEFORE GUESTS ARRIVE</small><h2>Cash and envelopes</h2></div></div>
-      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$71</strong><p>31 one-dollar bills<br />8 five-dollar bills</p></article><article><small>PREPARE</small><strong>39</strong><p>31 red envelopes with $1<br />8 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
+      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$74</strong><p>34 one-dollar bills<br />8 five-dollar bills</p></article><article><small>PREPARE</small><strong>42</strong><p>34 red envelopes with $1<br />8 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
       <div className="envelope-groups">{envelopeGroups.map(group => <details key={group.title}><summary><span>{group.title}</span><small>{group.labels.length} labels · {group.amount}</small></summary><ol>{group.labels.map(label => <li key={label}>{label}</li>)}</ol></details>)}</div>
     </section>
 
