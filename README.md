@@ -14,7 +14,7 @@ Game nights usually split information across a group chat, a notes app, handwrit
 
 - **Start** — claim one pre-listed roster name, see the locked teams, and release mistaken claims.
 - **Group Games** — run GeoGuessr, Wordle, Connections, and six four-minute Jenga matches in a clear order.
-- **Circuit** — show exact Blokus and Mario Strikers assignments plus a live Flip 7 / Magical Athlete choice for four rounds.
+- **Circuit** — show exact four-player Mario Strikers, Blokus, and Jenga assignments across four optimized rounds.
 - **Scores** — separate the team championship from individual standings.
 
 The interface uses progressive disclosure: guests see the next action first, while visual rules and scoring details stay collapsed until needed.
@@ -30,7 +30,7 @@ The interface uses progressive disclosure: guests see the next action first, whi
 - Claim-protected Willy controls for resetting one Wordle or Connections round without disturbing other scores or check-ins
 - Five Wordle rounds with dictionary validation, keyboard feedback, DNF tracking, and solution reveals
 - Three original New York-themed Connections rounds with live solve-time leaderboards
-- Responsive, diagram-based game guides for every scheduled activity, including Flip 7 special-card rules
+- Responsive, diagram-based game guides for every scheduled activity, including four-player Jenga rules
 - Optimistic score updates for immediate feedback
 - Cloudflare Workers Static Assets deployment with SPA fallback and security headers
 - Browser-local fallback when Convex is not configured

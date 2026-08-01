@@ -99,7 +99,7 @@ const itinerary = [
   { time: '6:00', period: 'PM', title: 'Players ready up', detail: 'Snacks, check-in, teams, and ghost colors.', duration: '20 min', type: 'welcome', icon: '●' },
   { time: '6:20', period: 'PM', title: 'Welcome + quick intro', detail: 'Finish the 30-minute welcome block with teams, scoring, and the four-station circuit.', duration: '10 min', type: 'welcome', icon: '◌' },
   { time: '6:30', period: 'PM', title: 'Group game session', detail: 'GeoGuessr, Wordle, then Connections. Each player records their own result.', duration: '50 min', points: 'Individual results', type: 'group', icon: '◎' },
-  { time: '7:20', period: 'PM', title: 'Quick dinner', detail: 'Eat what was ordered while the host finishes resetting the four stations.', duration: '10 min', type: 'break', icon: '☕' },
+  { time: '7:20', period: 'PM', title: 'Quick dinner', detail: 'Eat what was ordered while the host finishes resetting the three stations.', duration: '10 min', type: 'break', icon: '☕' },
   { time: '7:30', period: 'PM', title: 'Circuit 1 · Starting stations', detail: 'Shuffle once and send every pod to its first location.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅰ' },
   { time: '7:50', period: 'PM', title: 'Circuit 2 · Rotate', detail: 'Keep the same pod and move clockwise to the next station.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅱ' },
   { time: '8:10', period: 'PM', title: 'Circuit 3 · Rotate', detail: 'Move clockwise again; everyone reaches a third game.', duration: '20 min', points: '40 pts', type: 'circuit', icon: 'Ⅲ' },
@@ -769,7 +769,6 @@ function GroupGames({ navigate, players, gameWinners, recordGameWinner, puzzleRe
 const championPodInfo = {
   A: { game: 'Mario Strikers', location: 'Couch', icon: '⚽' },
   B: { game: 'Blokus', location: 'Dinner Table #1', icon: '▦' },
-  C: { game: 'Flip 7 / Magical Athlete', location: 'Dinner Table #2', icon: '⑦' },
   D: { game: 'Jenga', location: 'Island', icon: '▥' },
 }
 
@@ -778,7 +777,7 @@ function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }
   const podCount = (team, pod) => players.filter(player => player.team === team && assignments[String(player.id)] === pod).length
 
   return <section className="champion-draft">
-    <header><div><span className="kicker">CIRCUIT 4 · OPTIMIZED TEAM CHOICE</span><h2>Review your championship lineup</h2><p>The maximum-diversity lineup is prefilled: rounds 1–3 give everyone a new game, and eight players complete all four. Teams may still adjust the final selections.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
+    <header><div><span className="kicker">CIRCUIT 4 · OPTIMIZED TEAM CHOICE</span><h2>Review your championship lineup</h2><p>Everyone plays all three games in rounds 1–3. This diverse repeat lineup is prefilled, and teams may still adjust the final selections.</p></div><span className="draft-sync"><span className="live-dot" /> Choices sync live</span></header>
     <div className="champion-draft-grid">{Object.keys(teamInfo).map(team => {
       const members = players.filter(player => player.team === team)
       return <section className={`champion-team-card ${teamInfo[team].color}`} key={team}>
@@ -801,7 +800,7 @@ function CircuitChampionDraft({ players, assignments, setCircuitFourAssignment }
   </section>
 }
 
-function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitGameChoices, setCircuitGameChoice, circuitFourAssignments, setCircuitFourAssignment, navigate }) {
+function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recordCircuitResult, circuitFourAssignments, setCircuitFourAssignment, navigate }) {
   const [selectedRound, setSelectedRound] = useState(0)
   const round = circuitRounds[selectedRound]
   const rosterByName = new Map(players.map(player => [player.name, player]))
@@ -814,7 +813,7 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
       <section className="phase-page-hero circuit-hero">
         <span className="eyebrow">8:00–9:35 PM · FOUR ROUNDS</span>
         <h1>Competition Circuit</h1>
-        <p>Rounds 1–3 give every player a different game and maximize new opponents. Round 4 starts with an optimized lineup that teams can adjust.</p>
+        <p>Rounds 1–3 give every player all three games. Across the four rounds, everyone meets every opposing-team player at least once.</p>
         <div className="phase-summary"><span><strong>4</strong> rounds</span><span><strong>{round.stations.length}</strong> stations now</span><span><strong>20</strong> min each</span></div>
       </section>
 
@@ -832,10 +831,9 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
       <section className={`exact-station-grid ${isChampionRound ? 'is-champion-round' : ''}`}>
         {round.stations.map(station => {
           const isStrikers = station.slug === 'mario-strikers-gc'
-          const isTableChoice = station.slug === 'flip-7'
           const isJenga = station.slug === 'jenga'
-          const activeSlug = isTableChoice ? (circuitGameChoices[String(selectedRound + 1)] || 'flip-7') : station.slug
-          const winnerKey = isTableChoice ? `table-choice:circuit-${selectedRound + 1}` : `${activeSlug}:circuit-${selectedRound + 1}`
+          const activeSlug = station.slug
+          const winnerKey = `${activeSlug}:circuit-${selectedRound + 1}`
           const teamResultKey = `${selectedRound + 4}:${activeSlug}`
           const game = getGame(activeSlug)
           const stationNames = isChampionRound ? players.filter(player => effectiveChampionAssignments[String(player.id)] === station.pod).map(player => player.name) : station.players
@@ -844,7 +842,6 @@ function Circuit({ players, gameWinners, recordGameWinner, circuitResults, recor
           const stationReady = !isChampionRound || stationPlayers.length === stationCapacity
           return <article className="simple-station-card" key={`${selectedRound}-${station.location}`}>
             <header><span className="station-icon">{game.icon}</span><div><small>{station.location}</small><h2>{game.name}</h2></div><span className={`pod-badge ${stationReady ? '' : 'needs-draft'}`}>{isChampionRound ? `${stationPlayers.length}/${stationCapacity}` : stationPlayers.length} PLAYERS</span></header>
-            {isTableChoice && <div className="table-game-switch" role="group" aria-label={`Dinner Table #2 game for ${round.label}`}><span>PLAY THIS ROUND</span><div>{['flip-7', 'magical-athlete'].map(slug => { const option = getGame(slug); return <button type="button" className={activeSlug === slug ? 'active' : ''} aria-pressed={activeSlug === slug} onClick={() => setCircuitGameChoice(selectedRound + 1, slug)} key={slug}><span>{option.icon}</span><strong>{option.name}</strong></button> })}</div></div>}
             <div className="exact-player-list">{stationNames.map(name => { const player = rosterByName.get(name); return <div className={player?.team === 'meeple' ? 'jessa-player' : 'willy-player'} key={name}><Avatar name={name} team={player?.team} size="sm" /><span><strong>{name}</strong><small>{player ? teamInfo[player.team].name : ''}</small></span><i>{player?.checkedIn ? 'READY' : 'ROSTER'}</i></div> })}{isChampionRound && Array.from({ length: Math.max(0, stationCapacity - stationPlayers.length) }, (_, index) => <div className="open-champion-slot" key={`open-${index}`}><span>+</span><strong>Open champion slot</strong><i>DRAFT</i></div>)}</div>
             <div className="station-guide-links"><button onClick={() => navigate(`/games/${activeSlug}`)}><span>{game.icon}</span><div><strong>{game.name} how-to</strong><small>Rules · play map{isStrikers ? ' · controls' : ''}</small></div><ArrowRight size={14} /></button></div>
             {isStrikers
@@ -862,8 +859,7 @@ function GameLibrary({ navigate }) {
   const teamLocations = [
     { location: 'Couch', note: '2v2 GameCube soccer', games: ['mario-strikers-gc'] },
     { location: 'Dinner Table #1', note: 'Four-player strategy', games: ['blokus'] },
-    { location: 'Dinner Table #2', note: 'Choose one tabletop game', games: ['flip-7', 'magical-athlete'] },
-    { location: 'Island', note: 'Dexterity station', games: ['jenga'] },
+    { location: 'Island', note: 'Four-player dexterity', games: ['jenga'] },
   ]
   const GameCard = ({ game, compact = false }) => <article className={`library-game-card card ${game.color} ${compact ? 'compact' : ''}`}>
     <div className="library-card-top"><span>{game.icon}</span><em>{game.status}</em></div>
@@ -876,7 +872,7 @@ function GameLibrary({ navigate }) {
       <section className="page-intro games-intro">
         <span className="eyebrow">TONIGHT'S GAME MAP</span>
         <h1>Play together. Then <em>hit the circuit.</em></h1>
-        <p>Group games keep all fourteen players together. Team games are organized by the four places you will rotate through later.</p>
+        <p>Group games bring everyone together. Circuit games are organized into three four-player stations.</p>
       </section>
       <section className="puzzle-launch-panel">
         <div><span className="kicker">READY ON YOUR PHONE</span><h2>Jump into the puzzle arcade</h2><p>Choose a round, submit your run, and see the live individual leaderboard.</p></div>
@@ -1154,7 +1150,7 @@ function Schedule({ currentEvent, setCurrentEvent, players, navigate }) {
       <section className="page-intro">
         <span className="eyebrow">THE GAME PLAN</span>
         <h1>A full night, <em>zero benchwarmers.</em></h1>
-        <p>The core schedule keeps all 12 players active. Each round uses two four-player stations and two head-to-head stations.</p>
+        <p>The core schedule keeps all 12 players active across three four-player stations.</p>
       </section>
 
       <section className="schedule-layout">
@@ -1287,7 +1283,7 @@ function HostPlan({ navigate }) {
 
     <section className="host-plan-section cash-plan-section">
       <div className="host-plan-heading"><span>01</span><div><small>BEFORE GUESTS ARRIVE</small><h2>Cash and envelopes</h2></div></div>
-      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$68</strong><p>33 one-dollar bills<br />7 five-dollar bills</p></article><article><small>PREPARE</small><strong>40</strong><p>33 red envelopes with $1<br />7 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
+      <div className="cash-plan-grid"><article><small>WITHDRAW</small><strong>$64</strong><p>29 one-dollar bills<br />7 five-dollar bills</p></article><article><small>PREPARE</small><strong>36</strong><p>29 red envelopes with $1<br />7 red envelopes with $5</p></article><article><small>LABEL RULE</small><strong>Front only</strong><p>Do not write amounts. Put a tiny private dot or number on the back if useful.</p></article></div>
       <div className="envelope-groups">{envelopeGroups.map(group => <details key={group.title}><summary><span>{group.title}</span><small>{group.labels.length} labels · {group.amount}</small></summary><ol>{group.labels.map(label => <li key={label}>{label}</li>)}</ol></details>)}</div>
     </section>
 

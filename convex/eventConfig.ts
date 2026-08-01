@@ -33,37 +33,33 @@ export const circuitRounds = [
   {
     label: 'Circuit 1', time: '8:00–8:20 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Thomas', 'Willy', 'Brendan'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Julie', 'Valeria', 'Andrew', 'Joanna'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Annhien', 'Janice'] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Rebekah', 'Young'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Don Robert', 'Julie', 'Willy', 'Brendan'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Thomas', 'Valeria', 'Joanna', 'Andrew'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Annhien', 'Rebekah', 'Young', 'Janice'] },
     ],
   },
   {
     label: 'Circuit 2', time: '8:25–8:45 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Julie', 'Young'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Annhien', 'Rebekah', 'Willy', 'Janice'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Don Robert', 'Thomas', 'Andrew', 'Joanna'] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Valeria', 'Brendan'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Annhien', 'Rebekah', 'Joanna', 'Andrew'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Julie', 'Young', 'Janice'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Thomas', 'Valeria', 'Willy', 'Brendan'] },
     ],
   },
   {
     label: 'Circuit 3', time: '8:50–9:10 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Annhien', 'Rebekah', 'Andrew', 'Joanna'] },
-      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Don Robert', 'Brendan'] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', players: ['Julie', 'Valeria', 'Willy', 'Young'] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Thomas', 'Janice'] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', players: ['Thomas', 'Valeria', 'Young', 'Janice'] },
+      { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', players: ['Annhien', 'Rebekah', 'Willy', 'Brendan'] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', players: ['Don Robert', 'Julie', 'Joanna', 'Andrew'] },
     ],
   },
   {
     label: 'Circuit 4', time: '9:15–9:35 PM',
     stations: [
-      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', pod: 'A' as const, capacity: 2, players: [] },
+      { slug: 'mario-strikers-gc', name: 'Mario Strikers', location: 'Couch', pod: 'A' as const, capacity: 4, players: [] },
       { slug: 'blokus', name: 'Blokus', location: 'Dinner Table #1', pod: 'B' as const, capacity: 4, players: [] },
-      { slug: 'flip-7', name: 'Flip 7', location: 'Dinner Table #2', pod: 'C' as const, capacity: 4, players: [] },
-      { slug: 'jenga', name: 'Jenga', location: 'Island', pod: 'D' as const, capacity: 2, players: [] },
+      { slug: 'jenga', name: 'Jenga', location: 'Island', pod: 'D' as const, capacity: 4, players: [] },
     ],
   },
 ]
@@ -72,21 +68,21 @@ export const circuitFourLockedAssignments = {} as const
 
 // Maximum-diversity starting lineup. Teams can still adjust these selections in the app.
 export const circuitFourSuggestedAssignments = {
-  'Don Robert': 'D',
-  Julie: 'C',
-  Thomas: 'B',
-  Valeria: 'A',
+  'Don Robert': 'A',
+  Julie: 'B',
+  Thomas: 'A',
+  Valeria: 'D',
   Annhien: 'B',
-  Rebekah: 'C',
-  Willy: 'D',
-  Brendan: 'C',
-  Joanna: 'C',
-  Andrew: 'B',
+  Rebekah: 'D',
+  Willy: 'A',
+  Brendan: 'B',
+  Joanna: 'A',
+  Andrew: 'D',
   Young: 'B',
-  Janice: 'A',
+  Janice: 'D',
 } as const
 
-export const circuitFourTeamCapacities = { A: 1, B: 2, C: 2, D: 1 } as const
+export const circuitFourTeamCapacities = { A: 2, B: 2, C: 0, D: 2 } as const
 
 export const eventTimeline = [
   { time: '6:00–6:15', activity: 'Arrival and setup', detail: 'Claim your pre-listed name, find your team, and get settled.' },
@@ -102,13 +98,13 @@ export const eventTimeline = [
 
 export const pointRules = [
   { result: 'GeoGuessr, Wordle, or Connections win', individual: 3, team: 3 },
-  { result: 'Jenga 1v1 win', individual: 1, team: 1 },
-  { result: 'Blokus, Flip 7, or Magical Athlete win', individual: 2, team: 2 },
+  { result: 'Jenga win', individual: 1, team: 1 },
+  { result: 'Blokus win', individual: 2, team: 2 },
   { result: 'Mario Strikers team win', individual: 0, team: 2 },
 ]
 
 export const envelopeGroups = [
   { title: 'Group Games', amount: '$1', labels: ['GeoGuessr — Round 1 Winner', 'GeoGuessr — Round 2 Winner', 'GeoGuessr — Round 3 Winner', 'Wordle — Word 1 Winner', 'Wordle — Word 2 Winner', 'Wordle — Word 3 Winner', 'Wordle — Word 4 Winner', 'Wordle — Word 5 Winner', 'Connections — Round 1 Winner', 'Connections — Round 2 Winner', 'Connections — Round 3 Winner', ...jengaMatches.map((_, index) => `Jenga — Match ${index + 1} Winner`)] },
-  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Dinner Table #2', 'Jenga'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
+  { title: 'Main Circuit', amount: '$1', labels: circuitRounds.flatMap((round, index) => ['Blokus', 'Mario Strikers Team', 'Jenga'].map(game => `Circuit Round ${index + 1} — ${game} Winner`)) },
   { title: 'Final Awards', amount: '$5', labels: ['Individual Champion', ...Array.from({ length: 6 }, (_, index) => `Winning Team Member ${index + 1}`)] },
 ]

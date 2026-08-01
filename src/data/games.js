@@ -29,12 +29,12 @@ export const games = [
     hostTip: 'Use a 20-minute timer; finish the current turn and count remaining squares.',
   }),
   game({
-    slug: 'jenga', name: 'Jenga', icon: '▥', category: 'Tabletop', format: '1v1 dexterity', players: '2', duration: '4 min / match', difficulty: 'Easy', status: 'Group game', color: 'pink',
-    summary: 'Six fast cross-team matches: pull, place, and keep the tower standing.',
-    why: 'Six fixed head-to-head matches give every player one fast, dramatic turn.',
-    setup: ['Build 18 alternating layers of three blocks.', 'Call the next Team Jessa vs. Team Willy matchup.', 'Start a four-minute timer.'],
+    slug: 'jenga', name: 'Jenga', icon: '▥', category: 'Tabletop', format: 'Dexterity', players: '2–4', duration: '4–20 min', difficulty: 'Easy', status: 'Group + circuit game', color: 'pink',
+    summary: 'Fast head-to-head matches lead into a four-player circuit station: pull, place, and keep the tower standing.',
+    why: 'The short group matches give everyone a dramatic turn, while the circuit version keeps four players active at once.',
+    setup: ['Build 18 alternating layers of three blocks.', 'For group play, call the next fixed cross-team matchup and start a four-minute timer.', 'For circuit play, seat all four assigned players around one tower and use the full 20-minute round.'],
     rules: ['Use one hand to remove one block from below the highest completed layer.', 'Place it on top at a right angle.', 'You may test blocks but must restore anything you move.', 'A fallen tower loses; at four minutes, the tallest stable tower wins.'],
-    scoring: 'Each 1v1 winner earns 1 individual point and 1 point for their team.',
+    scoring: 'The winner earns 1 individual point and 1 point for their team. In the four-player circuit, the last player to complete a legal turn before the tower falls wins.',
     hostTip: 'Film the tower in slow motion for an instant end-of-night replay.',
   }),
   game({
