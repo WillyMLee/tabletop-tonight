@@ -228,7 +228,7 @@ function useRouter() {
 
 function Avatar({ name, team, size = 'md' }) {
   const rosterTeam = team || defaultPlayers.find(player => player.name === name)?.team
-  const ghostTone = rosterTeam ? `ghost-team-${teamInfo[rosterTeam].color}` : `ghost-${name.charCodeAt(0) % 4}`
+  const ghostTone = name === 'Jessa' ? 'ghost-team-coral' : rosterTeam ? `ghost-team-${teamInfo[rosterTeam].color}` : `ghost-${name.charCodeAt(0) % 4}`
   return <span className={`avatar ghost-avatar ${ghostTone} avatar-${size}`} aria-label={`${name}${rosterTeam ? `, ${teamInfo[rosterTeam].name}` : ''}`}>{name.slice(0, 1).toUpperCase()}</span>
 }
 
